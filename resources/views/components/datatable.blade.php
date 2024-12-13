@@ -1,0 +1,53 @@
+<div class="card">
+    <div class="card-datatable table-responsive pt-0">
+        <div class="card-header d-flex align-items-center justify-content-between flex-column flex-md-row border-bottom">
+            <div class="head-label text-center">
+                <h5 class="card-title mb-0">{{ $datatableTitle }}</h5>
+            </div>
+            <div class="dt-action-buttons text-end pt-3 pt-md-0">
+                <div class="dt-buttons btn-group flex-wrap">
+                    <div class="btn-group">
+                        <button class="btn btn-secondary buttons-collection dropdown-toggle btn-label-primary me-4 waves-effect waves-light"
+                            data-bs-toggle="dropdown" tabindex="0" aria-controls="datatable" type="button"
+                            aria-haspopup="dialog" aria-expanded="false">
+                            <span>
+                                <i class="ri-external-link-line me-sm-1"></i>
+                                <span class="d-none d-sm-inline-block">{{ trans('main.export') }}</span>
+                            </span>
+                        </button>
+                        <div class="dropdown-menu dt-button-collection" aria-modal="true" role="dialog">
+                            <div role="menu">
+                                <a class="dt-button dropdown-item print-button" tabindex="0" href="#"><span><i class="ri-printer-line me-1"></i>Print</span></a>
+                                <a class="dt-button dropdown-item csv-button buttons-html5" tabindex="0"href="#"><span><i class="ri-file-text-line me-1"></i>Csv</span></a>
+                                <a class="dt-button dropdown-item excel-button buttons-html5" tabindex="0"href="#"><span><i class="ri-file-excel-line me-1"></i>Excel</span></a>
+                                <a class="dt-button dropdown-item pdf-button buttons-html5" tabindex="0"href="#"><span><i class="ri-file-pdf-line me-1"></i>Pdf</span></a>
+                                <a class="dt-button dropdown-item copy-button buttons-html5" tabindex="0"href="#"><span><i class="ri-file-copy-line me-1"></i>Copy</span></a>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="delete-selected-btn" class="btn btn-danger me-4 waves-effect waves-light" tabindex="0"
+                        data-bs-target="#delete-selected-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
+                        <span>
+                            <i class="ri-delete-bin-line ri-16px me-sm-2"></i>
+                            <span class="d-none d-sm-inline-block">{{ trans('main.deleteSelected') }}</span>
+                        </span>
+                    </button>
+                    <button id="add-button" class="btn btn-primary waves-effect waves-light" tabindex="0"
+                        data-bs-toggle="offcanvas" data-bs-target="#add-modal">
+                        <span>
+                            <i class="ri-add-line ri-16px me-sm-2"></i>
+                            <span class="d-none d-sm-inline-block">{{ $addButton }}</span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <table id="datatable" class="datatables-basic table">
+            <thead>
+                <tr>
+                    {{ $slot }}
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
