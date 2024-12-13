@@ -1,0 +1,416 @@
+let errorMessage = window.translations.errorMessage || 'An unexpected error occurred. Please try again later!';
+let tooManyRequestsMessage = window.translations.tooManyRequestsMessage || 'You have exceeded the maximum number of requests. Please try again later!';
+let submitButton;
+
+// Function to toggle all checkboxes and update the main checkbox state
+function toggleCheckboxes(className, mainCheckbox) {
+    $(`.${className}`).prop('checked', $(mainCheckbox).prop('checked'));
+    updateMainCheckboxState(className);
+}
+
+// Function to update the main checkbox state based on individual checkboxes
+function updateMainCheckboxState(className) {
+    const $checkboxes = $(`.${className}`);
+    const $mainCheckbox = $('#select-all');
+
+    const allChecked = $checkboxes.length > 0 && $checkboxes.length === $checkboxes.filter(':checked')
+        .length;
+    const anyChecked = $checkboxes.filter(':checked').length > 0;
+
+    if (allChecked) {
+        $mainCheckbox.prop('checked', true);
+        $mainCheckbox.prop('indeterminate', false); // All checkboxes are checked
+    } else if (anyChecked) {
+        $mainCheckbox.prop('checked', false);
+        $mainCheckbox.prop('indeterminate', true); // Some checkboxes are checked (mixed state)
+    } else {
+        $mainCheckbox.prop('checked', false);
+        $mainCheckbox.prop('indeterminate', false); // No checkboxes are checked
+    }
+}
+
+// Use event delegation to handle checkbox changes dynamically
+$(document).on('change', '.dt-checkboxes', function() {
+    updateMainCheckboxState('dt-checkboxes');
+});
+
+// Attach the change event to the main checkbox to toggle all checkboxes
+$('#select-all').on('change', function() {
+    toggleCheckboxes('dt-checkboxes', this);
+});
+
+// Put the selected data ids in the ids container in the deleting selected modal
+$(function() {
+    $('body').on('click', '#delete-selected-btn', function(e) {
+        e.preventDefault();
+
+        $('#ids-container').empty();
+        const selected = Array.from($("#datatable td input[type=checkbox]:checked"))
+            .map(
+                checkbox => checkbox.value);
+
+        if (selected.length > 0) {
+            $('#delete-selected-modal').modal('show');
+
+            selected.forEach(id => {
+                $('#ids-container').append(
+                    `<input type="hidden" name="ids[]" value="${id}">`
+                );
+            });
+
+            $('input[id="itemToDelete"]').val(window.translations.items + ': ' + selected.length);
+        } else {
+            $('#delete-selected-modal').modal('show');
+        }
+    });
+});
+
+toastr.options = {
+    'closeButton': true,
+    'progressBar': true,
+}
+
+function refreshDataTable(datatableId) {
+    $(datatableId).DataTable().ajax.reload(null, false);
+}
+
+function initializeSelect2(modalId, elementId, value = null) {
+    const select2Element = $('#' + modalId + ' #' + elementId);
+    if (typeof $.fn.select2 !== 'undefined' && select2Element.length) {
+        // Destroy any existing instance
+        if (select2Element.hasClass('select2-hidden-accessible')) {
+            select2Element.select2('destroy');
+        }
+
+        select2Focus(select2Element);
+        select2Element.wrap('<div class="position-relative"></div>').select2({
+            placeholder: window.translations.select_option,
+            dropdownParent: select2Element.parent()
+        });
+
+        if (value !== null) {
+            select2Element.val(value).trigger('change');
+        } else {
+            select2Element.val('').trigger('change');
+        }
+    }
+}
+
+function initializeDataTable(tableId, ajaxUrl, exportColumns, columns) {
+    $(document).ready(function () {
+        let table = $(tableId);
+
+        if (table.length) {
+            table = table.DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: ajaxUrl,
+                    error: function (xhr, error, code) {
+                        toastr.error(errorMessage);
+                    },
+                },
+                columns: columns,
+                columnDefs: [
+                    {
+                        // For Responsive
+                        targets: 0,
+                        responsivePriority: 2,
+                        className: "control",
+                        render: function (data, type, full, meta) {
+                            return "";
+                        },
+                    },
+                ],
+                displayLength: 7,
+                lengthMenu: [7, 10, 25, 50, 75, 100],
+                language: {
+                    search: window.translations.datatable.search,
+                    emptyTable: window.translations.datatable.empty_table,
+                    zeroRecords: window.translations.datatable.zero_records,
+                    lengthMenu: window.translations.datatable.length_menu,
+                    info: window.translations.datatable.info,
+                    infoEmpty: window.translations.datatable.info_empty,
+                    infoFiltered: window.translations.datatable.info_filtered,
+                    paginate: {
+                        next: '<i class="ri-arrow-right-s-line"></i>',
+                        previous: '<i class="ri-arrow-left-s-line"></i>',
+                    },
+                },
+                buttons: [
+                    {
+                        extend: "collection",
+                        className:
+                            "btn btn-label-primary dropdown-toggle me-4 waves-effect waves-light",
+                        text: '<i class="ri-external-link-line me-sm-1"></i> <span class="d-none d-sm-inline-block">Export</span>',
+                        buttons: [
+                            {
+                                extend: "print",
+                                text: '<i class="ri-printer-line me-1" ></i>Print',
+                                className: "dropdown-item",
+                                exportOptions: {
+                                    columns: exportColumns,
+                                },
+                                customize: function (win) {
+                                    //customize print view for dark
+                                    $(win.document.body)
+                                        .css(
+                                            "color",
+                                            config.colors.headingColor
+                                        )
+                                        .css(
+                                            "border-color",
+                                            config.colors.borderColor
+                                        )
+                                        .css(
+                                            "background-color",
+                                            config.colors.bodyBg
+                                        );
+                                    $(win.document.body)
+                                        .find("table")
+                                        .addClass("compact")
+                                        .css("color", "inherit")
+                                        .css("border-color", "inherit")
+                                        .css("background-color", "inherit");
+                                },
+                            },
+                            {
+                                extend: "csv",
+                                text: '<i class="ri-file-text-line me-1" ></i>Csv',
+                                className: "dropdown-item",
+                                exportOptions: {
+                                    columns: exportColumns,
+                                },
+                            },
+                            {
+                                extend: "excel",
+                                text: '<i class="ri-file-excel-line me-1"></i>Excel',
+                                className: "dropdown-item",
+                                exportOptions: {
+                                    columns: exportColumns,
+                                },
+                            },
+                            {
+                                extend: "pdf",
+                                text: '<i class="ri-file-pdf-line me-1"></i>Pdf',
+                                className: "dropdown-item",
+                                exportOptions: {
+                                    columns: exportColumns,
+                                },
+                            },
+                            {
+                                extend: "copy",
+                                text: '<i class="ri-file-copy-line me-1" ></i>Copy',
+                                className: "dropdown-item",
+                                exportOptions: {
+                                    columns: exportColumns,
+                                },
+                            },
+                        ],
+                    },
+                ],
+                responsive: {
+                    details: {
+                        display: $.fn.dataTable.Responsive.display.modal({
+                            header: function (row) {
+                                var data = row.data();
+                                return "Details of " + data["name"];
+                            },
+                        }),
+                        type: "column",
+                        renderer: function (api, rowIdx, columns) {
+                            var data = $.map(columns, function (col, i) {
+                                if (i !== 0) {
+                                    return col.title !== "" // ? Do not show row in modal popup if title is blank (for check box)
+                                        ? '<tr data-dt-row="' +
+                                            col.rowIndex +
+                                            '" data-dt-column="' +
+                                            col.columnIndex +
+                                            '">' +
+                                            "<td>" +
+                                            col.title +
+                                            ":" +
+                                            "</td> " +
+                                            "<td>" +
+                                            col.data +
+                                            "</td>" +
+                                            "</tr>"
+                                        : "";
+                                }
+                                return "";
+                            }).join("");
+
+                            return data
+                                ? $('<table class="table"/><tbody />').append(
+                                    data
+                                  )
+                                : false;
+                        },
+                    },
+                },
+            });
+
+            table.on("init", function () {
+                fields = ["print", "csv", "excel", "pdf", "copy"];
+                $.each(fields, function (key, field) {
+                    $("." + field + "-button").on("click", function () {
+                        table.button(".buttons-" + field).trigger();
+                    });
+                });
+            });
+        }
+        else {
+            toastr.error(errorMessage);
+        }
+    });
+}
+
+function setupModal({ buttonId, modalId, fields = {}, onShow = null }) {
+    $('body').on('click', buttonId, function(e) {
+        e.preventDefault();
+
+        const $modal = $(modalId);
+
+        // Populate fields dynamically
+        Object.entries(fields).forEach(([field, getValue]) => {
+            const $fieldElement = $modal.find('#' + field);
+
+            if (typeof getValue === 'function') {
+                const value = getValue($(this));
+
+                if ($fieldElement.is('select')) {
+                    // Automatically initialize Select2 for select fields
+                    initializeSelect2(modalId.replace('#', ''), field, value);
+                } else {
+                    $fieldElement.val(value);
+                }
+            }
+        });
+
+        // Execute any custom logic before showing the modal
+        if (typeof onShow === 'function') {
+            onShow($modal, $(this));
+        }
+    });
+}
+
+function handleFormSubmit(formId, fields, modalId, datatableId) {
+    $(formId).on('submit', function(e) {
+        e.preventDefault();
+        submitButton = $(this).find('button[type="submit"]');
+        submitButton.prop('disabled', true);
+
+        // Clear previous error states
+        $.each(fields, function(_, field) {
+            $(formId + ' #' + field).removeClass('is-invalid');
+            $(formId + ' #' + field + '_error').text('').addClass('d-none').removeClass('d-block');
+        });
+
+        const formData = new FormData(this);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: $(this).attr('method'),
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    $.each(fields, function(_, field) {
+                        const fieldElement = $(formId + ' #' + field);
+                        if (fieldElement.is('select')) {
+                            fieldElement.val('').trigger('change');
+                        } else {
+                            fieldElement.val('');
+                        }
+                    });
+                    toastr.success(response.success)
+                    setTimeout(function() {
+                        submitButton.prop('disabled', false);
+                    }, 1500);
+                    $(modalId).offcanvas('hide');
+                    refreshDataTable(datatableId);
+                } else {
+                    toastr.error(response.error || errorMessage);
+                    setTimeout(function() {
+                        submitButton.prop('disabled', false);
+                    }, 1500);
+                }
+            },
+            error: function(xhr, status, error) {
+                if (xhr.status === 429) {
+                    toastr.error(tooManyRequestsMessage);
+                } else if (xhr.responseJSON) {
+                    if (xhr.responseJSON.errors) {
+                        $.each(xhr.responseJSON.errors, function(key, val) {
+                            const inputElement = $(formId + ' #' + key);
+                            const errorElement = $(formId + ' #' + key + '_error');
+                            inputElement.addClass('is-invalid');
+                            errorElement.text(val[0]).addClass('d-block').removeClass('d-none');
+                        });
+                    } else if (xhr.responseJSON.error) {
+                        toastr.error(xhr.responseJSON.error);
+                    } else {
+                        toastr.error(errorMessage);
+                    }
+                } else {
+                    toastr.error(errorMessage);
+                }
+
+                setTimeout(function() {
+                    submitButton.prop('disabled', false);
+                }, 1500);
+            },
+        });
+    });
+}
+
+function handleDeletionFormSubmit(formId, modalId, datatableId) {
+    $(formId).on('submit', function(e) {
+        e.preventDefault();
+        submitButton = $(this).find('button[type="submit"]');
+        submitButton.prop('disabled', true);
+
+        const formData = new FormData(this);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: $(this).attr('method'),
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    toastr.success(response.success)
+                    setTimeout(function() {
+                        submitButton.prop('disabled', false);
+                    }, 1500);
+                    $(modalId).modal('hide')
+                    refreshDataTable(datatableId);
+                } else {
+                    toastr.error(response.error || errorMessage);
+                    setTimeout(function() {
+                        submitButton.prop('disabled', false);
+                    }, 1500);
+                }
+            },
+            error: function(xhr, status, error) {
+                if (xhr.status === 429) {
+                    toastr.error(tooManyRequestsMessage);
+                } else if (xhr.responseJSON && xhr.responseJSON.error) {
+                    toastr.error(xhr.responseJSON.error);
+                } else {
+                    toastr.error(errorMessage);
+                }
+                setTimeout(function() {
+                    submitButton.prop('disabled', false);
+                }, 1500);
+            },
+        });
+    });
+}
+
+
+
