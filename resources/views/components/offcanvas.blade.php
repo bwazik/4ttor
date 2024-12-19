@@ -3,6 +3,7 @@
     'offcanvasTitle',
     'action',
     'id' => false,
+    'hasFiles' => false,
 ])
 
 <div class="offcanvas offcanvas-end" id="{{ $offcanvasType}}-modal">
@@ -11,7 +12,7 @@
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body flex-grow-1">
-        <form id="{{ $offcanvasType}}-form" class="pt-0 row g-3" action="{{ $action }}" method="POST">
+        <form id="{{ $offcanvasType}}-form" class="pt-0 row g-3" action="{{ $action }}" method="POST" {{ $hasFiles ? 'enctype=multipart/form-data' : '' }} autocomplete="off">
             @csrf
             @if($id)
                 <input type="hidden" id="id" name="id">

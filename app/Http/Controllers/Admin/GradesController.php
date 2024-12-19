@@ -73,7 +73,7 @@ class GradesController extends Controller
     {
         $this->validateExistence($request, 'grades');
 
-        $result = $this->gradeService->deleteSelectedGrade($request->ids);
+        $result = $this->gradeService->deleteSelectedGrades($request->ids);
 
         if ($result['status'] === 'success') {
             return response()->json(['success' => $result['message']], 200);

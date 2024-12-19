@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('grades', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name', 255)->unique();
+            $table->string('name')->unique();
             $table->boolean('is_active')->default(true);
             $table->integer('stage_id')->unsigned();
             $table->timestamps();

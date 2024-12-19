@@ -3,12 +3,6 @@
 use Illuminate\Support\Facades\Route;
 
 if (!function_exists('isActiveRoute')) {
-    /**
-     * Determine if the current route is active.
-     *
-     * @param string|array $routes
-     * @return boolean
-     */
     function isActiveRoute($routes)
     {
         if (is_array($routes)) {
@@ -22,5 +16,11 @@ if (!function_exists('isActiveRoute')) {
         }
 
         return false;
+    }
+
+    if (!function_exists('pageTitle')) {
+        function pageTitle($key) {
+            return trans('layouts/sidebar.platformName') . ' - ' . trans($key);
+        }
     }
 }

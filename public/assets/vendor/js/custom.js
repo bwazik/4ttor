@@ -44,7 +44,7 @@ $(function() {
     $('body').on('click', '#delete-selected-btn', function(e) {
         e.preventDefault();
 
-        $('#ids-container').empty();
+        $('#delete-selected-form #ids-container').empty();
         const selected = Array.from($("#datatable td input[type=checkbox]:checked"))
             .map(
                 checkbox => checkbox.value);
@@ -53,7 +53,7 @@ $(function() {
             $('#delete-selected-modal').modal('show');
 
             selected.forEach(id => {
-                $('#ids-container').append(
+                $('#delete-selected-form #ids-container').append(
                     `<input type="hidden" name="ids[]" value="${id}">`
                 );
             });
@@ -64,10 +64,76 @@ $(function() {
         }
     });
 });
+$(function() {
+    $('body').on('click', '#archive-selected-btn', function(e) {
+        e.preventDefault();
+
+        $('#archive-selected-form #ids-container').empty();
+        const selected = Array.from($("#datatable td input[type=checkbox]:checked"))
+            .map(
+                checkbox => checkbox.value);
+
+        if (selected.length > 0) {
+            $('#archive-selected-modal').modal('show');
+
+            selected.forEach(id => {
+                $('#archive-selected-form #ids-container').append(
+                    `<input type="hidden" name="ids[]" value="${id}">`
+                );
+            });
+
+            $('input[id="itemToArchive"]').val(window.translations.items + ': ' + selected.length);
+        } else {
+            $('#archive-selected-modal').modal('show');
+        }
+    });
+});
+$(function() {
+    $('body').on('click', '#restore-selected-btn', function(e) {
+        e.preventDefault();
+
+        $('#restore-selected-form #ids-container').empty();
+        const selected = Array.from($("#datatable td input[type=checkbox]:checked"))
+            .map(
+                checkbox => checkbox.value);
+
+        if (selected.length > 0) {
+            $('#restore-selected-modal').modal('show');
+
+            selected.forEach(id => {
+                $('#restore-selected-form #ids-container').append(
+                    `<input type="hidden" name="ids[]" value="${id}">`
+                );
+            });
+
+            $('input[id="itemToRestore"]').val(window.translations.items + ': ' + selected.length);
+        } else {
+            $('#restore-selected-modal').modal('show');
+        }
+    });
+});
 
 toastr.options = {
     'closeButton': true,
     'progressBar': true,
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const datePickers = document.querySelectorAll('.flatpickr-date');
+
+    Array.from(datePickers).forEach((datepicker) => {
+        flatpickr(datepicker, {
+            monthSelectorType: 'dropdown',
+            yearSelectorType: 'static',
+            dateFormat: 'Y-m-d'
+        });
+    });
+});
+
+function generateRandomString(length = 8) {
+    const array = new Uint8Array(length);
+    window.crypto.getRandomValues(array);
+    return Array.from(array, byte => byte.toString(36)).join('').substring(0, length);
 }
 
 function refreshDataTable(datatableId) {
@@ -214,7 +280,7 @@ function initializeDataTable(tableId, ajaxUrl, exportColumns, columns) {
                         display: $.fn.dataTable.Responsive.display.modal({
                             header: function (row) {
                                 var data = row.data();
-                                return "Details of " + data["name"];
+                                return window.translations.detailsOf + ': ' + data["name"];
                             },
                         }),
                         type: "column",
@@ -276,9 +342,13 @@ function setupModal({ buttonId, modalId, fields = {}, onShow = null }) {
             const $fieldElement = $modal.find('#' + field);
 
             if (typeof getValue === 'function') {
-                const value = getValue($(this));
+                let value = getValue($(this));
 
                 if ($fieldElement.is('select')) {
+                    // Check if the value is a string and needs to be split for multiple select
+                    if (typeof value === 'string') {
+                        value = value.split(','); // Split the string into an array
+                    }
                     // Automatically initialize Select2 for select fields
                     initializeSelect2(modalId.replace('#', ''), field, value);
                 } else {
@@ -294,7 +364,7 @@ function setupModal({ buttonId, modalId, fields = {}, onShow = null }) {
     });
 }
 
-function handleFormSubmit(formId, fields, modalId, datatableId) {
+function handleFormSubmit(formId, fields, modalId, modalType, datatableId) {
     $(formId).on('submit', function(e) {
         e.preventDefault();
         submitButton = $(this).find('button[type="submit"]');
@@ -329,7 +399,11 @@ function handleFormSubmit(formId, fields, modalId, datatableId) {
                     setTimeout(function() {
                         submitButton.prop('disabled', false);
                     }, 1500);
-                    $(modalId).offcanvas('hide');
+                    if (modalType === 'offcanvas') {
+                        $(modalId).offcanvas('hide');
+                    } else if (modalType === 'modal') {
+                        $(modalId).modal('hide');
+                    }
                     refreshDataTable(datatableId);
                 } else {
                     toastr.error(response.error || errorMessage);
