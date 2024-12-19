@@ -28,6 +28,8 @@ return [
     'plan' => 'Plan',
     'stage' => 'Stage',
     'grade' => 'Grade',
+    'parent' => 'Parent',
+    'teacher' => 'Teacher',
     'status' => 'Status',
     'actions' => 'Actions',
     'details' => 'Details',

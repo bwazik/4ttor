@@ -2,46 +2,27 @@
 
 namespace App\Services\Admin;
 
-use App\Models\Student;
+use App\Models\MyParent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-class StudentService
+class ParentService
 {
-    public function getStudentsForDatatable($studentsQuery)
+    public function getParentsForDatatable($parentsQuery)
     {
-        return datatables()->eloquent($studentsQuery)
+        return datatables()->eloquent($parentsQuery)
             ->addIndexColumn()
             ->addColumn('selectbox', function ($row) {
                 $btn = '<td class="dt-checkboxes-cell"><input type="checkbox" value="' . $row->id . '" class="dt-checkboxes form-check-input"></td>';
                 return $btn;
             })
-            ->addColumn('details', function ($row) {
-                $profilePic = $row->profile_pic ?
-                '<img src="' . asset('storage/' . $row->profile_picture) . '" alt="Profile Picture" class="rounded-circle">' :
-                '<img src="' . asset('assets/img/avatars/19.png') . '" alt="Profile Picture" class="rounded-circle">';
-
-                return
-                '<div class="d-flex justify-content-start align-items-center">
-                    <div class="avatar-wrapper">
-                        <div class="avatar me-2">'.$profilePic.'</div>
-                    </div>
-                    <div class="d-flex flex-column align-items-start">
-                        <span class="emp_name text-truncate text-heading fw-medium">'.$row->name.'</span>
-                        <small class="emp_post text-truncate">'.$row->grade->name.'</small>
-                    </div>
-                </div>';
-            })
-            ->editColumn('parent_id', function ($row) {
-                return $row->parent_id ? $row->parent->name : '-';
+            ->editColumn('name', function ($row) {
+                return $row->name;
             })
             ->editColumn('is_active', function ($row) {
                 return $row->is_active ? '<span class="badge rounded-pill bg-label-success" text-capitalized="">'.trans('main.active').'</span>' : '<span class="badge rounded-pill bg-label-secondary" text-capitalized="">'.trans('main.inactive').'</span>';
             })
             ->addColumn('actions', function ($row) {
-                $teacherIds = $row->teachers->pluck('id')->toArray();
-                $teachers = implode(',', $teacherIds);
-
                 return
                 '<div class="d-inline-block">
                     <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ri-more-2-line"></i></a>
@@ -65,40 +46,27 @@ class StudentService
                     </ul>
                 </div>
                 <button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light"
-                    tabindex="0" type="button" data-bs-toggle="modal" data-bs-target="#edit-modal"
-                    id="edit-button" data-id="' . $row->id . '" data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
-                    data-username="' . $row->username . '" data-email="' . $row->email . '" data-phone="' . $row->phone . '"
-                    data-password="" data-birth_date="'.$row->birth_date.'" data-gender="'.$row->gender.'" data-grade_id="' . $row->grade_id . '" data-parent_id="' . $row->parent_id . '" data-teachers="'. $teachers .'" data-is_active="' . ($row->is_active == 0 ? '0' : '1') . '">
+                    tabindex="0" type="button" data-bs-toggle="offcanvas" data-bs-target="#edit-modal"
+                    id="edit-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
+                    data-username=' . $row->username . ' data-email=' . $row->email . ' data-phone=' . $row->phone . '
+                    data-password="" data-gender="'.$row->gender.'" data-is_active="' . ($row->is_active == 0 ? '0' : '1') . '">
                     <i class="ri-edit-box-line ri-20px"></i>
                 </button>';
             })
-            ->rawColumns(['selectbox', 'details', 'is_active', 'actions'])
+            ->rawColumns(['selectbox', 'is_active', 'actions'])
             ->make(true);
     }
 
-    public function getArchivedStudentsForDatatable($studentsQuery)
+    public function getArchivedParentsForDatatable($parentsQuery)
     {
-        return datatables()->eloquent($studentsQuery)
+        return datatables()->eloquent($parentsQuery)
             ->addIndexColumn()
             ->addColumn('selectbox', function ($row) {
                 $btn = '<td class="dt-checkboxes-cell"><input type="checkbox" value="' . $row->id . '" class="dt-checkboxes form-check-input"></td>';
                 return $btn;
             })
-            ->addColumn('details', function ($row) {
-                $profilePic = $row->profile_pic ?
-                '<img src="' . asset('storage/' . $row->profile_picture) . '" alt="Profile Picture" class="rounded-circle">' :
-                '<img src="' . asset('assets/img/avatars/19.png') . '" alt="Profile Picture" class="rounded-circle">';
-
-                return
-                '<div class="d-flex justify-content-start align-items-center">
-                    <div class="avatar-wrapper">
-                        <div class="avatar me-2">'.$profilePic.'</div>
-                    </div>
-                    <div class="d-flex flex-column align-items-start">
-                        <span class="emp_name text-truncate text-heading fw-medium">'.$row->name.'</span>
-                        <small class="emp_post text-truncate">'.$row->grade->name.'</small>
-                    </div>
-                </div>';
+            ->editColumn('name', function ($row) {
+                return $row->name;
             })
             ->addColumn('actions', function ($row) {
                 return
@@ -124,34 +92,29 @@ class StudentService
                     </ul>
                 </div>';
             })
-            ->rawColumns(['selectbox', 'details', 'actions'])
+            ->rawColumns(['selectbox', 'actions'])
             ->make(true);
     }
 
-    public function insertStudent(array $request)
+    public function insertParent(array $request)
     {
         DB::beginTransaction();
 
         try {
-            $student = Student::create([
+            MyParent::create([
                 'username' => $request['username'],
                 'password' => Hash::make($request['username']),
                 'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
                 'phone' => $request['phone'],
                 'email' => $request['email'],
-                'birth_date' => $request['birth_date'],
                 'gender' => $request['gender'],
-                'grade_id' => $request['grade_id'],
-                'parent_id' => $request['parent_id'],
             ]);
-
-            $student->teachers()->attach($request['teachers']);
 
             DB::commit();
 
             return [
                 'status' => 'success',
-                'message' => trans('main.added', ['item' => trans('admin/students.student')]),
+                'message' => trans('main.added', ['item' => trans('admin/parents.parent')]),
             ];
         } catch (\Exception $e) {
             DB::rollBack();
@@ -165,12 +128,12 @@ class StudentService
         }
     }
 
-    public function updateStudent($id, array $request): array
+    public function updateParent($id, array $request): array
     {
         DB::beginTransaction();
 
         try {
-            $student = Student::findOrFail($id);
+            $parent = MyParent::findOrFail($id);
 
             if (!empty($request['password'])) {
                 $request['password'] = bcrypt(Hash::make($request['password']));
@@ -178,26 +141,21 @@ class StudentService
                 unset($request['password']);
             }
 
-            $student->update([
+            $parent->update([
                 'username' => $request['username'],
-                'password' => $request['password'] ?? $student->password,
+                'password' => $request['password'] ?? $parent->password,
                 'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
                 'phone' => $request['phone'],
                 'email' => $request['email'],
-                'birth_date' => $request['birth_date'],
                 'gender' => $request['gender'],
-                'grade_id' => $request['grade_id'],
-                'parent_id' => $request['parent_id'],
                 'is_active' => $request['is_active'],
             ]);
 
-            $student->teachers()->sync($request['teachers'] ?? []);
-
             DB::commit();
 
             return [
                 'status' => 'success',
-                'message' => trans('main.edited', ['item' => trans('admin/students.student')]),
+                'message' => trans('main.edited', ['item' => trans('admin/parents.parent')]),
             ];
         } catch (\Exception $e) {
             DB::rollBack();
@@ -211,19 +169,19 @@ class StudentService
         }
     }
 
-    public function deleteStudent($id): array
+    public function deleteParent($id): array
     {
         DB::beginTransaction();
 
         try {
-            $student = Student::withTrashed()->findOrFail($id);
-            $student->forceDelete();
+            $parent = MyParent::withTrashed()->findOrFail($id);
+            $parent->forceDelete();
 
             DB::commit();
 
             return [
                 'status' => 'success',
-                'message' => trans('main.deleted', ['item' => trans('admin/students.student')]),
+                'message' => trans('main.deleted', ['item' => trans('admin/parents.parent')]),
             ];
         } catch (\Exception $e) {
             DB::rollBack();
@@ -237,19 +195,19 @@ class StudentService
         }
     }
 
-    public function archiveStudent($id): array
+    public function archiveParent($id): array
     {
         DB::beginTransaction();
 
         try {
-            $student = Student::findOrFail($id);
-            $student->delete();
+            $parent = MyParent::findOrFail($id);
+            $parent->delete();
 
             DB::commit();
 
             return [
                 'status' => 'success',
-                'message' => trans('main.archived', ['item' => trans('admin/students.student')]),
+                'message' => trans('main.archived', ['item' => trans('admin/parents.parent')]),
             ];
         } catch (\Exception $e) {
             DB::rollBack();
@@ -263,19 +221,19 @@ class StudentService
         }
     }
 
-    public function restoreStudent($id): array
+    public function restoreParent($id): array
     {
         DB::beginTransaction();
 
         try {
-            $student = Student::onlyTrashed()->findOrFail($id);
-            $student->restore();
+            $parent = MyParent::onlyTrashed()->findOrFail($id);
+            $parent->restore();
 
             DB::commit();
 
             return [
                 'status' => 'success',
-                'message' => trans('main.restored', ['item' => trans('admin/students.student')]),
+                'message' => trans('main.restored', ['item' => trans('admin/parents.parent')]),
             ];
         } catch (\Exception $e) {
             DB::rollBack();
@@ -289,7 +247,7 @@ class StudentService
         }
     }
 
-    public function deleteSelectedStudents($ids)
+    public function deleteSelectedParents($ids)
     {
         if (empty($ids)) {
             return [
@@ -301,12 +259,12 @@ class StudentService
         DB::beginTransaction();
 
         try {
-            Student::withTrashed()->whereIn('id', $ids)->forceDelete();
+            MyParent::withTrashed()->whereIn('id', $ids)->forceDelete();
 
             DB::commit();
             return [
                 'status' => 'success',
-                'message' => trans('main.deletedSelected', ['item' => strtolower(trans('admin/students.students'))]),
+                'message' => trans('main.deletedSelected', ['item' => strtolower(trans('admin/parents.parents'))]),
             ];
 
         } catch (\Exception $e) {
@@ -321,7 +279,7 @@ class StudentService
         }
     }
 
-    public function archiveSelectedStudents($ids)
+    public function archiveSelectedParents($ids)
     {
         if (empty($ids)) {
             return [
@@ -333,12 +291,12 @@ class StudentService
         DB::beginTransaction();
 
         try {
-            Student::whereIn('id', $ids)->delete();
+            MyParent::whereIn('id', $ids)->delete();
 
             DB::commit();
             return [
                 'status' => 'success',
-                'message' => trans('main.archivedSelected', ['item' => strtolower(trans('admin/students.students'))]),
+                'message' => trans('main.archivedSelected', ['item' => strtolower(trans('admin/parents.parents'))]),
             ];
 
         } catch (\Exception $e) {
@@ -353,7 +311,7 @@ class StudentService
         }
     }
 
-    public function restoreSelectedStudents($ids)
+    public function restoreSelectedParents($ids)
     {
         if (empty($ids)) {
             return [
@@ -365,12 +323,12 @@ class StudentService
         DB::beginTransaction();
 
         try {
-            Student::onlyTrashed()->whereIn('id', $ids)->restore();
+            MyParent::onlyTrashed()->whereIn('id', $ids)->restore();
 
             DB::commit();
             return [
                 'status' => 'success',
-                'message' => trans('main.restoredSelected', ['item' => strtolower(trans('admin/students.students'))]),
+                'message' => trans('main.restoredSelected', ['item' => strtolower(trans('admin/parents.parents'))]),
             ];
 
         } catch (\Exception $e) {

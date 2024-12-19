@@ -10,6 +10,7 @@ use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
 use App\Services\Admin\StudentService;
 use App\Http\Requests\Admin\StudentsRequest;
+use App\Models\MyParent;
 
 class StudentsController extends Controller
 {
@@ -31,9 +32,10 @@ class StudentsController extends Controller
         }
 
         $grades = Grade::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
+        $parents = MyParent::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
         $teachers = Teacher::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
 
-        return view('admin.students.manage.index', compact('teachers', 'grades'));
+        return view('admin.students.manage.index', compact('teachers', 'grades', 'parents'));
     }
 
     public function archived(Request $request)

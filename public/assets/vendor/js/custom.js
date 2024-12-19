@@ -136,6 +136,13 @@ function generateRandomString(length = 8) {
     return Array.from(array, byte => byte.toString(36)).join('').substring(0, length);
 }
 
+function generateRandomUsername(suffix) {
+    $('#add-form #name_en').on('input', function() {
+        const username = '4ttor' + generateRandomString() + suffix;
+        $('#add-form #username').val(username);
+    });
+}
+
 function refreshDataTable(datatableId) {
     $(datatableId).DataTable().ajax.reload(null, false);
 }

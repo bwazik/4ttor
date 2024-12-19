@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\SubjectsController;
 use App\Http\Controllers\Admin\Teachers\TeachersController;
 use App\Http\Controllers\Admin\Students\StudentsController;
 use App\Http\Controllers\Admin\Parents\ParentsController;
+use App\Http\Controllers\Admin\Assistants\AssistantsController;
 
 Route::group(
     [
@@ -83,6 +84,22 @@ Route::group(
                 });
             });
 
+            # Manage Assistants
+            Route::prefix('assistants')->controller(AssistantsController::class)->name('assistants.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::get('/archived', 'archived')->name('archived');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('archive', 'archive')->name('archive');
+                    Route::post('restore', 'restore')->name('restore');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                    Route::post('archive-selected', 'archiveSelected')->name('archiveSelected');
+                    Route::post('restore-selected', 'restoreSelected')->name('restoreSelected');
+                });
+            });
+            
             # Manage Students
             Route::prefix('students')->controller(StudentsController::class)->name('students.')->group(function() {
                 Route::get('/', 'index')->name('index');

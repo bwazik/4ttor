@@ -17,4 +17,8 @@ return [
     'teachersManagment' => 'Teachers Managment',
     'students' => 'Students',
     'studentsManagment' => 'Students Managment',
+    'parents' => 'Parents',
+    'parentsManagment' => 'Parents Managment',
+    'assistants' => 'Assistants',
+    'assistantsManagment' => 'Assistants Managment',
 ];

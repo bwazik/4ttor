@@ -171,30 +171,30 @@ class TeacherService
         }
     }
 
-    public function updateTeacher($id, array $data): array
+    public function updateTeacher($id, array $request): array
     {
         DB::beginTransaction();
 
         try {
             $teacher = Teacher::findOrFail($id);
 
-            if (!empty($data['password'])) {
-                $data['password'] = bcrypt(Hash::make($data['password']));
+            if (!empty($request['password'])) {
+                $request['password'] = bcrypt(Hash::make($request['password']));
             } else {
-                unset($data['password']);
+                unset($request['password']);
             }
 
             $teacher->update([
-                'username' => $data['username'],
-                'password' => $data['password'] ?? $teacher->password,
-                'name' => ['ar' => $data['name_ar'], 'en' => $data['name_en']],
-                'phone' => $data['phone'],
-                'email' => $data['email'],
-                'subject_id' => $data['subject_id'],
-                'is_active' => $data['is_active'],
+                'username' => $request['username'],
+                'password' => $request['password'] ?? $teacher->password,
+                'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
+                'phone' => $request['phone'],
+                'email' => $request['email'],
+                'subject_id' => $request['subject_id'],
+                'is_active' => $request['is_active'],
             ]);
 
-            $teacher->grades()->sync($data['grades'] ?? []);
+            $teacher->grades()->sync($request['grades'] ?? []);
 
             DB::commit();
 

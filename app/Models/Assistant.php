@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Translatable\HasTranslations;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class MyParent extends Authenticatable
+class Assistant extends Authenticatable
 {
     use HasTranslations, SoftDeletes;
 
-    protected $table = 'parents';
+    protected $table = 'assistants';
 
     public $translatable = ['name'];
 
@@ -20,8 +20,9 @@ class MyParent extends Authenticatable
         'name',
         'phone',
         'email',
-        'gender',
+        'teacher_id',
         'is_active',
+        'profile_pic',
     ];
 
     protected $casts = [
@@ -37,22 +38,12 @@ class MyParent extends Authenticatable
     ];
 
     # Relations
-    public function students()
+    public function teacher()
     {
-        return $this->hasMany(Student::class, 'parent_id');
+        return $this->belongsTo(Teacher::class, 'teacher_id');
     }
 
     # Scopes
-    public function scopeMale($query)
-    {
-        return $query->where('gender', 1);
-    }
-
-    public function scopeFemale($query)
-    {
-        return $query->where('gender', 2);
-    }
-
     public function scopeActive($query)
     {
         return $query->where('is_active', 1);

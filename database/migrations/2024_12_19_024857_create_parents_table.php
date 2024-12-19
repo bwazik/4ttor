@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string('email')->unique()->nullable();
             $table->tinyInteger('gender')->comment('1=Male, 2=Female');
             $table->boolean('is_active')->default(false);
-            $table->string('profile_pic')->nullable();
             $table->rememberToken();
             $table->softDeletes();
             $table->timestamps();

@@ -26,7 +26,7 @@ class StudentsRequest extends FormRequest
             'birth_date' => 'nullable|date|date_format:Y-m-d',
             'gender' => 'required|integer|in:1,2',
             'grade_id' => 'required|integer|exists:grades,id',
-            'parent_id' => 'nullable|integer|exists:parents,id',
+            'parent_id' => 'required|integer|exists:parents,id',
             'is_active' => 'nullable|boolean',
             'teachers' => 'required|array|min:1',
             'teachers.*' => 'integer|exists:teachers,id',
