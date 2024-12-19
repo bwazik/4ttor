@@ -24,7 +24,8 @@
             info: @json(trans('main.datatable.info')),
             info_empty: @json(trans('main.datatable.info_empty')),
             info_filtered: @json(trans('main.datatable.info_filtered')),
-        }
+        },
+        detailsOf: @json(trans('main.detailsOf')),
     };
 </script>
 
@@ -32,6 +33,7 @@
 <script src="{{ asset('assets/vendor/libs/toastr/toastr.js') }}"></script>
 <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
 <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
+<script src="{{ asset('assets/vendor/libs/flatpickr/flatpickr.js') }}"></script>
 <script src="{{ asset('assets/vendor/js/custom.js') }}"></script>
 
 <!-- Main JS -->

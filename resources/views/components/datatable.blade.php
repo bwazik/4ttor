@@ -25,20 +25,50 @@
                             </div>
                         </div>
                     </div>
-                    <button id="delete-selected-btn" class="btn btn-danger me-4 waves-effect waves-light" tabindex="0"
-                        data-bs-target="#delete-selected-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
-                        <span>
-                            <i class="ri-delete-bin-line ri-16px me-sm-2"></i>
-                            <span class="d-none d-sm-inline-block">{{ trans('main.deleteSelected') }}</span>
-                        </span>
-                    </button>
-                    <button id="add-button" class="btn btn-primary waves-effect waves-light" tabindex="0"
-                        data-bs-toggle="offcanvas" data-bs-target="#add-modal">
-                        <span>
-                            <i class="ri-add-line ri-16px me-sm-2"></i>
-                            <span class="d-none d-sm-inline-block">{{ $addButton }}</span>
-                        </span>
-                    </button>
+                    @isset($deleteButton)
+                        @if ($deleteButton)
+                        <button id="delete-selected-btn" class="btn btn-danger me-4 waves-effect waves-light" tabindex="0"
+                            data-bs-target="#delete-selected-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
+                            <span>
+                                <i class="ri-delete-bin-line ri-16px me-sm-2"></i>
+                                <span class="d-none d-sm-inline-block">{{ trans('main.deleteSelected') }}</span>
+                            </span>
+                        </button>
+                        @endif
+                    @endisset
+                    @isset($archiveButton)
+                        @if ($archiveButton)
+                        <button id="archive-selected-btn" class="btn btn-primary me-4 waves-effect waves-light" tabindex="0"
+                            data-bs-target="#archive-selected-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
+                            <span>
+                                <i class="ri-inbox-archive-line ri-16px me-sm-2"></i>
+                                <span class="d-none d-sm-inline-block">{{ trans('main.archiveSelected') }}</span>
+                            </span>
+                        </button>
+                        @endif
+                    @endisset
+                    @isset($restoreButton)
+                        @if ($restoreButton)
+                        <button id="restore-selected-btn" class="btn btn-primary me-4 waves-effect waves-light" tabindex="0"
+                            data-bs-target="#restore-selected-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
+                            <span>
+                                <i class="ri-arrow-go-back-line ri-16px me-sm-2"></i>
+                                <span class="d-none d-sm-inline-block">{{ trans('main.restoreSelected') }}</span>
+                            </span>
+                        </button>
+                        @endif
+                    @endisset
+                    @isset($addButton)
+                        @if ($addButton)
+                        <button id="add-button" class="btn btn-primary waves-effect waves-light" tabindex="0"
+                            data-bs-toggle="{{ $dataToggle }}" data-bs-target="#add-modal">
+                            <span>
+                                <i class="ri-add-line ri-16px me-sm-2"></i>
+                                <span class="d-none d-sm-inline-block">{{ $addButton }}</span>
+                            </span>
+                        </button>
+                        @endif
+                    @endisset
                 </div>
             </div>
         </div>

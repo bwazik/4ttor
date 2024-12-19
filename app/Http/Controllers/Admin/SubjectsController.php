@@ -70,7 +70,7 @@ class SubjectsController extends Controller
     {
         $this->validateExistence($request, 'subjects');
 
-        $result = $this->subjectService->deleteSelectedSubject($request->ids);
+        $result = $this->subjectService->deleteSelectedSubjects($request->ids);
 
         if ($result['status'] === 'success') {
             return response()->json(['success' => $result['message']], 200);

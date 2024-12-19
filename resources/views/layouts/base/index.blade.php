@@ -32,6 +32,27 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/rtl/theme-default.css') }}" class="template-customizer-theme-css" />
     <link rel="stylesheet" href="{{ asset('assets/css/demo.css') }}" />
     @yield('head')
+    <style>
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Hide arrows in Firefox */
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        /* Hide arrows in other browsers */
+        input[type="number"] {
+            appearance: textfield;
+        }
+
+        textarea {
+            resize: none;
+        }
+    </style>
 </head>
 
 <body>

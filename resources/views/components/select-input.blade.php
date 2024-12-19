@@ -5,9 +5,21 @@
     'required' => false,
     'id' => null,
     'multiple' => false,
+    'context' => null,
+    'divClasses' => null,
 ])
 
-<div class="col-sm-12">
+@php
+$defaultDivClasses = match ($context) {
+    'modal' => 'col-12 col-md-6',
+    'offcanvas' => 'col-sm-12 mt-4',
+    default => 'col-sm-12',
+};
+
+$divClasses = $divClasses ?? $defaultDivClasses;
+@endphp
+
+<div class="{{ $divClasses }}">
     <div class="form-floating form-floating-outline">
         <select id="{{ $id ?? $name }}" class="form-select" name="{{ $name }}{{ $multiple ? '[]' : '' }}"
             {{ $multiple ? 'multiple' : '' }} {{ $required ? "required" : "" }}>

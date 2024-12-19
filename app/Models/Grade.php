@@ -14,10 +14,13 @@ class Grade extends Model
     public $translatable = ['name'];
 
     protected $fillable = [
-        'id',
         'name',
         'is_active',
         'stage_id',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     protected $hidden = [
@@ -27,6 +30,11 @@ class Grade extends Model
 
     public function stage(){
         return $this->belongsTo(Stage::class, 'stage_id');
+    }
+
+    public function teachers()
+    {
+        return $this->belongsToMany(Teacher::class, 'teacher_grade');
     }
 
     public function scopeActive($query)

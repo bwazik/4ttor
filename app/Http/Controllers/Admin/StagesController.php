@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Http\Requests\Admin\StagesRequest;
 use App\Models\Stage;
+use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
+use App\Http\Controllers\Controller;
 use App\Services\Admin\StageService;
+use App\Http\Requests\Admin\StagesRequest;
 
 class StagesController extends Controller
 {
@@ -70,7 +70,7 @@ class StagesController extends Controller
     {
         $this->validateExistence($request, 'stages');
 
-        $result = $this->stageService->deleteSelectedStage($request->ids);
+        $result = $this->stageService->deleteSelectedStages($request->ids);
 
         if ($result['status'] === 'success') {
             return response()->json(['success' => $result['message']], 200);

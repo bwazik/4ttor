@@ -14,9 +14,12 @@ class Subject extends Model
     public $translatable = ['name'];
 
     protected $fillable = [
-        'id',
         'name',
         'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     protected $hidden = [
@@ -24,4 +27,14 @@ class Subject extends Model
         'updated_at',
     ];
 
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', 1);
+    }
+
+    public function scopeInactive($query)
+    {
+        return $query->where('is_active', 0);
+    }
 }

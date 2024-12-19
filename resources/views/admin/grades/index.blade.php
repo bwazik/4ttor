@@ -4,17 +4,18 @@
 
 @endsection
 
-@section('title', 'Stages')
+@section('title', pageTitle('admin/grades.grades'))
 
 @section('content')
     <!-- DataTable with Buttons -->
-    <x-datatable datatableTitle="{{ trans('main.datatableTitle', ['item' => trans('admin/grades.grades')]) }}" addButton="{{ trans('main.addItem', ['item' => trans('admin/grades.grade')]) }}">
+    <x-datatable datatableTitle="{{ trans('main.datatableTitle', ['item' => trans('admin/grades.grades')]) }}"
+        dataToggle="offcanvas" deleteButton addButton="{{ trans('main.addItem', ['item' => trans('admin/grades.grade')]) }}">
         <th></th>
         <th class="dt-checkboxes-cell dt-checkboxes-select-all"><input type="checkbox" id="select-all"class="form-check-input"></th>
         <th>#</th>
         <th>{{ trans('main.name') }}</th>
         <th>{{ trans('main.status') }}</th>
-        <th>{{ trans('admin/grades.grade') }}</th>
+        <th>{{ trans('main.stage') }}</th>
         <th>{{ trans('main.actions') }}</th>
     </x-datatable>
     @include('admin.grades.modals')
@@ -67,8 +68,8 @@
         });
 
         let fields = ['name_ar', 'name_en', 'is_active', 'stage_id'];
-        handleFormSubmit('#add-form', fields, '#add-modal', '#datatable');
-        handleFormSubmit('#edit-form', fields, '#edit-modal', '#datatable');
+        handleFormSubmit('#add-form', fields, '#add-modal', 'offcanvas', '#datatable');
+        handleFormSubmit('#edit-form', fields, '#edit-modal', 'offcanvas', '#datatable');
         handleDeletionFormSubmit('#delete-form', '#delete-modal', '#datatable')
         handleDeletionFormSubmit('#delete-selected-form', '#delete-selected-modal', '#datatable')
     </script>

@@ -4,11 +4,12 @@
 
 @endsection
 
-@section('title', 'Subjects')
+@section('title', pageTitle('admin/subjects.subjects'))
 
 @section('content')
     <!-- DataTable with Buttons -->
-    <x-datatable datatableTitle="{{ trans('main.datatableTitle', ['item' => trans('admin/subjects.subjects')]) }}" addButton="{{ trans('main.addItem', ['item' => trans('admin/subjects.subject')]) }}">
+    <x-datatable datatableTitle="{{ trans('main.datatableTitle', ['item' => trans('admin/subjects.subjects')]) }}"
+        dataToggle="offcanvas" deleteButton addButton="{{ trans('main.addItem', ['item' => trans('admin/subjects.subject')]) }}">
         <th></th>
         <th class="dt-checkboxes-cell dt-checkboxes-select-all"><input type="checkbox" id="select-all"class="form-check-input"></th>
         <th>#</th>
@@ -63,8 +64,8 @@
         });
 
         let fields = ['name_ar', 'name_en', 'is_active'];
-        handleFormSubmit('#add-form', fields, '#add-modal', '#datatable');
-        handleFormSubmit('#edit-form', fields, '#edit-modal', '#datatable');
+        handleFormSubmit('#add-form', fields, '#add-modal', 'offcanvas', '#datatable');
+        handleFormSubmit('#edit-form', fields, '#edit-modal', 'offcanvas', '#datatable');
         handleDeletionFormSubmit('#delete-form', '#delete-modal', '#datatable')
         handleDeletionFormSubmit('#delete-selected-form', '#delete-selected-modal', '#datatable')
     </script>

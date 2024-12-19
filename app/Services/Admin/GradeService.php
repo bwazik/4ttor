@@ -31,7 +31,7 @@ class GradeService
                         <button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light"
                             tabindex="0" type="button" data-bs-toggle="offcanvas" data-bs-target="#edit-modal"
                             id="edit-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
-                            data-is_active = "' . $row->is_active . '" data-stage_id="' . $row -> stage_id . '">
+                            data-is_active="' . ($row->is_active == 0 ? '0' : '1') . '" data-stage_id="' . $row -> stage_id . '">
                             <i class="ri-edit-box-line ri-20px"></i>
                         </button>
                     </span>' .
@@ -132,7 +132,7 @@ class GradeService
         }
     }
 
-    public function deleteSelectedGrade($ids)
+    public function deleteSelectedGrades($ids)
     {
         if (empty($ids)) {
             return [

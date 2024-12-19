@@ -6,6 +6,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\StagesController;
 use App\Http\Controllers\Admin\GradesController;
 use App\Http\Controllers\Admin\SubjectsController;
+use App\Http\Controllers\Admin\Teachers\TeachersController;
+use App\Http\Controllers\Admin\Students\StudentsController;
+use App\Http\Controllers\Admin\Parents\ParentsController;
 
 Route::group(
     [
@@ -31,38 +34,87 @@ Route::group(
         })->name('dashboard');
 
         # Start Platform Managment
-
-        # Stages
-        Route::prefix('stages')->controller(StagesController::class)->name('stages.')->group(function() {
-            Route::get('/', 'index')->name('index');
-            Route::middleware('throttle:10,1')->group(function() {
-                Route::post('insert', 'insert')->name('insert');
-                Route::post('update', 'update')->name('update');
-                Route::post('delete', 'delete')->name('delete');
-                Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+            # Stages
+            Route::prefix('stages')->controller(StagesController::class)->name('stages.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
             });
-        });
-        # Grades
-        Route::prefix('grades')->controller(GradesController::class)->name('grades.')->group(function() {
-            Route::get('/', 'index')->name('index');
-            Route::middleware('throttle:10,1')->group(function() {
-                Route::post('insert', 'insert')->name('insert');
-                Route::post('update', 'update')->name('update');
-                Route::post('delete', 'delete')->name('delete');
-                Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+            # Grades
+            Route::prefix('grades')->controller(GradesController::class)->name('grades.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
             });
-        });
-        # Subjects
-        Route::prefix('subjects')->controller(SubjectsController::class)->name('subjects.')->group(function() {
-            Route::get('/', 'index')->name('index');
-            Route::middleware('throttle:10,1')->group(function() {
-                Route::post('insert', 'insert')->name('insert');
-                Route::post('update', 'update')->name('update');
-                Route::post('delete', 'delete')->name('delete');
-                Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+            # Subjects
+            Route::prefix('subjects')->controller(SubjectsController::class)->name('subjects.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
             });
-        });
         # End Platform Managment
+
+        # Start Users Managment
+            # Manage Teachers
+            Route::prefix('teachers')->controller(TeachersController::class)->name('teachers.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::get('/archived', 'archived')->name('archived');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('archive', 'archive')->name('archive');
+                    Route::post('restore', 'restore')->name('restore');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                    Route::post('archive-selected', 'archiveSelected')->name('archiveSelected');
+                    Route::post('restore-selected', 'restoreSelected')->name('restoreSelected');
+                });
+            });
+
+            # Manage Students
+            Route::prefix('students')->controller(StudentsController::class)->name('students.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::get('/archived', 'archived')->name('archived');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('archive', 'archive')->name('archive');
+                    Route::post('restore', 'restore')->name('restore');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                    Route::post('archive-selected', 'archiveSelected')->name('archiveSelected');
+                    Route::post('restore-selected', 'restoreSelected')->name('restoreSelected');
+                });
+            });
+
+            # Manage Parents
+            Route::prefix('parents')->controller(ParentsController::class)->name('parents.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::get('/archived', 'archived')->name('archived');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('archive', 'archive')->name('archive');
+                    Route::post('restore', 'restore')->name('restore');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                    Route::post('archive-selected', 'archiveSelected')->name('archiveSelected');
+                    Route::post('restore-selected', 'restoreSelected')->name('restoreSelected');
+                });
+            });
+        # End Users Managment
     });
 });
 
