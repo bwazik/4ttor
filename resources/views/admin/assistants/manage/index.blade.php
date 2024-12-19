@@ -4,12 +4,12 @@
 
 @endsection
 
-@section('title', pageTitle('admin/students.students'))
+@section('title', pageTitle('admin/assistants.assistants'))
 
 @section('content')
     <!-- DataTable with Buttons -->
-    <x-datatable datatableTitle="{{ trans('main.datatableTitle', ['item' => trans('admin/students.students')]) }}"
-        dataToggle="modal" deleteButton archiveButton addButton="{{ trans('main.addItem', ['item' => trans('admin/students.student')]) }}">
+    <x-datatable datatableTitle="{{ trans('main.datatableTitle', ['item' => trans('admin/assistants.assistants')]) }}"
+        dataToggle="offcanvas" deleteButton archiveButton addButton="{{ trans('main.addItem', ['item' => trans('admin/assistants.assistant')]) }}">
         <th></th>
         <th class="dt-checkboxes-cell dt-checkboxes-select-all"><input type="checkbox" id="select-all"class="form-check-input">
         </th>
@@ -17,17 +17,17 @@
         <th>{{ trans('main.name') }}</th>
         <th>{{ trans('main.username') }}</th>
         <th>{{ trans('main.phone') }}</th>
-        <th>{{ trans('main.parent') }}</th>
+        <th>{{ trans('main.teacher') }}</th>
         <th>{{ trans('main.status') }}</th>
         <th>{{ trans('main.actions') }}</th>
     </x-datatable>
-    @include('admin.students.manage.modals')
+    @include('admin.assistants.manage.modals')
     <!--/ DataTable with Buttons -->
 @endsection
 
 @section('page-js')
     <script>
-        initializeDataTable('#datatable', "{{ route('admin.students.index') }}", [2, 3, 4, 5, 6, 7],
+        initializeDataTable('#datatable', "{{ route('admin.assistants.index') }}", [2, 3, 4, 5, 6, 7],
             [{
                     data: "",
                     orderable: false,
@@ -60,8 +60,8 @@
                     name: 'phone'
                 },
                 {
-                    data: 'parent_id',
-                    name: 'parent_id'
+                    data: 'teacher_id',
+                    name: 'teacher_id'
                 },
                 {
                     data: 'is_active',
@@ -81,11 +81,8 @@
             buttonId: '#add-button',
             modalId: '#add-modal',
             fields: {
-                gender: () => '',
-                grade_id: () => '',
-                parent_id: () => '',
-                teachers: () => '',
-            },
+                teacher_id: () => '',
+            }
         });
         // Setup edit modal
         setupModal({
@@ -96,14 +93,10 @@
                 name_ar: button => button.data('name_ar'),
                 name_en: button => button.data('name_en'),
                 username: button => button.data('username'),
-                password: button => button.data('password'),
-                phone: button => button.data('phone'),
                 email: button => button.data('email'),
-                birth_date: button => button.data('birth_date'),
-                gender: button => button.data('gender'),
-                grade_id: button => button.data('grade_id'),
-                parent_id: button => button.data('parent_id'),
-                teachers: button => button.data('teachers'),
+                phone: button => button.data('phone'),
+                password: button => button.data('password'),
+                teacher_id: button => button.data('teacher_id'),
                 is_active: button => button.data('is_active'),
             }
         });
@@ -126,14 +119,15 @@
             }
         });
 
-        let fields = ['name_ar', 'name_en', 'username', 'password', 'phone', 'email', 'birth_date', 'gender', 'grade_id', 'teachers'];
-        handleFormSubmit('#add-form', fields, '#add-modal', 'modal', '#datatable');
-        handleFormSubmit('#edit-form', fields, '#edit-modal', 'modal', '#datatable');
+        let fields = ['name_ar', 'name_en', 'username', 'email', 'phone', 'password', 'teacher_id'];
+        handleFormSubmit('#add-form', fields, '#add-modal', 'offcanvas', '#datatable');
+        handleFormSubmit('#edit-form', fields, '#edit-modal', 'offcanvas', '#datatable');
         handleDeletionFormSubmit('#delete-form', '#delete-modal', '#datatable')
         handleDeletionFormSubmit('#archive-form', '#archive-modal', '#datatable')
         handleDeletionFormSubmit('#delete-selected-form', '#delete-selected-modal', '#datatable')
         handleDeletionFormSubmit('#archive-selected-form', '#archive-selected-modal', '#datatable')
 
-        generateRandomUsername('s');
+
+        generateRandomUsername('a');
     </script>
 @endsection

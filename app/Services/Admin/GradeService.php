@@ -46,15 +46,15 @@ class GradeService
             ->make(true);
     }
 
-    public function insertGrade(array $data)
+    public function insertGrade(array $request)
     {
         DB::beginTransaction();
 
         try {
             Grade::create([
-                'name' => ['ar' => $data['name_ar'], 'en' => $data['name_en']],
-                'is_active' => $data['is_active'],
-                'stage_id' => $data['stage_id'],
+                'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
+                'is_active' => $request['is_active'],
+                'stage_id' => $request['stage_id'],
             ]);
 
             DB::commit();
@@ -75,7 +75,7 @@ class GradeService
         }
     }
 
-    public function updateGrade($id, array $data): array
+    public function updateGrade($id, array $request): array
     {
         DB::beginTransaction();
 
@@ -83,9 +83,9 @@ class GradeService
             $grade = Grade::findOrFail($id);
 
             $grade->update([
-                'name' => ['ar' => $data['name_ar'], 'en' => $data['name_en']],
-                'is_active' => $data['is_active'],
-                'stage_id' => $data['stage_id'],
+                'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
+                'is_active' => $request['is_active'],
+                'stage_id' => $request['stage_id'],
             ]);
 
             DB::commit();

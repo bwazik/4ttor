@@ -70,7 +70,7 @@ class StageService
         }
     }
 
-    public function updateStage($id, array $data): array
+    public function updateStage($id, array $request): array
     {
         DB::beginTransaction();
 
@@ -78,8 +78,8 @@ class StageService
             $stage = Stage::findOrFail($id);
 
             $stage->update([
-                'name' => ['ar' => $data['name_ar'], 'en' => $data['name_en']],
-                'is_active' => $data['is_active'],
+                'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
+                'is_active' => $request['is_active'],
             ]);
 
             DB::commit();

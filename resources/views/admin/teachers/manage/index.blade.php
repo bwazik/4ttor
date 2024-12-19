@@ -130,9 +130,6 @@
         handleDeletionFormSubmit('#archive-selected-form', '#archive-selected-modal', '#datatable')
 
 
-        $('#add-form #name_en').on('input', function() {
-            const username = '4ttor' + generateRandomString() + 't';
-            $('#add-form #username').val(username);
-        });
+        generateRandomUsername('t');
     </script>
 @endsection

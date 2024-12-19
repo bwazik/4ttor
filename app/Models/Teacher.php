@@ -63,6 +63,10 @@ class Teacher extends Authenticatable
         return $this->belongsToMany(Student::class, 'student_teacher');
     }
 
+    public function assistants()
+    {
+        return $this->hasMany(Assistant::class, 'teacher_id');
+    }
     # Scopes
     public function scopeActive($query)
     {

@@ -110,6 +110,25 @@
                 </li>
             </ul>
         </li>
+        <!-- Assistants Managment -->
+        <li class="menu-item {{ isActiveRoute(['admin.assistants.index', 'admin.assistants.archived']) ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
+                <i class="menu-icon tf-icons ri-user-star-line"></i>
+                <div>{{ trans('layouts/sidebar.assistants') }}</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ isActiveRoute('admin.assistants.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.assistants.index') }}" class="menu-link">
+                        <div>{{ trans('layouts/sidebar.assistantsManagment') }}</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ isActiveRoute('admin.assistants.archived') ? 'active' : '' }}">
+                    <a href="{{ route('admin.assistants.archived') }}" class="menu-link">
+                        <div>{{ trans('layouts/sidebar.archived') }}</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
         <!-- Students Managment -->
         <li class="menu-item {{ isActiveRoute(['admin.students.index', 'admin.students.archived']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
@@ -124,6 +143,25 @@
                 </li>
                 <li class="menu-item {{ isActiveRoute('admin.students.archived') ? 'active' : '' }}">
                     <a href="{{ route('admin.students.archived') }}" class="menu-link">
+                        <div>{{ trans('layouts/sidebar.archived') }}</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <!-- Parents Managment -->
+        <li class="menu-item {{ isActiveRoute(['admin.parents.index', 'admin.parents.archived']) ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
+                <i class="menu-icon tf-icons ri-parent-line"></i>
+                <div>{{ trans('layouts/sidebar.parents') }}</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ isActiveRoute('admin.parents.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.parents.index') }}" class="menu-link">
+                        <div>{{ trans('layouts/sidebar.parentsManagment') }}</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ isActiveRoute('admin.parents.archived') ? 'active' : '' }}">
+                    <a href="{{ route('admin.parents.archived') }}" class="menu-link">
                         <div>{{ trans('layouts/sidebar.archived') }}</div>
                     </a>
                 </li>

@@ -18,4 +18,8 @@ return [
     'teachersManagment' => 'إدارة المدرسين',
     'students' => 'الطلاب',
     'studentsManagment' => 'إدارة الطلاب',
+    'parents' => 'أولياء الأمور',
+    'parentsManagment' => 'إدارة أولياء الأمور',
+    'assistants' => 'الأسيستانتس',
+    'assistantsManagment' => 'إدارة الأسيستانتس',
 ];
