@@ -158,7 +158,7 @@ function initializeSelect2(modalId, elementId, value = null) {
         select2Focus(select2Element);
         select2Element.wrap('<div class="position-relative"></div>').select2({
             placeholder: window.translations.select_option,
-            dropdownParent: select2Element.parent()
+            dropdownParent: select2Element.parent(),
         });
 
         if (value !== null) {
@@ -168,6 +168,7 @@ function initializeSelect2(modalId, elementId, value = null) {
         }
     }
 }
+
 
 function initializeDataTable(tableId, ajaxUrl, exportColumns, columns) {
     $(document).ready(function () {
@@ -347,6 +348,7 @@ function setupModal({ buttonId, modalId, fields = {}, onShow = null }) {
         // Populate fields dynamically
         Object.entries(fields).forEach(([field, getValue]) => {
             const $fieldElement = $modal.find('#' + field);
+            const $radioElement = $modal.find('.' + field);
 
             if (typeof getValue === 'function') {
                 let value = getValue($(this));
@@ -358,6 +360,16 @@ function setupModal({ buttonId, modalId, fields = {}, onShow = null }) {
                     }
                     // Automatically initialize Select2 for select fields
                     initializeSelect2(modalId.replace('#', ''), field, value);
+                } else if ($radioElement.is('input[type="radio"]')) {
+                    // For radio buttons, check the value and set the checked attribute
+                    $radioElement.each(function() {
+                        if ($(this).val() == value) {
+                            $(this).prop('checked', true);
+                            $(this).closest('.form-check').addClass('checked');
+                        } else {
+                            $(this).closest('.form-check').removeClass('checked');
+                        }
+                    });
                 } else {
                     $fieldElement.val(value);
                 }

@@ -4,9 +4,15 @@ namespace App\Services\Admin;
 
 use App\Models\Subject;
 use Illuminate\Support\Facades\DB;
+use App\Traits\PreventDeletionIfRelated;
 
 class SubjectService
 {
+    use PreventDeletionIfRelated;
+
+    protected $relationships = ['teachers'];
+    protected $transModelKey = 'admin/subjects.subjects';
+
     public function getSubjectsForDatatable($subjectsQuery)
     {
         return datatables()->eloquent($subjectsQuery)
@@ -105,7 +111,11 @@ class SubjectService
         DB::beginTransaction();
 
         try {
-            $subject = Subject::findOrFail($id);
+            $subject = Subject::select('id', 'name')->findOrFail($id);
+
+            if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($subject)) {
+                return $dependencyCheck;
+            }
 
             $subject->delete();
 
@@ -139,6 +149,15 @@ class SubjectService
         DB::beginTransaction();
 
         try {
+            $subjects = Subject::whereIn('id', $ids)
+            ->select('id', 'name')
+            ->orderBy('id')
+            ->get();
+
+            if ($dependencyCheck = $this->checkDependenciesForMultipleDeletion($subjects)) {
+                return $dependencyCheck;
+            }
+
             Subject::whereIn('id', $ids)->delete();
 
             DB::commit();
@@ -157,5 +176,15 @@ class SubjectService
                     : $e->getMessage(),
             ];
         }
+    }
+
+    public function checkDependenciesForSingleDeletion($subject)
+    {
+        return $this->checkForSingleDependencies($subject, $this->relationships, $this->transModelKey);
+    }
+
+    public function checkDependenciesForMultipleDeletion($subjects)
+    {
+        return $this->checkForMultipleDependencies($subjects, $this->relationships, $this->transModelKey);
     }
 }

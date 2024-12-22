@@ -9,7 +9,7 @@
 @section('content')
     <!-- DataTable with Buttons -->
     <x-datatable datatableTitle="{{ trans('main.datatableTitle', ['item' => trans('admin/teachers.teachers')]) }}"
-        dataToggle="offcanvas" deleteButton archiveButton addButton="{{ trans('main.addItem', ['item' => trans('admin/teachers.teacher')]) }}">
+        dataToggle="modal" deleteButton archiveButton addButton="{{ trans('main.addItem', ['item' => trans('admin/teachers.teacher')]) }}">
         <th></th>
         <th class="dt-checkboxes-cell dt-checkboxes-select-all"><input type="checkbox" id="select-all"class="form-check-input">
         </th>
@@ -82,7 +82,7 @@
             modalId: '#add-modal',
             fields: {
                 subject_id: () => '',
-                grades: () => '',
+                grades: () => 6,
             }
         });
         // Setup edit modal
@@ -91,6 +91,7 @@
             modalId: '#edit-modal',
             fields: {
                 id: button => button.data('id'),
+                plan_id: button => button.data('plan_id'),
                 name_ar: button => button.data('name_ar'),
                 name_en: button => button.data('name_en'),
                 username: button => button.data('username'),
@@ -122,8 +123,8 @@
         });
 
         let fields = ['name_ar', 'name_en', 'username', 'email', 'phone', 'password', 'subject_id', 'grades'];
-        handleFormSubmit('#add-form', fields, '#add-modal', 'offcanvas', '#datatable');
-        handleFormSubmit('#edit-form', fields, '#edit-modal', 'offcanvas', '#datatable');
+        handleFormSubmit('#add-form', fields, '#add-modal', 'modal', '#datatable');
+        handleFormSubmit('#edit-form', fields, '#edit-modal', 'modal', '#datatable');
         handleDeletionFormSubmit('#delete-form', '#delete-modal', '#datatable')
         handleDeletionFormSubmit('#archive-form', '#archive-modal', '#datatable')
         handleDeletionFormSubmit('#delete-selected-form', '#delete-selected-modal', '#datatable')

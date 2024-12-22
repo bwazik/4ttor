@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('phone')->unique();
             $table->string('email')->unique()->nullable();
             $table->integer('subject_id')->unsigned();
-            $table->integer('plan_id')->unsigned()->default(1);
-            $table->boolean('is_active')->default(false);
+            $table->integer('plan_id')->unsigned()->nullable();
+            $table->boolean('is_active')->default(true);
             $table->decimal('average_rating', 3, 2)->default(0.00);
             $table->decimal('balance', 8, 2)->default(0.00);
             $table->string('profile_pic')->nullable();

@@ -4,9 +4,15 @@ namespace App\Services\Admin;
 
 use App\Models\Grade;
 use Illuminate\Support\Facades\DB;
+use App\Traits\PreventDeletionIfRelated;
 
 class GradeService
 {
+    use PreventDeletionIfRelated;
+
+    protected $relationships = ['students', 'teachers'];
+    protected $transModelKey = 'admin/grades.grades';
+
     public function getGradesForDatatable($gradesQuery)
     {
         return datatables()->eloquent($gradesQuery)
@@ -111,7 +117,12 @@ class GradeService
         DB::beginTransaction();
 
         try {
-            $grade = Grade::findOrFail($id);
+            $grade = Grade::select('id', 'name')->findOrFail($id);
+
+            if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($grade)) {
+                return $dependencyCheck;
+            }
+
             $grade->delete();
 
             DB::commit();
@@ -144,6 +155,15 @@ class GradeService
         DB::beginTransaction();
 
         try {
+            $grades = Grade::whereIn('id', $ids)
+                ->select('id', 'name')
+                ->orderBy('id')
+                ->get();
+
+            if ($dependencyCheck = $this->checkDependenciesForMultipleDeletion($grades)) {
+                return $dependencyCheck;
+            }
+
             Grade::whereIn('id', $ids)->delete();
 
             DB::commit();
@@ -151,7 +171,6 @@ class GradeService
                 'status' => 'success',
                 'message' => trans('main.deletedSelected', ['item' => strtolower(trans('admin/grades.grades'))]),
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -162,5 +181,15 @@ class GradeService
                     : $e->getMessage(),
             ];
         }
+    }
+
+    public function checkDependenciesForSingleDeletion($grade)
+    {
+        return $this->checkForSingleDependencies($grade, $this->relationships, $this->transModelKey);
+    }
+
+    public function checkDependenciesForMultipleDeletion($grades)
+    {
+        return $this->checkForMultipleDependencies($grades, $this->relationships, $this->transModelKey);
     }
 }

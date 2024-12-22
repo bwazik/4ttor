@@ -6,9 +6,15 @@ use App\Models\Teacher;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
+use App\Traits\PreventDeletionIfRelated;
 
 class TeacherService
 {
+    use PreventDeletionIfRelated;
+
+    protected $relationships = ['students', 'assistants'];
+    protected $transModelKey = 'admin/teachers.teachers';
+
     public function getTeachersForDatatable($teachersQuery)
     {
         return datatables()->eloquent($teachersQuery)
@@ -38,7 +44,7 @@ class TeacherService
                 </div>';
             })
             ->editColumn('plan_id', function ($row) {
-                return $row->plan_id ? $row->plan_id : '-';
+                return $row->plan_id ? $row->plan->name : '-';
             })
             ->editColumn('is_active', function ($row) {
                 return $row->is_active ? '<span class="badge rounded-pill bg-label-success" text-capitalized="">'.trans('main.active').'</span>' : '<span class="badge rounded-pill bg-label-secondary" text-capitalized="">'.trans('main.inactive').'</span>';
@@ -70,8 +76,9 @@ class TeacherService
                     </ul>
                 </div>
                 <button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light"
-                    tabindex="0" type="button" data-bs-toggle="offcanvas" data-bs-target="#edit-modal"
-                    id="edit-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
+                    tabindex="0" type="button" data-bs-toggle="modal" data-bs-target="#edit-modal"
+                    id="edit-button" data-id=' . $row->id . ' data-plan_id="' . $row->plan_id . '"
+                    data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
                     data-username=' . $row->username . ' data-email=' . $row->email . ' data-phone=' . $row->phone . '
                     data-password="" data-subject_id=' . $row->subject_id . ' data-grades='. $grades .' data-is_active="' . ($row->is_active == 0 ? '0' : '1') . '">
                     <i class="ri-edit-box-line ri-20px"></i>
@@ -143,6 +150,7 @@ class TeacherService
 
         try {
             $teacher = Teacher::create([
+                'plan_id' => $request['plan_id'],
                 'username' => $request['username'],
                 'password' => Hash::make($request['username']),
                 'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
@@ -185,6 +193,7 @@ class TeacherService
             }
 
             $teacher->update([
+                'plan_id' => $request['plan_id'],
                 'username' => $request['username'],
                 'password' => $request['password'] ?? $teacher->password,
                 'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
@@ -219,7 +228,12 @@ class TeacherService
         DB::beginTransaction();
 
         try {
-            $teacher = Teacher::withTrashed()->findOrFail($id);
+            $teacher = Teacher::withTrashed()->select('id', 'name')->findOrFail($id);
+
+            if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($teacher)) {
+                return $dependencyCheck;
+            }
+
             $teacher->forceDelete();
 
             DB::commit();
@@ -304,6 +318,15 @@ class TeacherService
         DB::beginTransaction();
 
         try {
+            $teachers = Teacher::whereIn('id', $ids)
+            ->select('id', 'name')
+            ->orderBy('id')
+            ->get();
+
+            if ($dependencyCheck = $this->checkDependenciesForMultipleDeletion($teachers)) {
+                return $dependencyCheck;
+            }
+
             Teacher::withTrashed()->whereIn('id', $ids)->forceDelete();
 
             DB::commit();
@@ -386,5 +409,15 @@ class TeacherService
                     : $e->getMessage(),
             ];
         }
+    }
+
+    public function checkDependenciesForSingleDeletion($teacher): array|null
+    {
+        return $this->checkForSingleDependencies($teacher, $this->relationships, $this->transModelKey);
+    }
+
+    public function checkDependenciesForMultipleDeletion($teachers)
+    {
+        return $this->checkForMultipleDependencies($teachers, $this->relationships, $this->transModelKey);
     }
 }

@@ -9,6 +9,7 @@
     'classes' => null,
     'context' => null,
     'divClasses' => null,
+    'price' => false,
 ])
 
 @php
@@ -50,7 +51,7 @@
             <div class="form-floating form-floating-outline">
                 <input type="{{ $type }}" id="{{ $id ?? $name }}" class="form-control"
                     name="{{ $name }}" {{ $required ? 'required' : '' }} placeholder="{{ $placeholder }}"
-                    aria-label="{{ $placeholder }}" @if($name === 'phone') step="1" @endif/>
+                    aria-label="{{ $placeholder }}" step="1"/>
                 <label for="{{ $id ?? $name }}">{{ $label }}</label>
             </div>
             @endif
@@ -58,12 +59,38 @@
         <span class="invalid-feedback" id="{{ $id ?? $name }}_error" role="alert"></span>
         <div class="form-text">لازم يبقي عليه واتساب</div>
     </div>
+@elseif($price)
+    <div class="{{ $divClasses }}">
+        <div class="input-group input-group-merge">
+            <div class="form-floating form-floating-outline">
+                <input type="{{ $type }}" id="{{ $id ?? $name }}" class="form-control{{ $classes ? ' ' . $classes : '' }}"
+                    name="{{ $name }}" {{ $required ? 'required' : '' }} placeholder="{{ $placeholder }}"
+                    aria-label="{{ $placeholder }}"/>
+                <label for="{{ $id ?? $name }}">{{ $label }}</label>
+            </div>
+            <span class="input-group-text">{{ trans('main.currency') }}</span>
+        </div>
+        <span class="invalid-feedback" id="{{ $id ?? $name }}_error" role="alert"></span>
+    </div>
+@elseif($name === 'username')
+    <div class="{{ $divClasses }}">
+        <div class="input-group input-group-merge">
+            <span class="input-group-text">@</span>
+            <div class="form-floating form-floating-outline">
+                <input type="{{ $type }}" id="{{ $id ?? $name }}" class="form-control{{ $classes ? ' ' . $classes : '' }}"
+                    name="{{ $name }}" {{ $required ? 'required' : '' }} placeholder="{{ $placeholder }}"
+                    aria-label="{{ $placeholder }}"/>
+                <label for="{{ $id ?? $name }}">{{ $label }}</label>
+            </div>
+        </div>
+        <span class="invalid-feedback" id="{{ $id ?? $name }}_error" role="alert"></span>
+    </div>
 @else
     <div class="{{ $divClasses }}">
         <div class="form-floating form-floating-outline">
             <input type="{{ $type }}" id="{{ $id ?? $name }}" class="form-control{{ $classes ? ' ' . $classes : '' }}"
                 name="{{ $name }}" {{ $required ? 'required' : '' }} placeholder="{{ $placeholder }}"
-                aria-label="{{ $placeholder }}" @if($name === 'phone') step="1" @endif/>
+                aria-label="{{ $placeholder }}"/>
             <label for="{{ $id ?? $name }}">{{ $label }}</label>
         </div>
         <span class="invalid-feedback" id="{{ $id ?? $name }}_error" role="alert"></span>

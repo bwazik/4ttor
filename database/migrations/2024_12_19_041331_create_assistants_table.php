@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('phone')->unique();
             $table->string('email')->unique()->nullable();
             $table->integer('teacher_id')->unsigned();
-            $table->boolean('is_active')->default(false);
+            $table->boolean('is_active')->default(true);
             $table->string('profile_pic')->nullable();
             $table->rememberToken();
             $table->softDeletes();

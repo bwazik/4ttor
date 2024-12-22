@@ -87,6 +87,12 @@
                 <div>{{ trans('layouts/sidebar.subjects') }}</div>
             </a>
         </li>
+        <li class="menu-item {{ isActiveRoute('admin.plans.index') ? 'active' : '' }}">
+            <a href="{{ route('admin.plans.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons ri-money-dollar-circle-line"></i>
+                <div>{{ trans('layouts/sidebar.plans') }}</div>
+            </a>
+        </li>
 
         <li class="menu-header mt-5">
             <span class="menu-header-text">{{ trans('layouts/sidebar.usersManagment') }}</span>

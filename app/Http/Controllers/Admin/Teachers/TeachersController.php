@@ -10,6 +10,7 @@ use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
 use App\Services\Admin\TeacherService;
 use App\Http\Requests\Admin\TeachersRequest;
+use App\Models\Plan;
 
 class TeachersController extends Controller
 {
@@ -30,10 +31,11 @@ class TeachersController extends Controller
             return $this->teacherService->getTeachersForDatatable($teachersQuery);
         }
 
+        $plans = Plan::active()->select('id', 'name', 'description', 'monthly_price')->orderBy('id')->get();
         $subjects = Subject::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
         $grades = Grade::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
 
-        return view('admin.teachers.manage.index', compact('subjects', 'grades'));
+        return view('admin.teachers.manage.index', compact('plans', 'subjects', 'grades'));
     }
 
     public function archived(Request $request)

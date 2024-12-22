@@ -1,6 +1,9 @@
 <?php
 
 return [
+    # Constants
+    'currency' => 'EGP',
+
     # Datatable buttons
     'datatableTitle' => 'Manage :item',
     'datatableTitle2' => ':item Archive',
@@ -38,6 +41,12 @@ return [
     'archive' => 'Archive',
     'restore' => 'Restore',
 
+    # Placeholders
+    'placeholders' => [
+        'description_ar' => 'اكتب وصف مختصر للعنصر دا.',
+        'description_en' => 'Enter a brief description of the item.',
+    ],
+
     # Main inputs
     'name_ar' => 'Name (AR)',
     'name_en' => 'Name (EN)',
@@ -51,8 +60,12 @@ return [
     'male' => 'Male',
     'female' => 'Female',
     'teachers' => 'Teachers',
+    'description_ar' => 'Description (AR)',
+    'description_en' => 'Description (EN)',
     'active' => 'Active',
     'inactive' => 'Inactive',
+    'allowed' => 'Allowed',
+    'notallowed' => 'Not Allowed',
     'select_option' => 'Select an option from the list',
 
     # Modals
@@ -90,5 +103,5 @@ return [
     'restoredSelected' => 'Selected :item has been restored successfully!',
     'noItemsSelected' => 'No items were selected!',
     'tooManyRequestsMessage' => 'You have exceeded the maximum number of requests. Please try again later!',
-    'errorDependencies' => 'The following :model cannot be deleted because they have associated :dependency: :items',
+    'errorDependencies' => 'The :model (:name) cannot be deleted because it has related records in :dependency.',
 ];

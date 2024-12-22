@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\StagesController;
 use App\Http\Controllers\Admin\GradesController;
 use App\Http\Controllers\Admin\SubjectsController;
+use App\Http\Controllers\Admin\PlansController;
 use App\Http\Controllers\Admin\Teachers\TeachersController;
 use App\Http\Controllers\Admin\Students\StudentsController;
 use App\Http\Controllers\Admin\Parents\ParentsController;
@@ -65,6 +66,16 @@ Route::group(
                     Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
                 });
             });
+            # Plans
+            Route::prefix('plans')->controller(PlansController::class)->name('plans.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
+            });
         # End Platform Managment
 
         # Start Users Managment
@@ -99,7 +110,7 @@ Route::group(
                     Route::post('restore-selected', 'restoreSelected')->name('restoreSelected');
                 });
             });
-            
+
             # Manage Students
             Route::prefix('students')->controller(StudentsController::class)->name('students.')->group(function() {
                 Route::get('/', 'index')->name('index');

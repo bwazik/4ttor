@@ -12,7 +12,7 @@
         <x-select-input context="modal" name="gender" label="{{ trans('main.gender') }}" :options="[1 => trans('main.male'), 2 => trans('main.female')]"/>
         <x-select-input context="modal" name="grade_id" label="{{ trans('main.grade') }}" :options="$grades"  required/>
         <x-select-input context="modal" name="parent_id" label="{{ trans('main.parent') }}" :options="$parents"  required/>
-        <x-select-input context="col-12" name="teachers" label="{{ trans('main.teachers') }}" :options="$teachers" multiple required/>
+        <x-select-input divClasses="col-12" name="teachers" label="{{ trans('main.teachers') }}" :options="$teachers" multiple required/>
     </div>
 </x-modal>
 <!-- Edit Modal -->

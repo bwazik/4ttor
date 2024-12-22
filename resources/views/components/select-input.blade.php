@@ -21,12 +21,14 @@ $divClasses = $divClasses ?? $defaultDivClasses;
 
 <div class="{{ $divClasses }}">
     <div class="form-floating form-floating-outline">
-        <select id="{{ $id ?? $name }}" class="form-select" name="{{ $name }}{{ $multiple ? '[]' : '' }}"
+        <div class="select2-primary">
+            <select id="{{ $id ?? $name }}" class="form-select" name="{{ $name }}{{ $multiple ? '[]' : '' }}"
             {{ $multiple ? 'multiple' : '' }} {{ $required ? "required" : "" }}>
             @foreach($options as $value => $optionLabel)
                 <option value="{{ $value }}">{{ $optionLabel }}</option>
             @endforeach
-        </select>
+            </select>
+        </div>
         <label for="{{ $id ?? $name }}">{{ $label }}</label>
     </div>
     <span class="invalid-feedback" id="{{ $id ?? $name }}_error" role="alert"></span>

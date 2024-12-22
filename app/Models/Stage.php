@@ -18,20 +18,18 @@ class Stage extends Model
         'is_active',
     ];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
-
     protected $hidden = [
         'created_at',
         'updated_at',
     ];
 
+    # Relationships
     public function grades()
     {
         return $this->hasMany(Grade::class, 'stage_id');
     }
 
+    # Scopes
     public function scopeActive($query)
     {
         return $query->where('is_active', 1);

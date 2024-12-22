@@ -5,9 +5,15 @@ namespace App\Services\Admin;
 use App\Models\MyParent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Traits\PreventDeletionIfRelated;
 
 class ParentService
 {
+    use PreventDeletionIfRelated;
+
+    protected $relationships = ['students'];
+    protected $transModelKey = 'admin/parents.parents';
+
     public function getParentsForDatatable($parentsQuery)
     {
         return datatables()->eloquent($parentsQuery)
@@ -174,7 +180,12 @@ class ParentService
         DB::beginTransaction();
 
         try {
-            $parent = MyParent::withTrashed()->findOrFail($id);
+            $parent = MyParent::withTrashed()->select('id', 'name')->findOrFail($id);
+
+            if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($parent)) {
+                return $dependencyCheck;
+            }
+
             $parent->forceDelete();
 
             DB::commit();
@@ -259,6 +270,15 @@ class ParentService
         DB::beginTransaction();
 
         try {
+            $parents = MyParent::whereIn('id', $ids)
+            ->select('id', 'name')
+            ->orderBy('id')
+            ->get();
+
+            if ($dependencyCheck = $this->checkDependenciesForMultipleDeletion($parents)) {
+                return $dependencyCheck;
+            }
+
             MyParent::withTrashed()->whereIn('id', $ids)->forceDelete();
 
             DB::commit();
@@ -341,5 +361,15 @@ class ParentService
                     : $e->getMessage(),
             ];
         }
+    }
+
+    public function checkDependenciesForSingleDeletion($parent)
+    {
+        return $this->checkForSingleDependencies($parent, $this->relationships, $this->transModelKey);
+    }
+
+    public function checkDependenciesForMultipleDeletion($parents)
+    {
+        return $this->checkForMultipleDependencies($parents, $this->relationships, $this->transModelKey);
     }
 }

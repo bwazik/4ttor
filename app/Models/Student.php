@@ -29,11 +29,6 @@ class Student extends Authenticatable
         'profile_pic',
     ];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-        'balance' => 'float',
-    ];
-
     protected $hidden = [
         'password',
         'remember_token',
@@ -42,7 +37,7 @@ class Student extends Authenticatable
         'deleted_at',
     ];
 
-    # Relations
+    # Relationships
     public function grade()
     {
         return $this->belongsTo(Grade::class, 'grade_id');
