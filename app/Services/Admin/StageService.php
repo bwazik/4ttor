@@ -3,10 +3,16 @@
 namespace App\Services\Admin;
 
 use App\Models\Stage;
+use App\Traits\PreventDeletionIfRelated;
 use Illuminate\Support\Facades\DB;
 
 class StageService
 {
+    use PreventDeletionIfRelated;
+    
+    protected $relationships = ['grades'];
+    protected $transModelKey = 'admin/stages.stages';
+
     public function getStagesForDatatable($stagesQuery)
     {
         return datatables()->eloquent($stagesQuery)
@@ -105,21 +111,10 @@ class StageService
         DB::beginTransaction();
 
         try {
-            $stage = Stage::findOrFail($id);
+            $stage = Stage::select('id', 'name')->findOrFail($id);
 
-            if ($stage->grades()->count() > 0) {
-                $stagesWithGrades = Stage::whereHas('grades')->get(['name']);
-                $stageNames = $stagesWithGrades->pluck('name')->toArray();
-                $stageNamesString = implode(', ', $stageNames);
-
-                return [
-                    'status' => 'error',
-                    'message' => trans('main.errorDependencies', [
-                        'model' => trans('admin/stages.stages'),
-                        'dependency' => trans('admin/grades.grades'),
-                        'items' => $stageNamesString,
-                    ]),
-                ];
+            if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($stage)) {
+                return $dependencyCheck;
             }
 
             $stage->delete();
@@ -154,20 +149,13 @@ class StageService
         DB::beginTransaction();
 
         try {
-            $stagesWithGrades = Stage::whereIn('id', $ids)->has('grades')->get(['id', 'name']);
+            $stages = Stage::whereIn('id', $ids)
+                ->select('id', 'name')
+                ->orderBy('id')
+                ->get();
 
-            if ($stagesWithGrades->isNotEmpty()) {
-                $stageNames = $stagesWithGrades->pluck('name')->toArray();
-                $stageNamesString = implode(', ', $stageNames);
-
-                return [
-                    'status' => 'error',
-                    'message' => trans('main.errorDependencies', [
-                        'model' => trans('admin/stages.stages'),
-                        'dependency' => trans('admin/grades.grades'),
-                        'items' => $stageNamesString,
-                    ]),
-                ];
+            if ($dependencyCheck = $this->checkDependenciesForMultipleDeletion($stages)) {
+                return $dependencyCheck;
             }
 
             Stage::whereIn('id', $ids)->delete();
@@ -188,5 +176,15 @@ class StageService
                     : $e->getMessage(),
             ];
         }
+    }
+
+    public function checkDependenciesForSingleDeletion($stage)
+    {
+        return $this->checkForSingleDependencies($stage, $this->relationships, $this->transModelKey);
+    }
+
+    public function checkDependenciesForMultipleDeletion($stages)
+    {
+        return $this->checkForMultipleDependencies($stages, $this->relationships, $this->transModelKey);
     }
 }

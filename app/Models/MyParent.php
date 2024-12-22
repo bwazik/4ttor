@@ -24,10 +24,6 @@ class MyParent extends Authenticatable
         'is_active',
     ];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
-
     protected $hidden = [
         'password',
         'remember_token',
@@ -36,7 +32,7 @@ class MyParent extends Authenticatable
         'deleted_at',
     ];
 
-    # Relations
+    # Relationships
     public function students()
     {
         return $this->hasMany(Student::class, 'parent_id');

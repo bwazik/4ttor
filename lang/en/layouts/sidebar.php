@@ -9,6 +9,7 @@ return [
     'stages' => 'Stages',
     'grades' => 'Grades',
     'subjects' => 'Subjects',
+    'plans' => 'Plans',
 
     # Users Managment
     'usersManagment' => 'Users Managment',

@@ -1,6 +1,9 @@
 <?php
 
 return [
+    # Constants
+    'currency' => 'ج.م',
+
     # Datatable buttons
     'datatableTitle' => 'إدارة :item',
     'datatableTitle2' => 'أرشيف :item',
@@ -38,6 +41,12 @@ return [
     'archive' => 'أرشفة',
     'restore' => 'إسترجاع',
 
+    # Placeholders
+    'placeholders' => [
+        'description_ar' => 'اكتب وصف مختصر للعنصر دا.',
+        'description_en' => 'Enter a brief description of the item.',
+    ],
+
     # Main inputs
     'name_ar' => 'الإسم بالعربي',
     'name_en' => 'الإسم بالإنجليزي',
@@ -51,8 +60,12 @@ return [
     'male' => 'ذكر',
     'female' => 'أنثي',
     'teachers' => 'المدرسين',
+    'description_ar' => 'الوصف بالعربي',
+    'description_en' => 'الوصف بالإنجليزي',
     'active' => 'مفعل',
     'inactive' => 'مش مفعل',
+    'allowed' => 'مسموح',
+    'notallowed' => 'مش مسموح',
     'select_option' => 'اختار حاجة من الاختيارات',
 
     # Modals
@@ -90,5 +103,5 @@ return [
     'restoredSelected' => 'تم إسترجاع :item المحددة بنجاح!',
     'noItemsSelected' => 'مفيش عناصر تم تحديدها!',
     'tooManyRequestsMessage' => 'انت تجاوزت العدد المسموح بيه من الطلبات. حاول تاني بعد شوية!',
-    'errorDependencies' => 'ال :model دول مش هينفع يتمسحو علشان عندهم :dependency مرتبطة بيهم: :items',
+    'errorDependencies' => ':model دي (:name) مش هينفع تتمسح علشان عندها علاقات مرتبطة مع :dependency.',
 ];

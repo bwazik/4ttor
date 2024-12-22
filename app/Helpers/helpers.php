@@ -17,10 +17,19 @@ if (!function_exists('isActiveRoute')) {
 
         return false;
     }
+}
 
-    if (!function_exists('pageTitle')) {
-        function pageTitle($key) {
-            return trans('layouts/sidebar.platformName') . ' - ' . trans($key);
-        }
+if (!function_exists('pageTitle')) {
+    function pageTitle($key) {
+        return trans('layouts/sidebar.platformName') . ' - ' . trans($key);
     }
 }
+
+if (!function_exists('formatCurrency')) {
+    function formatCurrency($value) {
+        return number_format($value, 2, '.', ',');
+    }
+}
+
+
+

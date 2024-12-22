@@ -25,10 +25,6 @@ class Assistant extends Authenticatable
         'profile_pic',
     ];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
-
     protected $hidden = [
         'password',
         'remember_token',
@@ -37,7 +33,7 @@ class Assistant extends Authenticatable
         'deleted_at',
     ];
 
-    # Relations
+    # Relationships
     public function teacher()
     {
         return $this->belongsTo(Teacher::class, 'teacher_id');

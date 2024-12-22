@@ -84,7 +84,7 @@
                 gender: () => '',
                 grade_id: () => '',
                 parent_id: () => '',
-                teachers: () => '',
+                teachers: () => 1,
             },
         });
         // Setup edit modal

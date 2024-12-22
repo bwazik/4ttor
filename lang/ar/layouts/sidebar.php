@@ -10,6 +10,7 @@ return [
     'stages' => 'المراحل الدراسية',
     'grades' => 'الصفوف',
     'subjects' => 'المواد',
+    'plans' => 'الخطط',
 
     # Users Managment
     'usersManagment' => 'إدارة المستخدمين',

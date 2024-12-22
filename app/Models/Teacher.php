@@ -28,12 +28,6 @@ class Teacher extends Authenticatable
         'profile_pic',
     ];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-        'average_rating' => 'float',
-        'balance' => 'float',
-    ];
-
     protected $hidden = [
         'password',
         'remember_token',
@@ -42,7 +36,7 @@ class Teacher extends Authenticatable
         'deleted_at',
     ];
 
-    # Relations
+    # Relationships
     public function subject()
     {
         return $this->belongsTo(Subject::class, 'subject_id');
@@ -67,6 +61,7 @@ class Teacher extends Authenticatable
     {
         return $this->hasMany(Assistant::class, 'teacher_id');
     }
+    
     # Scopes
     public function scopeActive($query)
     {

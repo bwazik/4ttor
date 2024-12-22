@@ -19,17 +19,19 @@ class Grade extends Model
         'stage_id',
     ];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
-
     protected $hidden = [
         'created_at',
         'updated_at',
     ];
 
+    # Relationships
     public function stage(){
         return $this->belongsTo(Stage::class, 'stage_id');
+    }
+
+    public function students()
+    {
+        return $this->hasMany(Student::class, 'grade_id');
     }
 
     public function teachers()
@@ -37,6 +39,7 @@ class Grade extends Model
         return $this->belongsToMany(Teacher::class, 'teacher_grade');
     }
 
+    # Scopes
     public function scopeActive($query)
     {
         return $query->where('is_active', 1);
