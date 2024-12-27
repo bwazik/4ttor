@@ -26,6 +26,11 @@
             info_filtered: @json(trans('main.datatable.info_filtered')),
         },
         detailsOf: @json(trans('main.detailsOf')),
+        weekdays: {
+            ar: @json(trans('main.weekdays', [], 'ar')),
+            en: @json(trans('main.weekdays', [], 'en')),
+        },
+        currentLocale: "{{ app()->getLocale() }}",
     };
 </script>
 

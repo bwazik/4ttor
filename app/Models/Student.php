@@ -53,6 +53,11 @@ class Student extends Authenticatable
         return $this->belongsToMany(Teacher::class, 'student_teacher');
     }
 
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class, 'student_group');
+    }
+
     # Scopes
     public function scopeMale($query)
     {

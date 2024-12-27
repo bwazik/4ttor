@@ -98,7 +98,7 @@
             <span class="menu-header-text">{{ trans('layouts/sidebar.usersManagment') }}</span>
         </li>
         <!-- Teachers Managment -->
-        <li class="menu-item {{ isActiveRoute(['admin.teachers.index', 'admin.teachers.archived']) ? 'active open' : '' }}">
+        <li class="menu-item {{ isActiveRoute(['admin.teachers.index', 'admin.teachers.archived', 'admin.groups.index']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
                 <i class="menu-icon tf-icons ri-presentation-line"></i>
                 <div>{{ trans('layouts/sidebar.teachers') }}</div>
@@ -107,6 +107,11 @@
                 <li class="menu-item {{ isActiveRoute('admin.teachers.index') ? 'active' : '' }}">
                     <a href="{{ route('admin.teachers.index') }}" class="menu-link">
                         <div>{{ trans('layouts/sidebar.teachersManagment') }}</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ isActiveRoute('admin.groups.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.groups.index') }}" class="menu-link">
+                        <div>{{ trans('layouts/sidebar.groupsManagment') }}</div>
                     </a>
                 </li>
                 <li class="menu-item {{ isActiveRoute('admin.teachers.archived') ? 'active' : '' }}">

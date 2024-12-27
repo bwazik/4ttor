@@ -17,6 +17,7 @@ return [
     'archived' => 'الأرشيف',
     'teachers' => 'المدرسين',
     'teachersManagment' => 'إدارة المدرسين',
+    'groupsManagment' => 'إدارة المجاميع',
     'students' => 'الطلاب',
     'studentsManagment' => 'إدارة الطلاب',
     'parents' => 'أولياء الأمور',

@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\GradesController;
 use App\Http\Controllers\Admin\SubjectsController;
 use App\Http\Controllers\Admin\PlansController;
 use App\Http\Controllers\Admin\Teachers\TeachersController;
+use App\Http\Controllers\Admin\Teachers\GroupsController;
 use App\Http\Controllers\Admin\Students\StudentsController;
 use App\Http\Controllers\Admin\Parents\ParentsController;
 use App\Http\Controllers\Admin\Assistants\AssistantsController;
@@ -83,6 +84,21 @@ Route::group(
             Route::prefix('teachers')->controller(TeachersController::class)->name('teachers.')->group(function() {
                 Route::get('/', 'index')->name('index');
                 Route::get('/archived', 'archived')->name('archived');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('archive', 'archive')->name('archive');
+                    Route::post('restore', 'restore')->name('restore');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                    Route::post('archive-selected', 'archiveSelected')->name('archiveSelected');
+                    Route::post('restore-selected', 'restoreSelected')->name('restoreSelected');
+                });
+            });
+
+            # Groups
+            Route::prefix('groups')->controller(GroupsController::class)->name('groups.')->group(function() {
+                Route::get('/', 'index')->name('index');
                 Route::middleware('throttle:10,1')->group(function() {
                     Route::post('insert', 'insert')->name('insert');
                     Route::post('update', 'update')->name('update');

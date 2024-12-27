@@ -34,12 +34,25 @@ return [
     'parent' => 'Parent',
     'teacher' => 'Teacher',
     'status' => 'Status',
+    'created_at' => 'Created Date',
+    'updated_at' => 'Updated Date',
     'actions' => 'Actions',
     'details' => 'Details',
     'edit' => 'Edit',
     'delete' => 'Delete',
     'archive' => 'Archive',
     'restore' => 'Restore',
+
+    # Weekdays
+    'weekdays' => [
+        1 => 'Saturday',
+        2 => 'Sunday',
+        3 => 'Monday',
+        4 => 'Tuesday',
+        5 => 'Wednesday',
+        6 => 'Thursday',
+        7 => 'Friday',
+    ],
 
     # Placeholders
     'placeholders' => [
