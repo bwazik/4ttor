@@ -1,6 +1,8 @@
 let errorMessage = window.translations.errorMessage || 'An unexpected error occurred. Please try again later!';
 let tooManyRequestsMessage = window.translations.tooManyRequestsMessage || 'You have exceeded the maximum number of requests. Please try again later!';
 let submitButton;
+const weekdays = window.translations.weekdays;
+const currentLocale = window.translations.currentLocale;
 
 // Function to toggle all checkboxes and update the main checkbox state
 function toggleCheckboxes(className, mainCheckbox) {
@@ -120,12 +122,19 @@ toastr.options = {
 
 document.addEventListener('DOMContentLoaded', function () {
     const datePickers = document.querySelectorAll('.flatpickr-date');
+    const timePickers = document.querySelectorAll('.flatpickr-timeB');
 
     Array.from(datePickers).forEach((datepicker) => {
         flatpickr(datepicker, {
-            monthSelectorType: 'dropdown',
-            yearSelectorType: 'static',
-            dateFormat: 'Y-m-d'
+            dateFormat: 'Y-m-d',
+
+        });
+    });
+    Array.from(timePickers).forEach((timePicker) => {
+        flatpickr(timePicker, {
+            enableTime: true,
+            noCalendar: true,
+            allowInput: true,
         });
     });
 });
@@ -168,7 +177,6 @@ function initializeSelect2(modalId, elementId, value = null) {
         }
     }
 }
-
 
 function initializeDataTable(tableId, ajaxUrl, exportColumns, columns) {
     $(document).ready(function () {
@@ -505,5 +513,27 @@ function handleDeletionFormSubmit(formId, modalId, datatableId) {
     });
 }
 
+function getWeekdayName(day, locale) {
+    return weekdays[locale][day] || '-';
+}
+
+function updateGroupNames() {
+    const day1 = $('#day_1').val();
+    const day2 = $('#day_2').val();
+    const time = $('#time').val();
+
+    let groupNameAr = '';
+    let groupNameEn = '';
+
+    if (day1 && !day2) {
+        groupNameAr = `${getWeekdayName(day1, 'ar')} ${time}`;
+        groupNameEn = `${getWeekdayName(day1, 'en')} ${time}`;
+    } else if (day1 && day2) {
+        groupNameAr = `${getWeekdayName(day1, 'ar')} & ${getWeekdayName(day2, 'ar')} ${time}`;
+        groupNameEn = `${getWeekdayName(day1, 'en')} & ${getWeekdayName(day2, 'en')} ${time}`;
+    }
+    $('#name_ar').val(groupNameAr);
+    $('#name_en').val(groupNameEn);
+}
 
 

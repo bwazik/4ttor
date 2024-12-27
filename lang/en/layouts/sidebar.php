@@ -16,6 +16,7 @@ return [
     'archived' => 'Archive',
     'teachers' => 'Teachers',
     'teachersManagment' => 'Teachers Managment',
+    'groupsManagment' => 'Groups Managment',
     'students' => 'Students',
     'studentsManagment' => 'Students Managment',
     'parents' => 'Parents',

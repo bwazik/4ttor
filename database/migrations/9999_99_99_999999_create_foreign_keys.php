@@ -53,6 +53,19 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });
+        Schema::table('groups', function (Blueprint $table) {
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('student_group', function (Blueprint $table) {
+            $table->foreign('student_id')->references('id')->on('students')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('group_id')->references('id')->on('groups')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
     }
 
     /**
@@ -81,6 +94,13 @@ return new class extends Migration
         });
         Schema::table('assistants', function (Blueprint $table) {
             $table->dropForeign('assistants_teacher_id_foreign');
+        });
+        Schema::table('groups', function (Blueprint $table) {
+            $table->dropForeign('groups_teacher_id_foreign');
+        });
+        Schema::table('student_group', function (Blueprint $table) {
+            $table->dropForeign('student_group_student_id_foreign');
+            $table->dropForeign('student_group_group_id_foreign');
         });
     }
 };

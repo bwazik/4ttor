@@ -28,7 +28,7 @@
 
 @section('page-js')
     <script>
-        initializeDataTable('#datatable', "{{ route('admin.plans.index') }}", [2, 3, 4],
+        initializeDataTable('#datatable', "{{ route('admin.plans.index') }}", [2, 3, 4, 5, 6, 7, 8, 9],
             [
                 { data: "", orderable: false, searchable: false },
                 { data: 'selectbox', name: 'selectbox', orderable: false, searchable: false },

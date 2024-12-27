@@ -61,7 +61,12 @@ class Teacher extends Authenticatable
     {
         return $this->hasMany(Assistant::class, 'teacher_id');
     }
-    
+
+    public function groups()
+    {
+        return $this->hasMany(Group::class, 'teacher_id');
+    }
+
     # Scopes
     public function scopeActive($query)
     {
