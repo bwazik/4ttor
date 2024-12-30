@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\Admin\Teachers;
 
+use App\Models\Plan;
+use App\Models\Grade;
+use App\Models\Group;
 use App\Models\Subject;
 use App\Models\Teacher;
-use App\Models\Grade;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
 use App\Services\Admin\TeacherService;
 use App\Http\Requests\Admin\TeachersRequest;
-use App\Models\Plan;
 
 class TeachersController extends Controller
 {
@@ -147,5 +148,23 @@ class TeachersController extends Controller
         }
 
         return response()->json(['error' => $result['message']], 500);
+    }
+
+    public function groups(Request $request)
+    {
+        $validated = $request->validate([
+            'teachers' => 'required|array',
+            'teachers.*' => 'exists:teachers,id',
+        ]);
+
+        $teacherIds = $validated['teachers'];
+
+        $groups = Group::whereIn('teacher_id', $teacherIds)->select('id', 'name', 'teacher_id')
+            ->with('teacher:id,name')->orderBy('id')->get()
+            ->mapWithKeys(function ($group) {
+                return [$group->id => $group->name . ' - ' . $group->teacher->name];
+            });
+
+        return response()->json($groups);
     }
 }

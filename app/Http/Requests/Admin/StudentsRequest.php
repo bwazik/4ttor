@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\Group;
 use App\Models\Teacher;
 use App\Rules\UniqueFieldAcrossModels;
 use Illuminate\Foundation\Http\FormRequest;
@@ -31,6 +32,8 @@ class StudentsRequest extends FormRequest
             'is_active' => 'nullable|boolean',
             'teachers' => 'required|array|min:1',
             'teachers.*' => 'integer|exists:teachers,id',
+            'groups' => 'array|min:1',
+            'groups.*' => 'integer|exists:groups,id',
         ];
     }
 
@@ -44,6 +47,15 @@ class StudentsRequest extends FormRequest
                     }
                     if (!Teacher::where('id', $teacher_id)->exists()) {
                         $validator->errors()->add('teachers', 'One of the selected grades is invalid.');
+                    }
+                }
+            } elseif($this->groups) {
+                foreach ($this->groups as $group_id) {
+                    if (!is_numeric($group_id) || (int)$group_id != $group_id) {
+                        $validator->errors()->add('groups', 'Each group ID must be an integer.');
+                    }
+                    if (!Group::where('id', $group_id)->exists()) {
+                        $validator->errors()->add('groups', 'One of the selected groups is invalid.');
                     }
                 }
             }

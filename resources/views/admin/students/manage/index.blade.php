@@ -85,6 +85,7 @@
                 grade_id: () => '',
                 parent_id: () => '',
                 teachers: () => 1,
+                groups: () => '',
             },
         });
         // Setup edit modal
@@ -104,6 +105,7 @@
                 grade_id: button => button.data('grade_id'),
                 parent_id: button => button.data('parent_id'),
                 teachers: button => button.data('teachers'),
+                groups: button => button.data('groups'),
                 is_active: button => button.data('is_active'),
             }
         });
@@ -126,14 +128,13 @@
             }
         });
 
-        let fields = ['name_ar', 'name_en', 'username', 'password', 'phone', 'email', 'birth_date', 'gender', 'grade_id', 'teachers'];
+        let fields = ['name_ar', 'name_en', 'username', 'password', 'phone', 'email', 'birth_date', 'gender', 'grade_id', 'teachers', 'groups'];
         handleFormSubmit('#add-form', fields, '#add-modal', 'modal', '#datatable');
         handleFormSubmit('#edit-form', fields, '#edit-modal', 'modal', '#datatable');
         handleDeletionFormSubmit('#delete-form', '#delete-modal', '#datatable')
         handleDeletionFormSubmit('#archive-form', '#archive-modal', '#datatable')
         handleDeletionFormSubmit('#delete-selected-form', '#delete-selected-modal', '#datatable')
         handleDeletionFormSubmit('#archive-selected-form', '#archive-selected-modal', '#datatable')
-
-        generateRandomUsername('s');
+        fetchDataByAjax('#add-form #teachers', "{{ route('admin.teachers.groups') }}", '#add-form #groups', 'teachers')
     </script>
 @endsection

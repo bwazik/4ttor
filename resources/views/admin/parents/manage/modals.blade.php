@@ -24,20 +24,20 @@
 <!-- Delete Modal -->
 <x-modal modalType="delete" modalTitle="{{ trans('main.deleteItem', ['item' => trans('admin/parents.parent')]) }}"
     action="{{ route('admin.parents.delete') }}" id submitColor="danger" submitButton="{{ trans('main.yes_delete') }}">
-    @include('partials.base.delete-modal-body')
+    @include('partials.delete-modal-body')
 </x-modal>
 <!-- Delete Selected Modal -->
 <x-modal modalType="delete-selected" modalTitle="{{ trans('main.deleteItem', ['item' => trans('admin/parents.selectedParents')]) }}"
     action="{{ route('admin.parents.deleteSelected') }}" submitColor="danger" ids submitButton="{{ trans('main.yes_delete') }}">
-    @include('partials.base.delete-modal-body')
+    @include('partials.delete-modal-body')
 </x-modal>
 <!-- Archive Modal -->
 <x-modal modalType="archive" modalTitle="{{ trans('main.archiveItem', ['item' => trans('admin/parents.parent')]) }}"
     action="{{ route('admin.parents.archive') }}" id submitButton="{{ trans('main.yes_archive') }}">
-    @include('partials.base.archive-modal-body')
+    @include('partials.archive-modal-body')
 </x-modal>
 <!-- Archive Selected Modal -->
 <x-modal modalType="archive-selected" modalTitle="{{ trans('main.archiveItem', ['item' => trans('admin/parents.selectedParents')]) }}"
     action="{{ route('admin.parents.archiveSelected') }}" ids submitButton="{{ trans('main.yes_archive') }}">
-    @include('partials.base.archive-modal-body')
+    @include('partials.archive-modal-body')
 </x-modal>

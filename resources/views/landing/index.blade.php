@@ -1,6 +1,6 @@
 @extends('layouts.landing.master')
 
-@section('css')
+@section('page-css')
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/front-page-landing.css') }}" />
 @endsection
 
@@ -1178,6 +1178,6 @@
     <!-- Contact Us: End -->
 @endsection
 
-@section('js')
+@section('page-js')
     <script src="{{ asset('assets/js/front-page-landing.js') }}"></script>
 @endsection
