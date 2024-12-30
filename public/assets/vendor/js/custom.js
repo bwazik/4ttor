@@ -3,6 +3,7 @@ let tooManyRequestsMessage = window.translations.tooManyRequestsMessage || 'You 
 let submitButton;
 const weekdays = window.translations.weekdays;
 const currentLocale = window.translations.currentLocale;
+const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
 // Function to toggle all checkboxes and update the main checkbox state
 function toggleCheckboxes(className, mainCheckbox) {
@@ -510,6 +511,54 @@ function handleDeletionFormSubmit(formId, modalId, datatableId) {
                 }, 1500);
             },
         });
+    });
+}
+
+function fetchDataByAjax(triggerSelector, url, targetSelector, requestDataKey) {
+    $(triggerSelector).on('change', function(e) {
+        e.preventDefault();
+
+        const selectedValue  = $(this).val();
+
+        if (selectedValue  && selectedValue .length > 0) {
+            $.ajax({
+                url: url,
+                type: "POST",
+                dataType: "json",
+                data: {
+                    [requestDataKey]: selectedValue,
+                    _token: csrfToken,
+                },
+                success: function(data) {
+                    $(targetSelector).empty();
+                    $.each(data, function(key, value) {
+                        $(targetSelector).append('<option value="' +
+                            key + '">' +
+                            value + '</option>');
+                    });
+                },
+                error: function(xhr) {
+                    $(targetSelector).empty();
+                    if (xhr.status === 429) {
+                        toastr.error(tooManyRequestsMessage);
+                    } else if (xhr.responseJSON) {
+                        if (xhr.responseJSON.errors) {
+                            $.each(xhr.responseJSON.errors, function(key, val) {
+                                toastr.error(val);
+                            });
+                        } else if (xhr.responseJSON.error) {
+                            toastr.error(xhr.responseJSON.error);
+                        } else {
+                            toastr.error(errorMessage);
+                        }
+                    } else {
+                        toastr.error(errorMessage);
+                    }
+                },
+            });
+        } else {
+            $(targetSelector).empty();
+        }
     });
 }
 

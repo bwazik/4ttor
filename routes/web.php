@@ -84,6 +84,7 @@ Route::group(
             Route::prefix('teachers')->controller(TeachersController::class)->name('teachers.')->group(function() {
                 Route::get('/', 'index')->name('index');
                 Route::get('/archived', 'archived')->name('archived');
+                Route::post('/groups', 'groups')->name('groups');
                 Route::middleware('throttle:10,1')->group(function() {
                     Route::post('insert', 'insert')->name('insert');
                     Route::post('update', 'update')->name('update');

@@ -12,7 +12,8 @@
         <x-select-input context="modal" name="gender" label="{{ trans('main.gender') }}" :options="[1 => trans('main.male'), 2 => trans('main.female')]"/>
         <x-select-input context="modal" name="grade_id" label="{{ trans('main.grade') }}" :options="$grades"  required/>
         <x-select-input context="modal" name="parent_id" label="{{ trans('main.parent') }}" :options="$parents"  required/>
-        <x-select-input divClasses="col-12" name="teachers" label="{{ trans('main.teachers') }}" :options="$teachers" multiple required/>
+        <x-select-input context="modal" name="teachers" label="{{ trans('main.teachers') }}" :options="$teachers" multiple/>
+        <x-select-input context="modal" name="groups" label="{{ trans('main.groups') }}" :options="$groups" multiple required/>
     </div>
 </x-modal>
 <!-- Edit Modal -->
@@ -30,26 +31,27 @@
         <x-select-input context="modal" name="grade_id" label="{{ trans('main.grade') }}" :options="$grades"  required/>
         <x-select-input context="modal" name="parent_id" label="{{ trans('main.parent') }}" :options="$parents"  required/>
         <x-select-input context="modal" name="teachers" label="{{ trans('main.teachers') }}" :options="$teachers" multiple required/>
-        <x-select-input context="modal" name="is_active" label="{{ trans('main.status') }}" :options="[1 => trans('main.active'), 0 => trans('main.inactive')]"/>
+        <x-select-input context="modal" name="groups" label="{{ trans('main.groups') }}" :options="$groups" multiple/>
+        <x-select-input divClasses="col-12" name="is_active" label="{{ trans('main.status') }}" :options="[1 => trans('main.active'), 0 => trans('main.inactive')]"/>
     </div>
 </x-modal>
 <!-- Delete Modal -->
 <x-modal modalType="delete" modalTitle="{{ trans('main.deleteItem', ['item' => trans('admin/students.student')]) }}"
     action="{{ route('admin.students.delete') }}" id submitColor="danger" submitButton="{{ trans('main.yes_delete') }}">
-    @include('partials.base.delete-modal-body')
+    @include('partials.delete-modal-body')
 </x-modal>
 <!-- Delete Selected Modal -->
 <x-modal modalType="delete-selected" modalTitle="{{ trans('main.deleteItem', ['item' => trans('admin/students.selectedStudents')]) }}"
     action="{{ route('admin.students.deleteSelected') }}" submitColor="danger" ids submitButton="{{ trans('main.yes_delete') }}">
-    @include('partials.base.delete-modal-body')
+    @include('partials.delete-modal-body')
 </x-modal>
 <!-- Archive Modal -->
 <x-modal modalType="archive" modalTitle="{{ trans('main.archiveItem', ['item' => trans('admin/students.student')]) }}"
     action="{{ route('admin.students.archive') }}" id submitButton="{{ trans('main.yes_archive') }}">
-    @include('partials.base.archive-modal-body')
+    @include('partials.archive-modal-body')
 </x-modal>
 <!-- Archive Selected Modal -->
 <x-modal modalType="archive-selected" modalTitle="{{ trans('main.archiveItem', ['item' => trans('admin/students.selectedStudents')]) }}"
     action="{{ route('admin.students.archiveSelected') }}" ids submitButton="{{ trans('main.yes_archive') }}">
-    @include('partials.base.archive-modal-body')
+    @include('partials.archive-modal-body')
 </x-modal>

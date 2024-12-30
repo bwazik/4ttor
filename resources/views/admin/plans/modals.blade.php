@@ -54,10 +54,10 @@
 <!-- Delete Modal -->
 <x-modal modalType="delete" modalTitle="{{ trans('main.deleteItem', ['item' => trans('admin/plans.plan')]) }}"
     action="{{ route('admin.plans.delete') }}" id submitColor="danger" submitButton="{{ trans('main.yes_delete') }}">
-    @include('partials.base.delete-modal-body')
+    @include('partials.delete-modal-body')
 </x-modal>
 <!-- Delete Selected Modal -->
 <x-modal modalType="delete-selected" modalTitle="{{ trans('main.deleteItem', ['item' => trans('admin/plans.selectedPlans')]) }}"
     action="{{ route('admin.plans.deleteSelected') }}" ids submitColor="danger" submitButton="{{ trans('main.yes_delete') }}">
-    @include('partials.base.delete-modal-body')
+    @include('partials.delete-modal-body')
 </x-modal>

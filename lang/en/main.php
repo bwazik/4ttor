@@ -73,6 +73,7 @@ return [
     'male' => 'Male',
     'female' => 'Female',
     'teachers' => 'Teachers',
+    'groups' => 'Groups',
     'description_ar' => 'Description (AR)',
     'description_en' => 'Description (EN)',
     'active' => 'Active',
@@ -117,4 +118,5 @@ return [
     'noItemsSelected' => 'No items were selected!',
     'tooManyRequestsMessage' => 'You have exceeded the maximum number of requests. Please try again later!',
     'errorDependencies' => 'The :model (:name) cannot be deleted because it has related records in :dependency.',
+    'validateTeacherGroups' => 'The student must be with the specified teacher to join their group.',
 ];

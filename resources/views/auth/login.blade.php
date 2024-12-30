@@ -1,6 +1,6 @@
 @extends('layouts.auth.master')
 
-@section('css')
+@section('page-css')
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/page-auth.css') }}" />
 @endsection
 
@@ -58,6 +58,6 @@
     </p>
 @endsection
 
-@section('js')
+@section('page-js')
     <script src="{{ asset('assets/js/pages-auth.js') }}"></script>
 @endsection

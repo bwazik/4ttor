@@ -73,6 +73,7 @@ return [
     'male' => 'ذكر',
     'female' => 'أنثي',
     'teachers' => 'المدرسين',
+    'groups' => 'المجاميع',
     'description_ar' => 'الوصف بالعربي',
     'description_en' => 'الوصف بالإنجليزي',
     'active' => 'مفعل',
@@ -117,4 +118,5 @@ return [
     'noItemsSelected' => 'مفيش عناصر تم تحديدها!',
     'tooManyRequestsMessage' => 'انت تجاوزت العدد المسموح بيه من الطلبات. حاول تاني بعد شوية!',
     'errorDependencies' => ':model دي (:name) مش هينفع تتمسح علشان عندها علاقات مرتبطة مع :dependency.',
+    'validateTeacherGroups' => 'لازم يكون الطالب مع المستر المحدد عشان يخش مجموعته.',
 ];

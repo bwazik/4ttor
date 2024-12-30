@@ -3,6 +3,7 @@
 namespace App\Services\Admin;
 
 use App\Models\Student;
+use App\Models\Teacher;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -40,7 +41,9 @@ class StudentService
             })
             ->addColumn('actions', function ($row) {
                 $teacherIds = $row->teachers->pluck('id')->toArray();
+                $groupIds = $row->groups->pluck('id')->toArray();
                 $teachers = implode(',', $teacherIds);
+                $groups = implode(',', $groupIds);
 
                 return
                 '<div class="d-inline-block">
@@ -68,7 +71,7 @@ class StudentService
                     tabindex="0" type="button" data-bs-toggle="modal" data-bs-target="#edit-modal"
                     id="edit-button" data-id="' . $row->id . '" data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
                     data-username="' . $row->username . '" data-email="' . $row->email . '" data-phone="' . $row->phone . '"
-                    data-password="" data-birth_date="'.$row->birth_date.'" data-gender="'.$row->gender.'" data-grade_id="' . $row->grade_id . '" data-parent_id="' . $row->parent_id . '" data-teachers="'. $teachers .'" data-is_active="' . ($row->is_active == 0 ? '0' : '1') . '">
+                    data-password="" data-birth_date="'.$row->birth_date.'" data-gender="'.$row->gender.'" data-grade_id="' . $row->grade_id . '" data-parent_id="' . $row->parent_id . '" data-teachers="'. $teachers .'" data-groups="'. $groups .'" data-is_active="' . ($row->is_active == 0 ? '0' : '1') . '">
                     <i class="ri-edit-box-line ri-20px"></i>
                 </button>';
             })
@@ -147,6 +150,16 @@ class StudentService
 
             $student->teachers()->attach($request['teachers']);
 
+            $validationResult = $this->validateTeacherGroups($request['teachers'], $request['groups']);
+            if (!$validationResult) {
+                return [
+                    'status' => 'error',
+                    'message' => trans('main.validateTeacherGroups'),
+                ];
+
+            }
+            $student->groups()->attach($request['groups']);
+
             DB::commit();
 
             return [
@@ -192,6 +205,16 @@ class StudentService
             ]);
 
             $student->teachers()->sync($request['teachers'] ?? []);
+
+            $validationResult = $this->validateTeacherGroups($request['teachers'], $request['groups']);
+            if (!$validationResult) {
+                return [
+                    'status' => 'error',
+                    'message' => trans('main.validateTeacherGroups'),
+                ];
+
+            }
+            $student->groups()->sync($request['groups'] ?? []);
 
             DB::commit();
 
@@ -383,5 +406,24 @@ class StudentService
                     : $e->getMessage(),
             ];
         }
+    }
+
+    function validateTeacherGroups($teacherIds, $groupIds)
+    {
+        $teacherGroups = Teacher::whereIn('id', $teacherIds)
+            ->with('groups')
+            ->get()
+            ->pluck('groups')
+            ->flatten()
+            ->pluck('id')
+            ->toArray();
+
+        $invalidGroups = array_diff($groupIds, $teacherGroups);
+
+        if (!empty($invalidGroups)) {
+            return false;
+        }
+
+        return true;
     }
 }

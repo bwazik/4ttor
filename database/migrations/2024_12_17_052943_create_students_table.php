@@ -22,7 +22,7 @@ return new class extends Migration
             $table->date('birth_date')->nullable();
             $table->unsignedInteger('grade_id');
             $table->unsignedInteger('parent_id');
-            $table->boolean('is_active')->default(false);
+            $table->boolean('is_active')->default(true);
             $table->decimal('balance', 8, 2)->default(0.00);
             $table->string('profile_pic')->nullable();
             $table->rememberToken();

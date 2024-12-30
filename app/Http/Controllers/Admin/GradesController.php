@@ -29,8 +29,7 @@ class GradesController extends Controller
             return $this->gradeService->getGradesForDatatable($gradesQuery);
         }
 
-        $stages = Stage::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
-
+ 
         return view('admin.grades.index', compact('stages'));
     }
 
