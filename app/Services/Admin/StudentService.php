@@ -186,7 +186,7 @@ class StudentService
             $student = Student::findOrFail($id);
 
             if (!empty($request['password'])) {
-                $request['password'] = bcrypt(Hash::make($request['password']));
+                $request['password'] = Hash::make($request['password']);
             } else {
                 unset($request['password']);
             }

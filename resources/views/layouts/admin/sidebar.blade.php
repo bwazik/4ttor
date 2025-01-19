@@ -59,7 +59,7 @@
     <ul class="menu-inner py-1">
         <!-- Dashboard -->
         <li class="menu-item {{ isActiveRoute('admin.dashboard') ? 'active' : '' }}">
-            <a href="{{ route('admin.dashboard') }}" class="menu-link">
+            <a href="{{ route('web.dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons ri-home-smile-line"></i>
                 <div>{{ trans('layouts/sidebar.dashboard') }}</div>
             </a>

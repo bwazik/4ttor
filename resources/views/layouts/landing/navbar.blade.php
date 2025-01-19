@@ -323,10 +323,10 @@
 
             <!-- navbar button: Start -->
             <li>
-                <a href="../vertical-menu-template/auth-login-cover.html"
-                    class="btn btn-primary px-2 px-sm-4 px-lg-2 px-xl-4" target="_blank"><span
+                <a href="{{ route('login.choose') }}"
+                    class="btn btn-primary px-2 px-sm-4 px-lg-2 px-xl-4"><span
                         class="tf-icons ri-user-line me-md-1"></span><span
-                        class="d-none d-md-block">Login/Register</span></a>
+                        class="d-none d-md-block">Login</span></a>
             </li>
             <!-- navbar button: End -->
         </ul>

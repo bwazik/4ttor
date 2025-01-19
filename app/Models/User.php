@@ -18,6 +18,7 @@ class User extends Authenticatable
     public $translatable = ['name'];
 
     protected $fillable = [
+        'username',
         'name',
         'email',
         'password',

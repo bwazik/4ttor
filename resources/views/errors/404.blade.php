@@ -1,0 +1,31 @@
+@extends('errors.master')
+
+@section('page-css')
+    <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/page-misc.css') }}" />
+@endsection
+
+@section('title', pageTitle('admin/grades.grades'))
+
+@section('content')
+    <!-- Error -->
+    <div class="misc-wrapper">
+        <h1 class="mb-2 mx-2" style="font-size: 6rem; line-height: 6rem">404</h1>
+        <h4 class="mb-2">Page Not Found ⚠️</h4>
+        <p class="mx-2">we couldn't find the page you are looking for</p>
+        <div class="d-flex justify-content-center">
+            <img src="{{ asset('assets/img/illustrations/misc-error-object.png') }}" alt="misc-error"
+                class="img-fluid misc-object d-none d-lg-inline-block" width="160" />
+            <img src="{{ asset('assets/img/illustrations/misc-bg-light.png') }}" alt="misc-error"
+                class="misc-bg d-none d-lg-inline-block" data-app-light-img="illustrations/misc-bg-light.png"
+                data-app-dark-img="illustrations/misc-bg-dark.png" />
+            <div class="d-flex flex-column align-items-center">
+                <a href="{{ route('landing') }}" class="btn btn-primary text-center my-10">Back to home</a>
+            </div>
+        </div>
+    </div>
+    <!-- /Error -->
+@endsection
+
+@section('page-js')
+
+@endsection
