@@ -9,14 +9,13 @@
 @section('content')
     <h4 class="mb-1">Welcome to Materialize! 👋</h4>
     <p class="mb-5">Please sign-in to your account and start the adventure</p>
-
-    <form id="loginForm" class="mb-5" method="POST" action="{{ route('login') }}">
+    <form id="loginForm" class="mb-5" method="POST" action="{{ route('login', $guard) }}">
         @csrf
         <div class="form-floating form-floating-outline mb-5">
-            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email"
+            <input type="text" class="form-control @error('username') is-invalid @enderror" id="username" name="username"
                 placeholder="Enter your email" autofocus />
-            <label for="email">Email</label>
-            @error('email')
+            <label for="username">Username</label>
+            @error('username')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>

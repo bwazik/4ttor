@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Traits\Truncatable;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class AdminSeeder extends Seeder
 {
@@ -17,9 +16,10 @@ class AdminSeeder extends Seeder
         $this->truncateTables(['users']);
 
         User::create([
+            'username' => 'bwazik',
             'name' => ['en' => 'Abdullah Mohamed', 'ar' => 'عبدالله محمد'],
             'email' => 'bwazik@outlook.com',
-            'password' => Hash::make('bwazik@outlook.com'),
+            'password' => Hash::make('123456789'),
         ]);
     }
 }

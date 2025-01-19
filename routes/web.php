@@ -16,26 +16,25 @@ use App\Http\Controllers\Admin\Assistants\AssistantsController;
 Route::group(
     [
         'prefix' => LaravelLocalization::setLocale(),
-        'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath', 'guest']
+        'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath']
     ], function(){
 
         Route::get('/', function () {
             return view('landing.index');
-        });
+        })->name('landing');
 });
 
 Route::group(
     [
         'prefix' => LaravelLocalization::setLocale() . '/developer',
-        'name' => 'admin.',
-        'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath', 'auth', 'verified']
+        'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath', 'auth:web']
     ], function(){
 
-    Route::name('admin.')->group(function() {
-        Route::get('/dashboard', function () {
-            return view('dashboard');
-        })->name('dashboard');
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('web.dashboard');
 
+    Route::name('admin.')->group(function() {
         # Start Platform Managment
             # Stages
             Route::prefix('stages')->controller(StagesController::class)->name('stages.')->group(function() {
@@ -172,3 +171,7 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+require __DIR__.'/teacher.php';
+require __DIR__.'/assistant.php';
+require __DIR__.'/student.php';
+require __DIR__.'/parent.php';

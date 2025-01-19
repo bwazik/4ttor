@@ -46,8 +46,6 @@
                 {
                     data: 'name',
                     name: 'name',
-                    orderable: false,
-                    searchable: false
                 },
                 {
                     data: 'username',

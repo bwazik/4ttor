@@ -11,30 +11,48 @@ use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
+    protected function isValidGuard($guard): bool
+    {
+        $availableGuards = ['developer', 'teacher', 'assistant', 'student', 'parent'];
+        return in_array($guard, $availableGuards);
+    }
+
     /**
      * Display the login view.
      */
-    public function create(): View
+    public function create($guard)
     {
-        return view('auth.login');
+        if (!$this->isValidGuard($guard)) {
+            abort(404);
+        }
+
+        return view('auth.login', compact('guard'));
     }
 
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request, $guard): RedirectResponse
     {
-        $request->authenticate();
+        if (!$this->isValidGuard($guard)) {
+            return redirect()->route('landing');
+        }
+
+        if ($guard == 'developer') {
+            $guard = 'web';
+        }
+
+        $request->authenticate($guard);
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended(route($guard.'.dashboard', absolute: false));
     }
 
     /**
      * Destroy an authenticated session.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request, $guard): RedirectResponse
     {
         Auth::guard('web')->logout();
 
@@ -42,6 +60,17 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        if (in_array($guard, ['web', 'developer']))
+        {
+            return redirect()->route('login', 'developer');
+        }
+        elseif (in_array($guard, ['teacher', 'assistant', 'student', 'parent']))
+        {
+            return redirect()->route('login', $guard);
+        }
+        else
+        {
+            return redirect()->route('landing');
+        }
     }
 }
