@@ -33,6 +33,7 @@ return [
     'grade' => 'Grade',
     'parent' => 'Parent',
     'teacher' => 'Teacher',
+    'amount' => 'Amount',
     'status' => 'Status',
     'created_at' => 'Created Date',
     'updated_at' => 'Updated Date',
@@ -119,4 +120,5 @@ return [
     'tooManyRequestsMessage' => 'You have exceeded the maximum number of requests. Please try again later!',
     'errorDependencies' => 'The :model (:name) cannot be deleted because it has related records in :dependency.',
     'validateTeacherGroups' => 'The student must be with the specified teacher to join their group.',
+    'validateTeacherGrades' => 'The teacher must be assigned to the specified grade.',
 ];

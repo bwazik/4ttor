@@ -38,6 +38,11 @@ class MyParent extends Authenticatable
         return $this->hasMany(Student::class, 'parent_id');
     }
 
+    public function images()
+    {
+        return $this->morphMany(Image::class, 'imageable');
+    }
+    
     # Scopes
     public function scopeMale($query)
     {

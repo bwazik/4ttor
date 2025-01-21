@@ -4,12 +4,14 @@
     'label',
     'placeholder' => '',
     'required' => false,
+    'readonly' => false,
     'date' => false,
     'id' => null,
     'classes' => null,
     'context' => null,
     'divClasses' => null,
     'price' => false,
+    'value' => null,
 ])
 
 @php
@@ -27,7 +29,7 @@
         <div class="input-group input-group-merge">
             <div class="form-floating form-floating-outline">
                 <input type="{{ $type }}" id="{{ $id ?? $name }}" class="form-control"
-                    name="{{ $name }}" {{ $required ? 'required' : '' }} placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+                    name="{{ $name }}" value="{{ e($value) }}" {{ $required ? 'required' : '' }} {{ $readonly ? 'readonly' : '' }} placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
                     aria-label="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
                 <label for="{{ $id ?? $name }}">{{ $label }}</label>
             </div>
@@ -41,7 +43,7 @@
             @if(app()->getLocale() == 'ar')
             <div class="form-floating form-floating-outline">
                 <input type="{{ $type }}" id="{{ $id ?? $name }}" class="form-control"
-                    name="{{ $name }}" {{ $required ? 'required' : '' }} placeholder="{{ $placeholder }}"
+                    name="{{ $name }}" value="{{ e($value) }}" {{ $required ? 'required' : '' }} {{ $readonly ? 'readonly' : '' }} placeholder="{{ $placeholder }}"
                     aria-label="{{ $placeholder }}" @if($name === 'phone') step="1" @endif/>
                 <label for="{{ $id ?? $name }}">{{ $label }}</label>
             </div>
@@ -50,7 +52,7 @@
             <span class="input-group-text">EG (+2)</span>
             <div class="form-floating form-floating-outline">
                 <input type="{{ $type }}" id="{{ $id ?? $name }}" class="form-control"
-                    name="{{ $name }}" {{ $required ? 'required' : '' }} placeholder="{{ $placeholder }}"
+                    name="{{ $name }}" value="{{ e($value) }}" {{ $required ? 'required' : '' }} {{ $readonly ? 'readonly' : '' }} placeholder="{{ $placeholder }}"
                     aria-label="{{ $placeholder }}" step="1"/>
                 <label for="{{ $id ?? $name }}">{{ $label }}</label>
             </div>
@@ -64,7 +66,7 @@
         <div class="input-group input-group-merge">
             <div class="form-floating form-floating-outline">
                 <input type="{{ $type }}" id="{{ $id ?? $name }}" class="form-control{{ $classes ? ' ' . $classes : '' }}"
-                    name="{{ $name }}" {{ $required ? 'required' : '' }} placeholder="{{ $placeholder }}"
+                    name="{{ $name }}" value="{{ e($value) }}" {{ $required ? 'required' : '' }} {{ $readonly ? 'readonly' : '' }} placeholder="{{ $placeholder }}"
                     aria-label="{{ $placeholder }}"/>
                 <label for="{{ $id ?? $name }}">{{ $label }}</label>
             </div>
@@ -78,7 +80,7 @@
             <span class="input-group-text">@</span>
             <div class="form-floating form-floating-outline">
                 <input type="{{ $type }}" id="{{ $id ?? $name }}" class="form-control{{ $classes ? ' ' . $classes : '' }}"
-                    name="{{ $name }}" {{ $required ? 'required' : '' }} placeholder="{{ $placeholder }}"
+                    name="{{ $name }}" value="{{ e($value) }}" {{ $required ? 'required' : '' }} {{ $readonly ? 'readonly' : '' }} placeholder="{{ $placeholder }}"
                     aria-label="{{ $placeholder }}"/>
                 <label for="{{ $id ?? $name }}">{{ $label }}</label>
             </div>
@@ -89,7 +91,7 @@
     <div class="{{ $divClasses }}">
         <div class="form-floating form-floating-outline">
             <input type="{{ $type }}" id="{{ $id ?? $name }}" class="form-control{{ $classes ? ' ' . $classes : '' }}"
-                name="{{ $name }}" {{ $required ? 'required' : '' }} placeholder="{{ $placeholder }}"
+                name="{{ $name }}" value="{{ e($value) }}" {{ $required ? 'required' : '' }} {{ $readonly ? 'readonly' : '' }} placeholder="{{ $placeholder }}"
                 aria-label="{{ $placeholder }}"/>
             <label for="{{ $id ?? $name }}">{{ $label }}</label>
         </div>

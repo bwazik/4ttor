@@ -3,10 +3,12 @@
     'label',
     'options' => [],
     'required' => false,
+    'readonly' => false,
     'id' => null,
     'multiple' => false,
     'context' => null,
     'divClasses' => null,
+    'selected' => [],
 ])
 
 @php
@@ -17,15 +19,19 @@ $defaultDivClasses = match ($context) {
 };
 
 $divClasses = $divClasses ?? $defaultDivClasses;
+
+$selectedValues = is_array($selected) ? $selected : [$selected];
 @endphp
 
 <div class="{{ $divClasses }}">
     <div class="form-floating form-floating-outline">
         <div class="select2-primary">
             <select id="{{ $id ?? $name }}" class="form-select" name="{{ $name }}{{ $multiple ? '[]' : '' }}"
-            {{ $multiple ? 'multiple' : '' }} {{ $required ? "required" : "" }}>
+            {{ $multiple ? 'multiple' : '' }} {{ $required ? "required" : "" }} {{ $readonly ? 'readonly' : '' }}>
             @foreach($options as $value => $optionLabel)
-                <option value="{{ $value }}">{{ $optionLabel }}</option>
+                <option value="{{ $value }}" {{ in_array($value, $selectedValues) ? 'selected' : '' }}>
+                    {{ $optionLabel }}
+                </option>
             @endforeach
             </select>
         </div>

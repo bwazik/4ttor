@@ -157,7 +157,7 @@ function refreshDataTable(datatableId) {
     $(datatableId).DataTable().ajax.reload(null, false);
 }
 
-function initializeSelect2(modalId, elementId, value = null) {
+function initializeSelect2(modalId, elementId, value = null, disabled = false) {
     const select2Element = $('#' + modalId + ' #' + elementId);
     if (typeof $.fn.select2 !== 'undefined' && select2Element.length) {
         // Destroy any existing instance
@@ -169,6 +169,7 @@ function initializeSelect2(modalId, elementId, value = null) {
         select2Element.wrap('<div class="position-relative"></div>').select2({
             placeholder: window.translations.select_option,
             dropdownParent: select2Element.parent(),
+            disabled: disabled,
         });
 
         if (value !== null) {
@@ -585,4 +586,67 @@ function updateGroupNames() {
     $('#name_en').val(groupNameEn);
 }
 
+function handleProfilePicSubmit(formId) {
+    $(formId).on('submit', function(e) {
+        e.preventDefault();
+        submitButton = $(this).find('button[type="submit"]');
+        submitButton.prop('disabled', true);
 
+        const formData = new FormData(this);
+
+        const file = $(formId).find('input[type="file"]')[0].files[0];
+
+        if (file && file.size > 1024 * 1024) {
+            toastr.error("The file is too large. Please select a file smaller than 1MB.");
+            setTimeout(function() {
+                submitButton.prop('disabled', false);
+            }, 1500);
+            return;
+        }
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: $(this).attr('method'),
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    toastr.success(response.success);
+                    setTimeout(function() {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    toastr.error(response.error || errorMessage);
+                    setTimeout(function() {
+                        submitButton.prop('disabled', false);
+                    }, 1500);
+                }
+            },
+            error: function(xhr, status, error) {
+                if (xhr.status === 429) {
+                    toastr.error(tooManyRequestsMessage);
+                } else if (xhr.responseJSON) {
+                    if (xhr.responseJSON.errors) {
+                        $.each(xhr.responseJSON.errors, function(key, val) {
+                            $.each(val, function(index, message) {
+                                toastr.error(message);
+                            });
+                        });
+                    } else if (xhr.responseJSON.error) {
+                        toastr.error(xhr.responseJSON.error);
+                    } else {
+                        toastr.error(errorMessage);
+                    }
+                } else {
+                    toastr.error(errorMessage);
+                }
+
+                setTimeout(function() {
+                    submitButton.prop('disabled', false);
+                }, 1500);
+            },
+        });
+    });
+}

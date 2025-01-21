@@ -11,11 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
+        # Start Platform Managment Tables
         Schema::table('grades', function (Blueprint $table) {
             $table->foreign('stage_id')->references('id')->on('stages')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });
+        # End Platform Managment Tables
+
+        # Start Users Management Tables
         Schema::table('teachers', function (Blueprint $table) {
             $table->foreign('subject_id')->references('id')->on('subjects')
                 ->onDelete('cascade')
@@ -66,6 +70,33 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });
+        # End Users Management Tables
+
+        # Start Finance Tables
+        Schema::table('fees', function (Blueprint $table) {
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('grade_id')->references('id')->on('grades')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('invoices', function (Blueprint $table) {
+            $table->foreign('fee_id')->references('id')->on('fees')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('plan_id')->references('id')->on('plans')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('student_id')->references('id')->on('students')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        # End Finance Tables
+
     }
 
     /**
@@ -73,9 +104,13 @@ return new class extends Migration
      */
     public function down(): void
     {
+        # Start Platform Managment Tables
         Schema::table('grades', function (Blueprint $table) {
             $table->dropForeign('grades_stage_id_foreign');
         });
+        # End Platform Managment Tables
+
+        # Start Users Management Tables
         Schema::table('teachers', function (Blueprint $table) {
             $table->dropForeign('teachers_subject_id_foreign');
             $table->dropForeign('teachers_plan_id_foreign');
@@ -102,5 +137,20 @@ return new class extends Migration
             $table->dropForeign('student_group_student_id_foreign');
             $table->dropForeign('student_group_group_id_foreign');
         });
+        # End Users Management Tables
+
+        # Start Finance Tables
+        Schema::table('fees', function (Blueprint $table) {
+            $table->dropForeign('fees_teacher_id_foreign');
+            $table->dropForeign('fees_grade_id_foreign');
+        });
+        Schema::table('invoices', function (Blueprint $table) {
+            $table->dropForeign('invoices_fee_id_foreign');
+            $table->dropForeign('invoices_plan_id_foreign');
+            $table->dropForeign('invoices_teacher_id_foreign');
+            $table->dropForeign('invoices_student_id_foreign');
+        });
+        # End Finance Tables
+
     }
 };

@@ -94,10 +94,10 @@
             </a>
         </li>
 
+        <!-- Users Managment -->
         <li class="menu-header mt-5">
             <span class="menu-header-text">{{ trans('layouts/sidebar.usersManagment') }}</span>
         </li>
-        <!-- Teachers Managment -->
         <li class="menu-item {{ isActiveRoute(['admin.teachers.index', 'admin.teachers.archived', 'admin.groups.index']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
                 <i class="menu-icon tf-icons ri-presentation-line"></i>
@@ -121,7 +121,6 @@
                 </li>
             </ul>
         </li>
-        <!-- Assistants Managment -->
         <li class="menu-item {{ isActiveRoute(['admin.assistants.index', 'admin.assistants.archived']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
                 <i class="menu-icon tf-icons ri-user-star-line"></i>
@@ -140,7 +139,6 @@
                 </li>
             </ul>
         </li>
-        <!-- Students Managment -->
         <li class="menu-item {{ isActiveRoute(['admin.students.index', 'admin.students.archived']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
                 <i class="menu-icon tf-icons ri-graduation-cap-line"></i>
@@ -159,7 +157,6 @@
                 </li>
             </ul>
         </li>
-        <!-- Parents Managment -->
         <li class="menu-item {{ isActiveRoute(['admin.parents.index', 'admin.parents.archived']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
                 <i class="menu-icon tf-icons ri-parent-line"></i>
@@ -177,6 +174,17 @@
                     </a>
                 </li>
             </ul>
+        </li>
+
+        <!-- Finance -->
+        <li class="menu-header mt-5">
+            <span class="menu-header-text">{{ trans('layouts/sidebar.finance') }}</span>
+        </li>
+        <li class="menu-item {{ isActiveRoute('admin.fees.index') ? 'active' : '' }}">
+            <a href="{{ route('admin.fees.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons ri-wallet-line"></i>
+                <div>{{ trans('layouts/sidebar.fees') }}</div>
+            </a>
         </li>
     </ul>
 </aside>

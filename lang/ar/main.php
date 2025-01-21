@@ -33,6 +33,7 @@ return [
     'grade' => 'الصف الدراسي',
     'parent' => 'ولي الأمر',
     'teacher' => 'المدرس',
+    'amount' => 'المبلغ',
     'status' => 'الحالة',
     'created_at' => 'تاريخ الإضافة',
     'updated_at' => 'تاريخ التعديل',
@@ -119,4 +120,5 @@ return [
     'tooManyRequestsMessage' => 'انت تجاوزت العدد المسموح بيه من الطلبات. حاول تاني بعد شوية!',
     'errorDependencies' => ':model دي (:name) مش هينفع تتمسح علشان عندها علاقات مرتبطة مع :dependency.',
     'validateTeacherGroups' => 'لازم يكون الطالب مع المستر المحدد عشان يخش مجموعته.',
+    'validateTeacherGrades' => 'لازم يكون المدرس مع الصف المحدد عشان يقدر يضيف المصاريف.',
 ];

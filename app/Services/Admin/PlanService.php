@@ -25,7 +25,7 @@ class PlanService
                 return $row->name;
             })
             ->editColumn('monthly_price', function ($row) {
-                    return formatCurrency($row->monthly_price) . ' ' . trans('main.currency');
+                return formatCurrency($row->monthly_price) . ' ' . trans('main.currency');
             })
             ->editColumn('term_price', function ($row) {
                 return formatCurrency($row->term_price) . ' ' . trans('main.currency');

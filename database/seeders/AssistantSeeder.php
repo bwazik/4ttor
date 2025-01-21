@@ -28,7 +28,7 @@ class AssistantSeeder extends Seeder
                 'name' => ['en' => $fakerEn -> name, 'ar' => $fakerAr -> name],
                 'phone' => '01' . $fakerEn->randomElement([0, 1, 2, 5]) . $fakerEn->numerify('########'),
                 'email' => $fakerEn->unique()->safeEmail,
-                'parent_id' => $fakerEn->randomElement($teachersIds),
+                'teacher_id' => $fakerEn->randomElement($teachersIds),
                 'is_active' => $fakerEn->boolean(75),
             ]);
         }
