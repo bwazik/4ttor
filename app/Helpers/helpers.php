@@ -23,7 +23,7 @@ if (!function_exists('isActiveRoute')) {
 
 if (!function_exists('pageTitle')) {
     function pageTitle($key) {
-        return trans('layouts/sidebar.platformName') . ' - ' . trans($key);
+        return trans($key) . ' - ' . trans('layouts/sidebar.platformName');
     }
 }
 

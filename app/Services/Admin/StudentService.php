@@ -18,9 +18,7 @@ class StudentService
                 return $btn;
             })
             ->addColumn('details', function ($row) {
-                $profilePic = $row->profile_pic ?
-                '<img src="' . asset('storage/' . $row->profile_picture) . '" alt="Profile Picture" class="rounded-circle">' :
-                '<img src="' . asset('assets/img/avatars/19.png') . '" alt="Profile Picture" class="rounded-circle">';
+                $profilePic =  '<img src="' . asset($row->profile_pic ? 'storage/profiles/students/' . $row->profile_pic : 'assets/img/avatars/default.jpg') . '" alt="Profile Picture" class="rounded-circle">';
 
                 return
                 '<div class="d-flex justify-content-start align-items-center">
@@ -34,7 +32,7 @@ class StudentService
                 </div>';
             })
             ->editColumn('parent_id', function ($row) {
-                return $row->parent_id ? $row->parent->name : '-';
+                return "<a target='_blank' href='" . route('admin.parents.details', $row->parent_id) . "'>" . ($row->parent_id ? $row->parent->name : '-') . "</a>";
             })
             ->editColumn('is_active', function ($row) {
                 return $row->is_active ? '<span class="badge rounded-pill bg-label-success" text-capitalized="">'.trans('main.active').'</span>' : '<span class="badge rounded-pill bg-label-secondary" text-capitalized="">'.trans('main.inactive').'</span>';
@@ -49,7 +47,7 @@ class StudentService
                 '<div class="d-inline-block">
                     <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ri-more-2-line"></i></a>
                     <ul class="dropdown-menu dropdown-menu-end m-0">
-                        <li><a href="javascript:;" class="dropdown-item">'.trans('main.details').'</a></li>
+                        <li><a target="_blank" href="'.route('admin.students.details', $row->id).'" class="dropdown-item">'.trans('main.details').'</a></li>
                         <li>
                             <a href="javascript:;" class="dropdown-item"
                                 id="archive-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
@@ -75,7 +73,7 @@ class StudentService
                     <i class="ri-edit-box-line ri-20px"></i>
                 </button>';
             })
-            ->rawColumns(['selectbox', 'details', 'is_active', 'actions'])
+            ->rawColumns(['selectbox', 'details', 'parent_id', 'is_active', 'actions'])
             ->make(true);
     }
 
@@ -90,7 +88,7 @@ class StudentService
             ->addColumn('details', function ($row) {
                 $profilePic = $row->profile_pic ?
                 '<img src="' . asset('storage/' . $row->profile_picture) . '" alt="Profile Picture" class="rounded-circle">' :
-                '<img src="' . asset('assets/img/avatars/19.png') . '" alt="Profile Picture" class="rounded-circle">';
+                '<img src="' . asset('assets/img/avatars/default.jpg') . '" alt="Profile Picture" class="rounded-circle">';
 
                 return
                 '<div class="d-flex justify-content-start align-items-center">

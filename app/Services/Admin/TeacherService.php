@@ -24,9 +24,7 @@ class TeacherService
                 return $btn;
             })
             ->addColumn('details', function ($row) {
-                $profilePic = $row->profile_pic ?
-                '<img src="' . asset('storage/' . $row->profile_picture) . '" alt="Profile Picture" class="rounded-circle">' :
-                '<img src="' . asset('assets/img/avatars/19.png') . '" alt="Profile Picture" class="rounded-circle">';
+                $profilePic =  '<img src="' . asset($row->profile_pic ? 'storage/profiles/teachers/' . $row->profile_pic : 'assets/img/avatars/default.jpg') . '" alt="Profile Picture" class="rounded-circle">';
 
                 $teacherName = App::getLocale() == 'ar' ?
                 trans('admin/teachers.teacher') . ' ' . $row->subject->name :
@@ -57,7 +55,7 @@ class TeacherService
                 '<div class="d-inline-block">
                     <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ri-more-2-line"></i></a>
                     <ul class="dropdown-menu dropdown-menu-end m-0">
-                        <li><a href="javascript:;" class="dropdown-item">'.trans('main.details').'</a></li>
+                        <li><a target="_blank" href="'.route('admin.teachers.details', $row->id).'" class="dropdown-item">'.trans('main.details').'</a></li>
                         <li>
                             <a href="javascript:;" class="dropdown-item"
                                 id="archive-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
@@ -99,7 +97,7 @@ class TeacherService
             ->addColumn('details', function ($row) {
                 $profilePic = $row->profile_pic ?
                 '<img src="' . asset('storage/' . $row->profile_picture) . '" alt="Profile Picture" class="rounded-circle">' :
-                '<img src="' . asset('assets/img/avatars/19.png') . '" alt="Profile Picture" class="rounded-circle">';
+                '<img src="' . asset('assets/img/avatars/default.jpg') . '" alt="Profile Picture" class="rounded-circle">';
 
                 $teacherName = App::getLocale() == 'ar' ?
                 trans('admin/teachers.teacher') . ' ' . $row->subject->name :

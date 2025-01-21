@@ -167,4 +167,25 @@ class TeachersController extends Controller
 
         return response()->json($groups);
     }
+
+    public function grades(Request $request)
+    {
+        $validated = $request->validate([
+            'teacher_id' => 'required|exists:teachers,id',
+        ]);
+
+        $teacherId = $validated['teacher_id'];
+
+        $grades = Grade::whereHas('teachers', function ($query) use ($teacherId) {
+            $query->where('teacher_id', $teacherId);
+            })
+            ->select('id', 'name')
+            ->orderBy('id')
+            ->get()
+            ->mapWithKeys(function ($grade) {
+                return [$grade->id => $grade->name];
+            });
+            
+        return response()->json($grades);
+    }
 }

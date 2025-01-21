@@ -33,7 +33,7 @@ class ParentService
                 '<div class="d-inline-block">
                     <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ri-more-2-line"></i></a>
                     <ul class="dropdown-menu dropdown-menu-end m-0">
-                        <li><a href="javascript:;" class="dropdown-item">'.trans('main.details').'</a></li>
+                        <li><a target="_blank" href="'.route('admin.parents.details', $row->id).'" class="dropdown-item">'.trans('main.details').'</a></li>
                         <li>
                             <a href="javascript:;" class="dropdown-item"
                                 id="archive-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
