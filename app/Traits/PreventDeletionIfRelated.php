@@ -50,6 +50,11 @@ trait PreventDeletionIfRelated
      */
     public function checkForSingleDependencies($models, array $relationships, string $transModelKey): ?array
     {
+        static $accountTranslations = [
+            'admin/studentAccount.studentAccount' => trans('main.studentAccount'),
+            'admin/teacherAccount.teacherAccount' => trans('main.teacherAccount')
+        ];
+
         // Ensure we work with a collection of models (even if a single model is passed)
         if (!$models instanceof Collection) {
             $models = collect([$models]);
@@ -66,7 +71,8 @@ trait PreventDeletionIfRelated
                 foreach ($relatedRecords as $relation => $relatedItems) {
                     if (!empty($relatedItems)) {
                         $relationName = trans("admin/{$relation}.{$relation}");
-                        $dependencyMessages[] = $relationName;
+
+                        $dependencyMessages[] = $accountTranslations[$relationName] ?? $relationName;
                     }
                 }
 
