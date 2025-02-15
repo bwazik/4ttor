@@ -3,25 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Translatable\HasTranslations;
 
-class Fee extends Model
+class TeacherAccount extends Model
 {
-    use HasTranslations;
-
-    protected $table = 'fees';
-
-    public $translatable = ['name'];
+    protected $table = 'teacher_accounts';
 
     protected $fillable = [
-        'name',
-        'amount',
+        'type',
         'teacher_id',
-        'grade_id',
+        'invoice_id',
+        'receipt_id',
+        'refund_id',
+        'debit',
+        'credit',
         'created_at',
-    ];
-
-    protected $hidden = [
         'updated_at',
     ];
 
@@ -31,14 +26,19 @@ class Fee extends Model
         return $this->belongsTo(Teacher::class, 'teacher_id');
     }
 
-    public function grade()
+    public function invoice()
     {
-        return $this->belongsTo(Grade::class, 'grade_id');
+        return $this->belongsTo(Invoice::class, 'invoice_id');
     }
 
-    public function invoices()
+    public function receipt()
     {
-        return $this->hasMany(Invoice::class, 'fee_id');
+        return $this->belongsTo(Receipt::class, 'receipt_id');
+    }
+
+    public function refund()
+    {
+        return $this->belongsTo(Refund::class, 'refund_id');
     }
 
     # Accessors
@@ -46,6 +46,7 @@ class Fee extends Model
     {
         return isoFormat($value);
     }
+
     public function getUpdatedAtAttribute($value)
     {
         return isoFormat($value);

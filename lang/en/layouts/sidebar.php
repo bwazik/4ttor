@@ -23,4 +23,11 @@ return [
     'parentsManagment' => 'Parents Managment',
     'assistants' => 'Assistants',
     'assistantsManagment' => 'Assistants Managment',
+
+    # Finance Managment
+    'financeManagment' => 'Finance Managment',
+    'fees' => 'Fees',
+    'invoices' => 'Invoices',
+    'teachersInvoices' => 'Teachers Invoices',
+    'studentsInvoices' => 'Students Invoices',
 ];

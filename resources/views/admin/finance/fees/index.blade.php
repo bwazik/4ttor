@@ -77,6 +77,6 @@
         handleFormSubmit('#edit-form', fields, '#edit-modal', 'offcanvas', '#datatable');
         handleDeletionFormSubmit('#delete-form', '#delete-modal', '#datatable')
         handleDeletionFormSubmit('#delete-selected-form', '#delete-selected-modal', '#datatable')
-        fetchDataByAjax('#add-form #teacher_id', "{{ route('admin.teachers.grades') }}", '#add-form #grade_id', 'teacher_id')
+        fetchMultipleDataByAjax('#add-form #teacher_id', "{{ route('admin.teachers.grades', '__ID__') }}", '#add-form #grade_id', 'teacher_id', 'GET')
     </script>
 @endsection

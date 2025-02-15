@@ -95,6 +95,50 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });
+        Schema::table('student_accounts', function (Blueprint $table) {
+            $table->foreign('student_id')->references('id')->on('students')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('invoice_id')->references('id')->on('invoices')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('receipt_id')->references('id')->on('receipts')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('refund_id')->references('id')->on('refunds')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('teacher_accounts', function (Blueprint $table) {
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('invoice_id')->references('id')->on('invoices')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('receipt_id')->references('id')->on('receipts')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('refund_id')->references('id')->on('refunds')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('receipts', function (Blueprint $table) {
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('student_id')->references('id')->on('students')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('refunds', function (Blueprint $table) {
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('student_id')->references('id')->on('students')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
         # End Finance Tables
 
     }
@@ -149,6 +193,26 @@ return new class extends Migration
             $table->dropForeign('invoices_plan_id_foreign');
             $table->dropForeign('invoices_teacher_id_foreign');
             $table->dropForeign('invoices_student_id_foreign');
+        });
+        Schema::table('student_accounts', function (Blueprint $table) {
+            $table->dropForeign('student_accounts_student_id_foreign');
+            $table->dropForeign('student_accounts_invoice_id_foreign');
+            $table->dropForeign('student_accounts_receipt_id_foreign');
+            $table->dropForeign('student_accounts_refund_id_foreign');
+        });
+        Schema::table('teacher_accounts', function (Blueprint $table) {
+            $table->dropForeign('teacher_accounts_teacher_id_foreign');
+            $table->dropForeign('teacher_accounts_invoice_id_foreign');
+            $table->dropForeign('teacher_accounts_receipt_id_foreign');
+            $table->dropForeign('teacher_accounts_refund_id_foreign');
+        });
+        Schema::table('receipts', function (Blueprint $table) {
+            $table->dropForeign('receipts_teacher_id_foreign');
+            $table->dropForeign('receipts_student_id_foreign');
+        });
+        Schema::table('refunds', function (Blueprint $table) {
+            $table->dropForeign('refunds_teacher_id_foreign');
+            $table->dropForeign('refunds_student_id_foreign');
         });
         # End Finance Tables
 

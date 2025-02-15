@@ -10,7 +10,7 @@ class PlanService
 {
     use PreventDeletionIfRelated;
 
-    protected $relationships = ['teachers'];
+    protected $relationships = ['teachers', 'invoices'];
     protected $transModelKey = 'admin/plans.plans';
 
     public function getPlansForDatatable($plansQuery)

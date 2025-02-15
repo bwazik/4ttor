@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Fee;
 use App\Models\Grade;
 use App\Models\Stage;
 use Illuminate\Http\Request;

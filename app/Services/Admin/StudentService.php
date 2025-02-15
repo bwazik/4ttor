@@ -6,9 +6,15 @@ use App\Models\Student;
 use App\Models\Teacher;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Traits\PreventDeletionIfRelated;
 
 class StudentService
 {
+    use PreventDeletionIfRelated;
+
+    protected $relationships = ['invoices', 'studentAccount', 'receipts', 'refunds'];
+    protected $transModelKey = 'admin/students.students';
+
     public function getStudentsForDatatable($studentsQuery)
     {
         return datatables()->eloquent($studentsQuery)
@@ -237,7 +243,12 @@ class StudentService
         DB::beginTransaction();
 
         try {
-            $student = Student::withTrashed()->findOrFail($id);
+            $student = Student::withTrashed()->select('id', 'name')->findOrFail($id);
+
+            if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($student)) {
+                return $dependencyCheck;
+            }
+
             $student->forceDelete();
 
             DB::commit();
@@ -322,6 +333,15 @@ class StudentService
         DB::beginTransaction();
 
         try {
+            $students = Student::whereIn('id', $ids)
+            ->select('id', 'name')
+            ->orderBy('id')
+            ->get();
+
+            if ($dependencyCheck = $this->checkDependenciesForMultipleDeletion($students)) {
+                return $dependencyCheck;
+            }
+
             Student::withTrashed()->whereIn('id', $ids)->forceDelete();
 
             DB::commit();
@@ -423,5 +443,15 @@ class StudentService
         }
 
         return true;
+    }
+
+    public function checkDependenciesForSingleDeletion($teacher): array|null
+    {
+        return $this->checkForSingleDependencies($teacher, $this->relationships, $this->transModelKey);
+    }
+
+    public function checkDependenciesForMultipleDeletion($teachers)
+    {
+        return $this->checkForMultipleDependencies($teachers, $this->relationships, $this->transModelKey);
     }
 }

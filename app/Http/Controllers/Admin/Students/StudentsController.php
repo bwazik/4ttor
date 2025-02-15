@@ -154,4 +154,58 @@ class StudentsController extends Controller
 
         return response()->json(['error' => $result['message']], 500);
     }
+
+    public function getStudentGrade($id)
+    {
+        try {
+            $student = Student::with('grade:id,name')->select('id', 'grade_id')->findOrFail($id);
+
+            if (!$student->grade) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => trans('main.noGradeAssigned'),
+                ], 404);
+            }
+
+            return response()->json(['status' => 'success', 'data' => $student->grade->name]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => config('app.env') === 'production'
+                    ? trans('main.errorMessage')
+                    : $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getStudentTeachers($id)
+    {
+        try {
+            $student = Student::select('id')->findOrFail($id);
+
+            $teachers = Teacher::whereHas('students', function ($query) use ($id) {
+                $query->where('student_id', $id);
+            })
+            ->select('id', 'name')
+            ->orderBy('id')
+            ->get()
+            ->mapWithKeys(fn($student) => [$student->id => $student->name]);
+
+            if ($teachers->isEmpty()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => trans('main.noStudentsAssigned'),
+                ], 404);
+            }
+
+            return response()->json(['status' => 'success', 'data' => $teachers]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => config('app.env') === 'production'
+                    ? trans('main.errorMessage')
+                    : $e->getMessage(),
+            ], 500);
+        }
+    }
 }

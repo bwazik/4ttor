@@ -12,7 +12,7 @@ class TeacherService
 {
     use PreventDeletionIfRelated;
 
-    protected $relationships = ['students', 'assistants', 'groups'];
+    protected $relationships = ['students', 'assistants', 'groups', 'fees', 'invoices', 'teacherAccount', 'receipts', 'refunds'];
     protected $transModelKey = 'admin/teachers.teachers';
 
     public function getTeachersForDatatable($teachersQuery)

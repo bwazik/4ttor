@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\Parents\ParentsDetailsController;
 use App\Http\Controllers\Admin\Assistants\AssistantsController;
 use App\Http\Controllers\Admin\Assistants\AssistantsDetailsController;
 use App\Http\Controllers\Admin\Finance\FeesController;
+use App\Http\Controllers\Admin\Finance\InvoicesController;
 
 Route::group(
     [
@@ -74,6 +75,7 @@ Route::group(
             # Plans
             Route::prefix('plans')->controller(PlansController::class)->name('plans.')->group(function() {
                 Route::get('/', 'index')->name('index');
+                Route::post('price', 'getPlanPrice')->name('price');
                 Route::middleware('throttle:10,1')->group(function() {
                     Route::post('insert', 'insert')->name('insert');
                     Route::post('update', 'update')->name('update');
@@ -90,7 +92,8 @@ Route::group(
                     Route::get('/', 'index')->name('index');
                     Route::get('/archived', 'archived')->name('archived');
                     Route::post('/groups', 'groups')->name('groups');
-                    Route::post('/grades', 'grades')->name('grades');
+                    Route::get('{id}/grades', 'grades')->name('grades');
+                    Route::get('{id}/fees', 'getTeacherFees')->name('fees');
                     Route::middleware('throttle:10,1')->group(function() {
                         Route::post('insert', 'insert')->name('insert');
                         Route::post('update', 'update')->name('update');
@@ -151,6 +154,8 @@ Route::group(
                     Route::get('/', 'index')->name('index');
                     Route::get('/archived', 'archived')->name('archived');
                     Route::get('/details/{id}', 'details')->name('details');
+                    Route::get('{id}/grade', 'getStudentGrade')->name('grade');
+                    Route::get('{id}/teachers', 'getStudentTeachers')->name('teachers');
                     Route::middleware('throttle:10,1')->group(function() {
                         Route::post('insert', 'insert')->name('insert');
                         Route::post('update', 'update')->name('update');
@@ -194,12 +199,26 @@ Route::group(
             # Fees
             Route::prefix('fees')->controller(FeesController::class)->name('fees.')->group(function() {
                 Route::get('/', 'index')->name('index');
+                Route::get('{id}/amount', 'getFeeAmount')->name('amount');
                 Route::middleware('throttle:10,1')->group(function() {
                     Route::post('insert', 'insert')->name('insert');
                     Route::post('update', 'update')->name('update');
                     Route::post('delete', 'delete')->name('delete');
                     Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
                 });
+            });
+
+            # Invoices
+            Route::prefix('invoices')->controller(InvoicesController::class)->name('invoices.')->group(function() {
+                foreach (['teachers', 'students'] as $type) {
+                    Route::prefix($type)->name("$type.")->group(function () {
+                        Route::get('/', 'index')->name('index');
+                        Route::middleware('throttle:10,1')->group(function () {
+                            Route::post('insert', 'insert')->name('insert');
+                            Route::post('delete', 'delete')->name('delete');
+                        });
+                    });
+                }
             });
         # End Finance Managment
 

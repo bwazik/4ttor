@@ -83,4 +83,27 @@ class FeesController extends Controller
 
         return response()->json(['error' => $result['message']], 500);
     }
+
+    public function getFeeAmount($id)
+    {
+        try {
+            $fee = Fee::select('id', 'amount')->findOrFail($id);
+
+            if (is_null($fee->amount)) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => trans('main.noAmountAssigned'),
+                ], 404);
+            }
+
+            return response()->json(['status' => 'success', 'data' => $fee->amount]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => config('app.env') === 'production'
+                    ? trans('main.errorMessage')
+                    : $e->getMessage(),
+            ], 500);
+        }
+    }
 }
