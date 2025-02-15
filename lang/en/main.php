@@ -85,6 +85,8 @@ return [
     'allowed' => 'Allowed',
     'notallowed' => 'Not Allowed',
     'select_option' => 'Select an option from the list',
+    'studentAccount' => 'Student Account',
+    'teacherAccount' => 'Teacher Account',
 
     # Modals
     'items' => 'Items Count',

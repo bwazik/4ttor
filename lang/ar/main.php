@@ -86,7 +86,9 @@ return [
     'allowed' => 'مسموح',
     'notallowed' => 'مش مسموح',
     'select_option' => 'اختار حاجة من الاختيارات',
-
+    'studentAccount' => 'حساب الطالب',
+    'teacherAccount' => 'حساب المدرس',
+    
     # Modals
     'items' => 'عدد العناصر',
     'editItem' => 'تعديل :item',
