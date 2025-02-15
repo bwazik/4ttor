@@ -10,7 +10,7 @@ class GradeService
 {
     use PreventDeletionIfRelated;
 
-    protected $relationships = ['students', 'teachers'];
+    protected $relationships = ['students', 'teachers', 'fees'];
     protected $transModelKey = 'admin/grades.grades';
 
     public function getGradesForDatatable($gradesQuery)

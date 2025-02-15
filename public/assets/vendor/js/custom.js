@@ -515,28 +515,35 @@ function handleDeletionFormSubmit(formId, modalId, datatableId) {
     });
 }
 
-function fetchDataByAjax(triggerSelector, url, targetSelector, requestDataKey) {
+function fetchMultipleDataByAjax(triggerSelector, urlTemplate, targetSelector, requestDataKey, type = 'POST') {
     $(triggerSelector).on('change', function(e) {
         e.preventDefault();
 
         const selectedValue  = $(this).val();
 
         if (selectedValue  && selectedValue .length > 0) {
+            const url = urlTemplate.replace('__ID__', selectedValue);
+
             $.ajax({
                 url: url,
-                type: "POST",
+                type: type,
                 dataType: "json",
                 data: {
                     [requestDataKey]: selectedValue,
                     _token: csrfToken,
                 },
-                success: function(data) {
-                    $(targetSelector).empty();
-                    $.each(data, function(key, value) {
-                        $(targetSelector).append('<option value="' +
-                            key + '">' +
-                            value + '</option>');
-                    });
+                success: function(response) {
+                    if(response.status === 'success') {
+                        $(targetSelector).empty();
+                        $(targetSelector).append('<option value="">' + window.translations.select_option + '</option>');
+                        $.each(response.data, function(key, value) {
+                            $(targetSelector).append('<option value="' +
+                                key + '">' +
+                                value + '</option>');
+                        });
+                    }else {
+                        toastr.error(response.message || errorMessage);
+                    }
                 },
                 error: function(xhr) {
                     $(targetSelector).empty();
@@ -547,6 +554,8 @@ function fetchDataByAjax(triggerSelector, url, targetSelector, requestDataKey) {
                             $.each(xhr.responseJSON.errors, function(key, val) {
                                 toastr.error(val);
                             });
+                        } else if (xhr.responseJSON.message) {
+                            toastr.error(xhr.responseJSON.message);
                         } else if (xhr.responseJSON.error) {
                             toastr.error(xhr.responseJSON.error);
                         } else {
@@ -559,6 +568,59 @@ function fetchDataByAjax(triggerSelector, url, targetSelector, requestDataKey) {
             });
         } else {
             $(targetSelector).empty();
+        }
+    });
+}
+
+function fetchSingleDataByAjax(triggerSelector, urlTemplate, targetSelector, requestDataKey, type = 'POST') {
+    $(triggerSelector).on('change', function(e) {
+        e.preventDefault();
+
+        const selectedValue  = $(this).val();
+
+        if (selectedValue  && selectedValue .length > 0) {
+            const url = urlTemplate.replace('__ID__', selectedValue);
+
+            $.ajax({
+                url: url,
+                type: type,
+                dataType: "json",
+                data: {
+                    [requestDataKey]: selectedValue,
+                    _token: csrfToken,
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $(targetSelector).val(response.data);
+                    } else {
+                        console.log(response);
+
+                        toastr.error(response.message || errorMessage);
+                    }
+                },
+                error: function(xhr) {
+                    $(targetSelector).val('');
+                    if (xhr.status === 429) {
+                        toastr.error(tooManyRequestsMessage);
+                    } else if (xhr.responseJSON) {
+                        if (xhr.responseJSON.errors) {
+                            $.each(xhr.responseJSON.errors, function(key, val) {
+                                toastr.error(val);
+                            });
+                        } else if (xhr.responseJSON.message) {
+                            toastr.error(xhr.responseJSON.message);
+                        } else if (xhr.responseJSON.error) {
+                            toastr.error(xhr.responseJSON.error);
+                        } else {
+                            toastr.error(errorMessage);
+                        }
+                    } else {
+                        toastr.error(errorMessage);
+                    }
+                },
+            });
+        } else {
+            $(targetSelector).val('');
         }
     });
 }

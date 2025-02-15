@@ -11,7 +11,8 @@ class FeeService
 {
     use PreventDeletionIfRelated;
 
-    // protected $relationships = ['grades'];
+    protected $relationships = ['invoices'];
+
     protected $transModelKey = 'admin/fees.fees';
 
     public function getFeesForDatatable($feesQuery)
@@ -141,9 +142,9 @@ class FeeService
         try {
             $fee = Fee::select('id', 'name')->findOrFail($id);
 
-            // if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($fee)) {
-            //     return $dependencyCheck;
-            // }
+            if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($fee)) {
+                return $dependencyCheck;
+            }
 
             $fee->delete();
 
@@ -182,9 +183,9 @@ class FeeService
                 ->orderBy('id')
                 ->get();
 
-            // if ($dependencyCheck = $this->checkDependenciesForMultipleDeletion($fees)) {
-            //     return $dependencyCheck;
-            // }
+            if ($dependencyCheck = $this->checkDependenciesForMultipleDeletion($fees)) {
+                return $dependencyCheck;
+            }
 
             Fee::whereIn('id', $ids)->delete();
 
@@ -206,13 +207,13 @@ class FeeService
         }
     }
 
-    // public function checkDependenciesForSingleDeletion($fee)
-    // {
-    //     return $this->checkForSingleDependencies($fee, $this->relationships, $this->transModelKey);
-    // }
+    public function checkDependenciesForSingleDeletion($fee)
+    {
+        return $this->checkForSingleDependencies($fee, $this->relationships, $this->transModelKey);
+    }
 
-    // public function checkDependenciesForMultipleDeletion($fees)
-    // {
-    //     return $this->checkForMultipleDependencies($fees, $this->relationships, $this->transModelKey);
-    // }
+    public function checkDependenciesForMultipleDeletion($fees)
+    {
+        return $this->checkForMultipleDependencies($fees, $this->relationships, $this->transModelKey);
+    }
 }

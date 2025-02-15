@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Teachers;
 
+use App\Models\Fee;
 use App\Models\Plan;
 use App\Models\Grade;
 use App\Models\Group;
@@ -150,6 +151,48 @@ class TeachersController extends Controller
         return response()->json(['error' => $result['message']], 500);
     }
 
+    // public function groups($ids)
+    // {
+    //     try {
+    //         $teacherIdsArray = explode(',', $ids);
+
+    //         $validTeachers = Teacher::whereIn('id', $teacherIdsArray)->pluck('id')->toArray();
+
+    //         if (empty($validTeachers)) {
+    //             return response()->json([
+    //                 'status' => 'error',
+    //                 'message' => trans('main.noTeachersFound'),
+    //             ], 404);
+    //         }
+
+    //         $groups = Group::whereIn('teacher_id', $validTeachers)
+    //             ->select('id', 'name', 'teacher_id')
+    //             ->with('teacher:id,name')
+    //             ->orderBy('id')
+    //             ->get()
+    //             ->mapWithKeys(fn($group) => [$group->id => $group->name . ' - ' . $group->teacher->name]);
+
+    //         if ($groups->isEmpty()) {
+    //             return response()->json([
+    //                 'status' => 'error',
+    //                 'message' => trans('main.noGroupsAssigned'),
+    //             ], 404);
+    //         }
+
+    //         return response()->json([
+    //             'status' => 'success',
+    //             'data' => $groups,
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => config('app.env') === 'production'
+    //                 ? trans('main.errorMessage')
+    //                 : $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
+
     public function groups(Request $request)
     {
         $validated = $request->validate([
@@ -165,27 +208,68 @@ class TeachersController extends Controller
                 return [$group->id => $group->name . ' - ' . $group->teacher->name];
             });
 
-        return response()->json($groups);
+        return response()->json(['status' => 'success', 'data' => $groups]);
     }
 
-    public function grades(Request $request)
+    public function grades($id)
     {
-        $validated = $request->validate([
-            'teacher_id' => 'required|exists:teachers,id',
-        ]);
+        try {
+            $teacher = Teacher::select('id')->findOrFail($id);
 
-        $teacherId = $validated['teacher_id'];
-
-        $grades = Grade::whereHas('teachers', function ($query) use ($teacherId) {
-            $query->where('teacher_id', $teacherId);
+            $grades = Grade::whereHas('teachers', function ($query) use ($id) {
+                $query->where('teacher_id', $id);
             })
             ->select('id', 'name')
             ->orderBy('id')
             ->get()
-            ->mapWithKeys(function ($grade) {
-                return [$grade->id => $grade->name];
-            });
-            
-        return response()->json($grades);
+            ->mapWithKeys(fn($grade) => [$grade->id => $grade->name]);
+
+            if ($grades->isEmpty()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => trans('main.noGradesAssigned'),
+                ], 404);
+            }
+
+            return response()->json(['status' => 'success', 'data' => $grades]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => config('app.env') === 'production'
+                    ? trans('main.errorMessage')
+                    : $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getTeacherFees($id)
+    {
+        try {
+            $teacher = Teacher::select('id')->findOrFail($id);
+
+            $fees = Fee::whereHas('teacher', function ($query) use ($id) {
+                $query->where('teacher_id', $id);
+            })
+            ->select('id', 'name', 'grade_id')
+            ->orderBy('id')
+            ->get()
+            ->mapWithKeys(fn($fee) => [$fee->id => $fee->name . ' - ' . $fee->grade->name]);
+
+            if ($fees->isEmpty()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => trans('main.noFeesAssigned'),
+                ], 404);
+            }
+
+            return response()->json(['status' => 'success', 'data' => $fees]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => config('app.env') === 'production'
+                    ? trans('main.errorMessage')
+                    : $e->getMessage(),
+            ], 500);
+        }
     }
 }

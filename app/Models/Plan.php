@@ -45,6 +45,11 @@ class Plan extends Model
         return $this->hasMany(Teacher::class, 'plan_id');
     }
 
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class, 'plan_id');
+    }
+
     # Scopes
     public function scopeActive($query)
     {

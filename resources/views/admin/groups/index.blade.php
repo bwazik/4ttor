@@ -41,7 +41,7 @@
                 { data: 'time', name: 'time' },
                 { data: 'is_active', name: 'is_active' },
                 { data: 'created_at', name: 'created_at' },
-                { data: 'updated_at', name: 'updated_at' },
+                { data: 'updated_at', name: 'updated_at', orderable: false, searchable: false },
                 { data: 'actions', name: 'actions', orderable: false, searchable: false }
             ],
         );

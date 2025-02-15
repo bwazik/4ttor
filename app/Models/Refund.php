@@ -5,19 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Invoice extends Model
+class Refund extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'invoices';
+    protected $table = 'refunds';
 
     protected $fillable = [
         'date',
-        'amount',
-        'fee_id',
-        'plan_id',
         'teacher_id',
         'student_id',
+        'debit',
+        'description',
         'created_at',
         'updated_at',
     ];
@@ -27,16 +26,6 @@ class Invoice extends Model
     ];
 
     # Relationships
-    public function fee()
-    {
-        return $this->belongsTo(Fee::class, 'fee_id');
-    }
-
-    public function plan()
-    {
-        return $this->belongsTo(Plan::class, 'plan_id');
-    }
-
     public function teacher()
     {
         return $this->belongsTo(Teacher::class, 'teacher_id');
@@ -49,12 +38,12 @@ class Invoice extends Model
 
     public function studentAccount()
     {
-        return $this->hasMany(StudentAccount::class, 'invoice_id');
+        return $this->hasMany(StudentAccount::class, 'refund_id');
     }
 
     public function teacherAccount()
     {
-        return $this->hasMany(TeacherAccount::class, 'invoice_id');
+        return $this->hasMany(TeacherAccount::class, 'refund_id');
     }
 
     # Accessors
@@ -62,6 +51,7 @@ class Invoice extends Model
     {
         return isoFormat($value);
     }
+
     public function getUpdatedAtAttribute($value)
     {
         return isoFormat($value);

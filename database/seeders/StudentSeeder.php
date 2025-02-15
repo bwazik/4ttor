@@ -32,8 +32,10 @@ class StudentSeeder extends Seeder
                 'birth_date' => $fakerEn->dateTimeBetween('2004-01-01', '2015-12-31')->format('Y-m-d'),
                 'grade_id' => rand(1, 6),
                 'parent_id' => $fakerEn->randomElement($parentsIds),
-                'is_active' => $fakerEn->boolean(75),
                 'balance' => $fakerEn->randomFloat(2, 0, 1000),
+                'is_active' => $fakerEn->boolean(75),
+                'is_exempted' => $fakerEn->boolean(10),
+                'fees_discount' => $fakerEn->randomFloat(2, 0, 100),
             ]);
         }
     }

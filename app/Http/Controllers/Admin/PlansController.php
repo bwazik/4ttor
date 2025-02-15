@@ -78,4 +78,24 @@ class PlansController extends Controller
 
         return response()->json(['error' => $result['message']], 500);
     }
+
+    public function getPlanPrice(Request $request)
+    {
+        $validated = $request->validate([
+            'plan_id' => 'required|exists:plans,id',
+        ]);
+
+        try {
+            $plan = Plan::select('monthly_price')->find($validated['plan_id']);
+
+            return response()->json(['status' => 'success', 'data' => $plan->monthly_price]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => config('app.env') === 'production'
+                    ? trans('main.errorMessage')
+                    : $e->getMessage(),
+            ]);
+        }
+    }
 }

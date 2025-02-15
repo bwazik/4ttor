@@ -24,4 +24,11 @@ return [
     'parentsManagment' => 'إدارة أولياء الأمور',
     'assistants' => 'الأسيستانتس',
     'assistantsManagment' => 'إدارة الأسيستانتس',
+
+    # Finance Managment
+    'financeManagment' => 'إدارة المالية',
+    'fees' => 'المصاريف',
+    'invoices' => 'الفواتير',
+    'teachersInvoices' => 'فواتير المدرسين',
+    'studentsInvoices' => 'فواتير الطلاب',
 ];

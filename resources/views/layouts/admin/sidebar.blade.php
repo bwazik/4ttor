@@ -98,7 +98,8 @@
         <li class="menu-header mt-5">
             <span class="menu-header-text">{{ trans('layouts/sidebar.usersManagment') }}</span>
         </li>
-        <li class="menu-item {{ isActiveRoute(['admin.teachers.index', 'admin.teachers.archived', 'admin.groups.index']) ? 'active open' : '' }}">
+        <li
+            class="menu-item {{ isActiveRoute(['admin.teachers.index', 'admin.teachers.archived', 'admin.groups.index']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
                 <i class="menu-icon tf-icons ri-presentation-line"></i>
                 <div>{{ trans('layouts/sidebar.teachers') }}</div>
@@ -121,7 +122,8 @@
                 </li>
             </ul>
         </li>
-        <li class="menu-item {{ isActiveRoute(['admin.assistants.index', 'admin.assistants.archived']) ? 'active open' : '' }}">
+        <li
+            class="menu-item {{ isActiveRoute(['admin.assistants.index', 'admin.assistants.archived']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
                 <i class="menu-icon tf-icons ri-user-star-line"></i>
                 <div>{{ trans('layouts/sidebar.assistants') }}</div>
@@ -139,7 +141,8 @@
                 </li>
             </ul>
         </li>
-        <li class="menu-item {{ isActiveRoute(['admin.students.index', 'admin.students.archived']) ? 'active open' : '' }}">
+        <li
+            class="menu-item {{ isActiveRoute(['admin.students.index', 'admin.students.archived']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
                 <i class="menu-icon tf-icons ri-graduation-cap-line"></i>
                 <div>{{ trans('layouts/sidebar.students') }}</div>
@@ -157,7 +160,8 @@
                 </li>
             </ul>
         </li>
-        <li class="menu-item {{ isActiveRoute(['admin.parents.index', 'admin.parents.archived']) ? 'active open' : '' }}">
+        <li
+            class="menu-item {{ isActiveRoute(['admin.parents.index', 'admin.parents.archived']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
                 <i class="menu-icon tf-icons ri-parent-line"></i>
                 <div>{{ trans('layouts/sidebar.parents') }}</div>
@@ -178,13 +182,31 @@
 
         <!-- Finance -->
         <li class="menu-header mt-5">
-            <span class="menu-header-text">{{ trans('layouts/sidebar.finance') }}</span>
+            <span class="menu-header-text">{{ trans('layouts/sidebar.financeManagment') }}</span>
         </li>
         <li class="menu-item {{ isActiveRoute('admin.fees.index') ? 'active' : '' }}">
             <a href="{{ route('admin.fees.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons ri-wallet-line"></i>
                 <div>{{ trans('layouts/sidebar.fees') }}</div>
             </a>
+        </li>
+        <li class="menu-item {{ isActiveRoute(['admin.invoices.teachers.index', 'admin.invoices.students.index']) ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
+                <i class="menu-icon tf-icons ri-file-list-3-line"></i>
+                <div>{{ trans('layouts/sidebar.invoices') }}</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ isActiveRoute('admin.invoices.teachers.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.invoices.teachers.index') }}" class="menu-link">
+                        <div>{{ trans('layouts/sidebar.teachersInvoices') }}</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ isActiveRoute('admin.invoices.students.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.invoices.students.index') }}" class="menu-link">
+                        <div>{{ trans('layouts/sidebar.studentsInvoices') }}</div>
+                    </a>
+                </li>
+            </ul>
         </li>
     </ul>
 </aside>
