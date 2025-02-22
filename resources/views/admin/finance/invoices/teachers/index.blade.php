@@ -58,7 +58,7 @@
             }
         });
 
-        let fields = ['name_ar', 'name_en', 'amount', 'teacher_id', 'grade_id'];
+        let fields = ['teacher_id', 'plan_id'];
         handleFormSubmit('#add-form', fields, '#add-modal', 'offcanvas', '#datatable');
         handleDeletionFormSubmit('#delete-form', '#delete-modal', '#datatable')
         fetchSingleDataByAjax('#add-form #plan_id', "{{ route('admin.plans.price') }}", '#add-form #amount', 'plan_id')

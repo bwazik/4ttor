@@ -13,7 +13,7 @@
         @csrf
         <div class="form-floating form-floating-outline mb-5">
             <input type="text" class="form-control @error('username') is-invalid @enderror" id="username" name="username"
-                placeholder="Enter your email" autofocus />
+                placeholder="Enter your email" value="bwazik" autofocus />
             <label for="username">Username</label>
             @error('username')
                 <div class="invalid-feedback">{{ $message }}</div>
@@ -25,7 +25,7 @@
                     <div class="form-floating form-floating-outline">
                         <input type="password" id="password" class="form-control @error('password') is-invalid @enderror" name="password"
                             placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
-                            aria-describedby="password" />
+                            aria-describedby="password" value="123456789" />
                         <label for="password">Password</label>
                         @error('password')
                             <div class="invalid-feedback">{{ $message }}</div>

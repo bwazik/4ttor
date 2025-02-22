@@ -3,6 +3,7 @@
 namespace App\Services\Admin;
 
 use App\Models\Teacher;
+use App\Models\TeacherAccount;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
@@ -417,5 +418,19 @@ class TeacherService
     public function checkDependenciesForMultipleDeletion($teachers)
     {
         return $this->checkForMultipleDependencies($teachers, $this->relationships, $this->transModelKey);
+    }
+
+    public function getTeacherAccountBalance($id): float
+    {
+        $teacherAccount = TeacherAccount::where('teacher_id', $id)->select('debit', 'credit')->get();
+
+        if ($teacherAccount->isEmpty()) {
+            return 0.00;
+        }
+
+        $debit = $teacherAccount->sum('debit');
+        $credit = $teacherAccount->sum('credit');
+
+        return round($debit - $credit, 2);
     }
 }

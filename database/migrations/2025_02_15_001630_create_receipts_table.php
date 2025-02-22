@@ -16,10 +16,10 @@ return new class extends Migration
             $table->date('date');
             $table->integer('teacher_id')->unsigned()->nullable();
             $table->integer('student_id')->unsigned()->nullable();
-            $table->decimal('debit')->nullable();
+            $table->decimal('debit')->default(0.00)->nullable();
             $table->text('description')->nullable();
-            $table->softDeletes();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -30,4 +30,10 @@ return [
     'invoices' => 'Invoices',
     'teachersInvoices' => 'Teachers Invoices',
     'studentsInvoices' => 'Students Invoices',
+    'receipts' => 'Receipts',
+    'teachersReceipts' => 'Teachers Receipts',
+    'studentsReceipts' => 'Students Receipts',
+    'refunds' => 'Refunds',
+    'teachersRefunds' => 'Teachers Refunds',
+    'studentsRefunds' => 'Students Refunds',
 ];

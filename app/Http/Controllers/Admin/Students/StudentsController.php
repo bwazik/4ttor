@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers\Admin\Students;
 
-use App\Models\Teacher;
-use App\Models\Student;
 use App\Models\Grade;
+use App\Models\Group;
+use App\Models\Student;
+use App\Models\Teacher;
+use App\Models\MyParent;
 use Illuminate\Http\Request;
+use App\Models\StudentAccount;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
 use App\Services\Admin\StudentService;
 use App\Http\Requests\Admin\StudentsRequest;
-use App\Models\Group;
-use App\Models\MyParent;
 
 class StudentsController extends Controller
 {
@@ -199,6 +200,25 @@ class StudentsController extends Controller
             }
 
             return response()->json(['status' => 'success', 'data' => $teachers]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => config('app.env') === 'production'
+                    ? trans('main.errorMessage')
+                    : $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getStudentAccountBalance($id)
+    {
+        try {
+            $balance = $this->studentService->getStudentAccountBalance($id);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => number_format($balance, 2),
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',

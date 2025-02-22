@@ -37,6 +37,7 @@ return [
     'date' => 'Date',
     'student' => 'Student',
     'fee' => 'Fee',
+    'description' => 'Description',
     'status' => 'Status',
     'created_at' => 'Created Date',
     'updated_at' => 'Updated Date',
@@ -87,6 +88,7 @@ return [
     'select_option' => 'Select an option from the list',
     'studentAccount' => 'Student Account',
     'teacherAccount' => 'Teacher Account',
+    'dependencyDept' => ':dependency Dept',
 
     # Modals
     'items' => 'Items Count',
@@ -125,5 +127,6 @@ return [
     'tooManyRequestsMessage' => 'You have exceeded the maximum number of requests. Please try again later!',
     'errorDependencies' => 'The :model (:name) cannot be deleted because it has related records in :dependency.',
     'validateTeacherGroups' => 'The student must be with the specified teacher to join their group.',
+    'validateTeacherGrade' => 'The student must be in the specified grade to be with the specified teacher.',
     'validateTeacherGrades' => 'The teacher must be assigned to the specified grade.',
 ];

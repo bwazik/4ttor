@@ -127,7 +127,6 @@
         handleDeletionFormSubmit('#delete-selected-form', '#delete-selected-modal', '#datatable')
         handleDeletionFormSubmit('#archive-selected-form', '#archive-selected-modal', '#datatable')
 
-
         generateRandomUsername('a');
     </script>
 @endsection

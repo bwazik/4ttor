@@ -136,5 +136,7 @@
         handleDeletionFormSubmit('#delete-selected-form', '#delete-selected-modal', '#datatable')
         handleDeletionFormSubmit('#archive-selected-form', '#archive-selected-modal', '#datatable')
         fetchMultipleDataByAjax('#add-form #teachers', "{{ route('admin.teachers.groups') }}", '#add-form #groups', 'teachers')
+
+        generateRandomUsername('s');
     </script>
 @endsection

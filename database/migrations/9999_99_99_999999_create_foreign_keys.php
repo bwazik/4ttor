@@ -139,6 +139,17 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });
+        Schema::table('funds', function (Blueprint $table) {
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('receipt_id')->references('id')->on('receipts')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('refund_id')->references('id')->on('refunds')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
         # End Finance Tables
 
     }
@@ -213,6 +224,11 @@ return new class extends Migration
         Schema::table('refunds', function (Blueprint $table) {
             $table->dropForeign('refunds_teacher_id_foreign');
             $table->dropForeign('refunds_student_id_foreign');
+        });
+        Schema::table('funds', function (Blueprint $table) {
+            $table->dropForeign('funds_teacher_id_foreign');
+            $table->dropForeign('funds_receipt_id_foreign');
+            $table->dropForeign('funds_refund_id_foreign');
         });
         # End Finance Tables
 

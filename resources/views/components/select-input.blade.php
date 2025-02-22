@@ -14,7 +14,7 @@
 @php
 $defaultDivClasses = match ($context) {
     'modal' => 'col-12 col-md-6',
-    'offcanvas' => 'col-sm-12 mt-4',
+    'offcanvas' => 'col-sm-12 mb-4',
     default => 'col-sm-12',
 };
 

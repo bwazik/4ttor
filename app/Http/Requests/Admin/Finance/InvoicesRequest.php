@@ -13,7 +13,8 @@ class InvoicesRequest extends FormRequest
 
     public function rules()
     {
-        $type = last(request()->segments());
+        $segments = request()->segments();
+        $type = $segments[count($segments) - 2] ?? null;
 
         $rules = [];
 

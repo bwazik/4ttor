@@ -18,6 +18,8 @@ use App\Http\Controllers\Admin\Assistants\AssistantsController;
 use App\Http\Controllers\Admin\Assistants\AssistantsDetailsController;
 use App\Http\Controllers\Admin\Finance\FeesController;
 use App\Http\Controllers\Admin\Finance\InvoicesController;
+use App\Http\Controllers\Admin\Finance\ReceiptsController;
+use App\Http\Controllers\Admin\Finance\RefundsController;
 
 Route::group(
     [
@@ -94,6 +96,7 @@ Route::group(
                     Route::post('/groups', 'groups')->name('groups');
                     Route::get('{id}/grades', 'grades')->name('grades');
                     Route::get('{id}/fees', 'getTeacherFees')->name('fees');
+                    Route::get('{id}/account-balance', 'getTeacherAccountBalance')->name('accountBalance');
                     Route::middleware('throttle:10,1')->group(function() {
                         Route::post('insert', 'insert')->name('insert');
                         Route::post('update', 'update')->name('update');
@@ -156,6 +159,7 @@ Route::group(
                     Route::get('/details/{id}', 'details')->name('details');
                     Route::get('{id}/grade', 'getStudentGrade')->name('grade');
                     Route::get('{id}/teachers', 'getStudentTeachers')->name('teachers');
+                    Route::get('{id}/account-balance', 'getStudentAccountBalance')->name('accountBalance');
                     Route::middleware('throttle:10,1')->group(function() {
                         Route::post('insert', 'insert')->name('insert');
                         Route::post('update', 'update')->name('update');
@@ -215,6 +219,34 @@ Route::group(
                         Route::get('/', 'index')->name('index');
                         Route::middleware('throttle:10,1')->group(function () {
                             Route::post('insert', 'insert')->name('insert');
+                            Route::post('delete', 'delete')->name('delete');
+                        });
+                    });
+                }
+            });
+
+            # Receipts
+            Route::prefix('receipts')->controller(ReceiptsController::class)->name('receipts.')->group(function() {
+                foreach (['teachers', 'students'] as $type) {
+                    Route::prefix($type)->name("$type.")->group(function () {
+                        Route::get('/', 'index')->name('index');
+                        Route::middleware('throttle:10,1')->group(function () {
+                            Route::post('insert', 'insert')->name('insert');
+                            Route::post('update', 'update')->name('update');
+                            Route::post('delete', 'delete')->name('delete');
+                        });
+                    });
+                }
+            });
+
+            # Refunds
+            Route::prefix('refunds')->controller(RefundsController::class)->name('refunds.')->group(function() {
+                foreach (['teachers', 'students'] as $type) {
+                    Route::prefix($type)->name("$type.")->group(function () {
+                        Route::get('/', 'index')->name('index');
+                        Route::middleware('throttle:10,1')->group(function () {
+                            Route::post('insert', 'insert')->name('insert');
+                            Route::post('update', 'update')->name('update');
                             Route::post('delete', 'delete')->name('delete');
                         });
                     });

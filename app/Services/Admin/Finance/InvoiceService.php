@@ -6,6 +6,8 @@ use App\Models\Fee;
 use App\Models\Plan;
 use App\Models\Invoice;
 use App\Models\Student;
+use App\Models\TeacherAccount;
+use App\Models\StudentAccount;
 use Illuminate\Support\Facades\DB;
 use App\Traits\PreventDeletionIfRelated;
 
@@ -13,16 +15,18 @@ class InvoiceService
 {
     use PreventDeletionIfRelated;
 
-    protected $relationships = ['grades', 'studentAccount', 'teacherAccount'];
+    protected $relationships = ['studentAccount', 'teacherAccount'];
     protected $transModelKey = 'admin/invoices.invoices';
     protected const TYPE_CONFIG = [
         'teachers' => [
             'relation' => 'teacher',
-            'type' => 'plan'
+            'type' => 'plan',
+            'account_model' => TeacherAccount::class
         ],
         'students' => [
             'relation' => 'student',
-            'type' => 'fee'
+            'type' => 'fee',
+            'account_model' => StudentAccount::class
         ]
     ];
 
@@ -79,13 +83,12 @@ class InvoiceService
             if ($mapping['type'] === 'plan') {
                 $amount = Plan::where('id', $request[$typeId] ?? null)->value('monthly_price');
             } else {
-                $fee = Fee::where('id', $request[$typeId] ?? null)->first();
-
+                $fee = Fee::findOrFail($request[$typeId] ?? null);
                 if (!$fee) {
                     throw new \InvalidArgumentException(trans('admin/fees.feeNotFound'));
                 }
 
-                $student = Student::where('id', $request[$relationId] ?? null)->first();
+                $student = Student::findOrFail($request[$relationId] ?? null);
 
                 if (!$student) {
                     throw new \InvalidArgumentException(trans('admin/fees.studentNotFound'));
@@ -108,7 +111,9 @@ class InvoiceService
             // Remove any null values
             $invoiceData = array_filter($invoiceData, fn($value) => !is_null($value));
 
-            Invoice::create($invoiceData);
+            $invoice = Invoice::create($invoiceData);
+
+            $this->createAccountTransaction($mapping, $invoice, $request[$relationId]);
 
             DB::commit();
 
@@ -183,7 +188,7 @@ class InvoiceService
     {
         $segments = request()->segments();
 
-        $actions = ['insert', 'update', 'delete', 'delete-selected'];
+        $actions = ['insert', 'delete'];
 
         if (in_array(last($segments), $actions)) {
             $type = $segments[count($segments) - 2] ?? null;
@@ -196,6 +201,19 @@ class InvoiceService
         }
 
         return $type;
+    }
+
+    protected function createAccountTransaction($mapping, $invoice, $relationId)
+    {
+        $accountModel = $mapping['account_model'];
+
+        $accountModel::create([
+            'type' => 1, // 1 - Invoice, 2 - Receipt, 3 - Refund
+            $mapping['relation'] . '_id' => $relationId,
+            'invoice_id' => $invoice->id,
+            'debit' => $invoice->amount,
+            'credit' => 0.00,
+        ]);
     }
 
     public function checkDependenciesForSingleDeletion($teacher): array|null
