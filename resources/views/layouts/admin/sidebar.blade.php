@@ -208,5 +208,41 @@
                 </li>
             </ul>
         </li>
+        <li class="menu-item {{ isActiveRoute(['admin.receipts.teachers.index', 'admin.receipts.students.index']) ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
+                <i class="menu-icon tf-icons ri-receipt-line"></i>
+                <div>{{ trans('layouts/sidebar.receipts') }}</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ isActiveRoute('admin.receipts.teachers.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.receipts.teachers.index') }}" class="menu-link">
+                        <div>{{ trans('layouts/sidebar.teachersReceipts') }}</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ isActiveRoute('admin.receipts.students.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.receipts.students.index') }}" class="menu-link">
+                        <div>{{ trans('layouts/sidebar.studentsReceipts') }}</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="menu-item {{ isActiveRoute(['admin.refunds.teachers.index', 'admin.refunds.students.index']) ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
+                <i class="menu-icon tf-icons ri-refund-2-line"></i>
+                <div>{{ trans('layouts/sidebar.refunds') }}</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ isActiveRoute('admin.refunds.teachers.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.refunds.teachers.index') }}" class="menu-link">
+                        <div>{{ trans('layouts/sidebar.teachersReceipts') }}</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ isActiveRoute('admin.refunds.students.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.refunds.students.index') }}" class="menu-link">
+                        <div>{{ trans('layouts/sidebar.studentsReceipts') }}</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
     </ul>
 </aside>

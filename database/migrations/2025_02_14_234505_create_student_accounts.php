@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('student_accounts', function (Blueprint $table) {
 			$table->increments('id');
-            $table->boolean('type')->default(1)->comment('1 - Invoice, 2 - Receipt, 3 - Refund');
+            $table->tinyInteger('type')->default(1)->comment('1 - Invoice, 2 - Receipt, 3 - Refund');
             $table->integer('student_id')->unsigned();
             $table->integer('invoice_id')->unsigned()->nullable();
             $table->integer('receipt_id')->unsigned()->nullable();
             $table->integer('refund_id')->unsigned()->nullable();
-            $table->decimal('debit')->nullable();
-            $table->decimal('credit')->nullable();
+            $table->decimal('debit')->default(0.00)->nullable();
+            $table->decimal('credit')->default(0.00)->nullable();
             $table->timestamps();
         });
     }

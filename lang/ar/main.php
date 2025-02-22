@@ -37,7 +37,7 @@ return [
     'date' => 'التاريخ',
     'student' => 'الطالب',
     'fee' => 'المصروف',
-
+    'description' => 'ملاحظات',
     'status' => 'الحالة',
     'created_at' => 'تاريخ الإضافة',
     'updated_at' => 'تاريخ التعديل',
@@ -88,7 +88,8 @@ return [
     'select_option' => 'اختار حاجة من الاختيارات',
     'studentAccount' => 'حساب الطالب',
     'teacherAccount' => 'حساب المدرس',
-    
+    'dependencyDept' => 'مديونية ال:dependency',
+
     # Modals
     'items' => 'عدد العناصر',
     'editItem' => 'تعديل :item',
@@ -126,5 +127,6 @@ return [
     'tooManyRequestsMessage' => 'انت تجاوزت العدد المسموح بيه من الطلبات. حاول تاني بعد شوية!',
     'errorDependencies' => ':model دي (:name) مش هينفع تتمسح علشان عندها علاقات مرتبطة مع :dependency.',
     'validateTeacherGroups' => 'لازم يكون الطالب مع المستر المحدد عشان يخش مجموعته.',
+    'validateTeacherGrade' => 'لازم يكون الطالب مع الصف المحدد عشان يبقي مع المستر المحدد.',
     'validateTeacherGrades' => 'لازم يكون المدرس مع الصف المحدد عشان يقدر يضيف المصاريف.',
 ];

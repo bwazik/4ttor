@@ -31,4 +31,10 @@ return [
     'invoices' => 'الفواتير',
     'teachersInvoices' => 'فواتير المدرسين',
     'studentsInvoices' => 'فواتير الطلاب',
+    'receipts' => 'سندات القبض',
+    'teachersReceipts' => 'سندات قبض المدرسين',
+    'studentsReceipts' => 'سندات قبض الطلاب',
+    'refunds' => 'الإستردادات',
+    'teachersRefunds' => 'إستردادات المدرسين',
+    'studentsRefunds' => 'إستردادات الطلاب',
 ];

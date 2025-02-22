@@ -13,6 +13,7 @@ use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
 use App\Services\Admin\TeacherService;
 use App\Http\Requests\Admin\TeachersRequest;
+use App\Models\TeacherAccount;
 
 class TeachersController extends Controller
 {
@@ -263,6 +264,25 @@ class TeachersController extends Controller
             }
 
             return response()->json(['status' => 'success', 'data' => $fees]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => config('app.env') === 'production'
+                    ? trans('main.errorMessage')
+                    : $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getTeacherAccountBalance($id)
+    {
+        try {
+            $balance = $this->teacherService->getTeacherAccountBalance($id);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => number_format($balance, 2),
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',

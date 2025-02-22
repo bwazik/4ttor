@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('refunds', function (Blueprint $table) {
+        Schema::create('funds', function (Blueprint $table) {
 			$table->increments('id');
-            $table->date('date');
-            $table->integer('teacher_id')->unsigned()->nullable();
-            $table->integer('student_id')->unsigned()->nullable();
+			$table->tinyInteger('type')->default(1)->comment('1 - Receipt, 2 - Refund');
+            $table->integer('teacher_id')->unsigned();
+            $table->integer('receipt_id')->unsigned()->nullable();
+            $table->integer('refund_id')->unsigned()->nullable();
             $table->decimal('debit')->default(0.00)->nullable();
-            $table->text('description')->nullable();
+            $table->decimal('credit')->default(0.00)->nullable();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('refunds');
+        Schema::dropIfExists('funds');
     }
 };

@@ -4,6 +4,7 @@ namespace App\Services\Admin;
 
 use App\Models\Student;
 use App\Models\Teacher;
+use App\Models\StudentAccount;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Traits\PreventDeletionIfRelated;
@@ -152,6 +153,14 @@ class StudentService
                 'parent_id' => $request['parent_id'],
             ]);
 
+            $gradeValidationResult = $this->validateTeacherGrade($request['teachers'], $request['grade_id']);
+            if (!$gradeValidationResult) {
+                return [
+                    'status' => 'error',
+                    'message' => trans('main.validateTeacherGrade'),
+                ];
+            }
+
             $student->teachers()->attach($request['teachers']);
 
             $validationResult = $this->validateTeacherGroups($request['teachers'], $request['groups']);
@@ -208,6 +217,13 @@ class StudentService
                 'is_active' => $request['is_active'],
             ]);
 
+            $gradeValidationResult = $this->validateTeacherGrade($request['teachers'], $request['grade_id']);
+            if (!$gradeValidationResult) {
+                return [
+                    'status' => 'error',
+                    'message' => trans('main.validateTeacherGrade'),
+                ];
+            }
             $student->teachers()->sync($request['teachers'] ?? []);
 
             $validationResult = $this->validateTeacherGroups($request['teachers'], $request['groups']);
@@ -426,7 +442,16 @@ class StudentService
         }
     }
 
-    function validateTeacherGroups($teacherIds, $groupIds)
+    public function validateTeacherGrade($teacherIds, $gradeId)
+    {
+        $validTeacherIds = Teacher::whereHas('grades', function ($query) use ($gradeId) {
+            $query->where('grades.id', $gradeId);
+        })->pluck('id')->toArray();
+
+        return empty(array_diff($teacherIds, $validTeacherIds));
+    }
+
+    public function validateTeacherGroups($teacherIds, $groupIds)
     {
         $teacherGroups = Teacher::whereIn('id', $teacherIds)
             ->with('groups')
@@ -453,5 +478,19 @@ class StudentService
     public function checkDependenciesForMultipleDeletion($teachers)
     {
         return $this->checkForMultipleDependencies($teachers, $this->relationships, $this->transModelKey);
+    }
+
+    public function getStudentAccountBalance($id): float
+    {
+        $studentAccount = StudentAccount::where('student_id', $id)->select('debit', 'credit')->get();
+
+        if ($studentAccount->isEmpty()) {
+            return 0.00;
+        }
+
+        $debit = $studentAccount->sum('debit');
+        $credit = $studentAccount->sum('credit');
+
+        return round($debit - $credit, 2);
     }
 }

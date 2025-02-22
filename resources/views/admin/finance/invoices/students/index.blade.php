@@ -59,7 +59,7 @@
             }
         });
 
-        let fields = ['name_ar', 'name_en', 'amount', 'student_id', 'grade_id'];
+        let fields = ['student_id', 'fee_id'];
         handleFormSubmit('#add-form', fields, '#add-modal', 'offcanvas', '#datatable');
         handleDeletionFormSubmit('#delete-form', '#delete-modal', '#datatable')
         fetchSingleDataByAjax('#add-form #student_id', "{{ route('admin.students.grade', '__ID__') }}", '#add-form #grade_id', 'student_id', 'GET')

@@ -25,7 +25,7 @@ class GroupService
                 return $row->name;
             })
             ->editColumn('teacher_id', function ($row) {
-                return $row->teacher_id ? $row->teacher->name : '-';
+                return "<a target='_blank' href='" . route('admin.teachers.details', $row->teacher_id) . "'>" . ($row->teacher_id ? $row->teacher->name : '-') . "</a>";
             })
             ->editColumn('day_1', function ($row) {
                 return $row->day_1 ? getDayName($row->day_1) : '-';
@@ -54,7 +54,7 @@ class GroupService
                         </button>' .
                     '</div>';
             })
-            ->rawColumns(['selectbox', 'is_active', 'actions'])
+            ->rawColumns(['selectbox', 'teacher_id', 'is_active', 'actions'])
             ->make(true);
     }
 
