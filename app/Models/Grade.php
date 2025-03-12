@@ -39,11 +39,16 @@ class Grade extends Model
         return $this->belongsToMany(Teacher::class, 'teacher_grade');
     }
 
+    public function groups()
+    {
+        return $this->hasMany(Group::class, 'grade_id');
+    }
+
     public function fees()
     {
         return $this->hasMany(Fee::class, 'grade_id');
     }
-    
+
     # Scopes
     public function scopeActive($query)
     {

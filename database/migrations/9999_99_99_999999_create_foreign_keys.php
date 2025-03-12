@@ -61,6 +61,9 @@ return new class extends Migration
             $table->foreign('teacher_id')->references('id')->on('teachers')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
+            $table->foreign('grade_id')->references('id')->on('grades')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
         });
         Schema::table('student_group', function (Blueprint $table) {
             $table->foreign('student_id')->references('id')->on('students')
@@ -152,6 +155,23 @@ return new class extends Migration
         });
         # End Finance Tables
 
+        # Start Activities Tables
+        Schema::table('attendances', function (Blueprint $table) {
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('grade_id')->references('id')->on('grades')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('group_id')->references('id')->on('groups')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('student_id')->references('id')->on('students')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        # End Activities Tables
+
     }
 
     /**
@@ -187,6 +207,7 @@ return new class extends Migration
         });
         Schema::table('groups', function (Blueprint $table) {
             $table->dropForeign('groups_teacher_id_foreign');
+            $table->dropForeign('groups_grade_id_foreign');
         });
         Schema::table('student_group', function (Blueprint $table) {
             $table->dropForeign('student_group_student_id_foreign');
@@ -232,5 +253,14 @@ return new class extends Migration
         });
         # End Finance Tables
 
+        # Start Activities Tables
+        Schema::table('attendances', function (Blueprint $table) {
+            $table->dropForeign('attendances_teacher_id_foreign');
+            $table->dropForeign('attendances_grade_id_foreign');
+            $table->dropForeign('attendances_group_id_foreign');
+            $table->dropForeign('attendances_student_id_foreign');
+        });
+
+        # End Activities Tables
     }
 };

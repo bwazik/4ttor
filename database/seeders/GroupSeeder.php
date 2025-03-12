@@ -28,7 +28,6 @@ class GroupSeeder extends Seeder
 
         $faker = Faker::create();
 
-        $teachersIds = Teacher::pluck('id')->toArray();
 
         for($i = 0; $i < 120; $i++)
         {
@@ -40,10 +39,16 @@ class GroupSeeder extends Seeder
 
             $day1Number = $this->dayMapping[$days[0]];
             $day2Number = $this->dayMapping[$days[1]];
+            
+            $teachersIds = Teacher::pluck('id')->toArray();
+            $teacherId = $faker->randomElement($teachersIds);
+            $teacher = Teacher::with('grades')->findOrFail($teacherId);
+            $gradeId = $faker->randomElement($teacher->grades->pluck('id')->toArray());
 
             Group::create([
                 'name' => ['en' => $groupNameEn, 'ar' => $groupNameAr],
-                'teacher_id' => $faker->randomElement($teachersIds),
+                'teacher_id' => $teacherId,
+                'grade_id' => $gradeId,
                 'day_1' => $day1Number,
                 'day_2' => $day2Number,
                 'time' => $time,

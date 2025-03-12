@@ -46,8 +46,8 @@ class RefundService
                     ($row->{$relation . '_id'} ? $row->{$relation}->name : '-') .
                     "</a>";
             })
-            ->editColumn('debit', function ($row) {
-                return formatCurrency($row->debit) . ' ' . trans('main.currency');
+            ->editColumn('credit', function ($row) {
+                return formatCurrency($row->credit) . ' ' . trans('main.currency');
             })
             ->editColumn('description', function ($row) {
                 return $row->description ?: '-';
@@ -76,7 +76,7 @@ class RefundService
             $refundData = [
                 'date' => date('Y-m-d'),
                 $relationId => $request[$relationId] ?? null,
-                'debit' => $request['amount'] ?? 0.00,
+                'credit' => $request['amount'] ?? 0.00,
                 'description' => $request['description'],
             ];
 
@@ -120,7 +120,7 @@ class RefundService
             $refund = Refund::findOrFail($id);
 
             $refundData = [
-                'debit' => $request['amount'] ?? 0.00,
+                'credit' => $request['amount'] ?? 0.00,
                 'description' => $request['description'],
             ];
 
@@ -151,7 +151,7 @@ class RefundService
         DB::beginTransaction();
 
         try {
-            $refund = Refund::select('id', 'debit')->findOrFail($id);
+            $refund = Refund::select('id', 'credit')->findOrFail($id);
 
             if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($refund)) {
                 return $dependencyCheck;
@@ -191,14 +191,14 @@ class RefundService
                 <button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light"
                     tabindex="0" type="button" data-bs-toggle="offcanvas" data-bs-target="#edit-modal"
                     id="edit-button" data-id="' . $row->id . '" data-' . $relationId . '_id="' . $row->{$relationId}->name . '"
-                    data-account_balance="' . $accountBalance . '" data-amount="' . $row->debit . '" data-description="' . $row->description . '">
+                    data-account_balance="' . $accountBalance . '" data-amount="' . $row->credit . '" data-description="' . $row->description . '">
                     <i class="ri-edit-box-line ri-20px"></i>
                 </button>
             </span>
             <button class="btn btn-sm btn-icon btn-text-danger rounded-pill text-body waves-effect waves-light me-1"
                 id="delete-button"
                 data-id="' . $row->id . '"
-                data-amount="' . $row->debit . '"
+                data-amount="' . $row->credit . '"
                 data-' . $relationId . '_id="' . $row->{$relationId}->name . '"
                 data-bs-target="#delete-modal"
                 data-bs-toggle="modal"
@@ -235,8 +235,8 @@ class RefundService
             'type' => 3, // 1 - Invoice, 2 - Refund, 3 - Refund
             $mapping['relation'] . '_id' => $relationId,
             'refund_id' => $refund->id,
-            'debit' => 0.00,
-            'credit' => $refund->debit,
+            'debit' => $refund->credit,
+            'credit' => 0.00,
         ]);
     }
 
@@ -250,8 +250,8 @@ class RefundService
         }
 
         $account->update([
-            'debit' => 0.00,
-            'credit' => $refund->debit,
+            'debit' => $refund->credit,
+            'credit' => 0.00,
             'description' => $refund->description,
         ]);
     }

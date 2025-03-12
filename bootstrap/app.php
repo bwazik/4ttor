@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'localeCookieRedirect'    => \Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect::class,
             'localeViewPath'          => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
             'DataTables' => Yajra\DataTables\Facades\DataTables::class,
+            'Zoom' => Jubaer\Zoom\Facades\Zoom::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

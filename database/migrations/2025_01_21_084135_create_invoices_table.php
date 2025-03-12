@@ -19,8 +19,8 @@ return new class extends Migration
             $table->unsignedInteger('plan_id')->nullable();
             $table->unsignedInteger('teacher_id')->nullable();
             $table->unsignedInteger('student_id')->nullable();
-            $table->softDeletes();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

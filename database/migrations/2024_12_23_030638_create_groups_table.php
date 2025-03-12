@@ -15,6 +15,7 @@ return new class extends Migration
             $table->increments('id');
             $table->string('name');
             $table->integer('teacher_id')->unsigned();
+            $table->integer('grade_id')->unsigned();
             $table->string('day_1')->nullable();
             $table->string('day_2')->nullable();
             $table->time('time');

@@ -37,4 +37,8 @@ return [
     'refunds' => 'الإستردادات',
     'teachersRefunds' => 'إستردادات المدرسين',
     'studentsRefunds' => 'إستردادات الطلاب',
+
+    # Activities
+    'activities' => 'الأنشطة الطلابية',
+    'attendance' => 'الحضور والغياب',
 ];

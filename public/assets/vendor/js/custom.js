@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function () {
     Array.from(datePickers).forEach((datepicker) => {
         flatpickr(datepicker, {
             dateFormat: 'Y-m-d',
-
+            defaultDate: 'today',
         });
     });
     Array.from(timePickers).forEach((timePicker) => {
@@ -207,7 +207,218 @@ function initializeDataTable(tableId, ajaxUrl, exportColumns, columns) {
                     },
                 ],
                 displayLength: 7,
-                lengthMenu: [7, 10, 25, 50, 75, 100],
+                lengthMenu: [7, 10, 25, 50, 75, 100, 500],
+                language: {
+                    search: window.translations.datatable.search,
+                    emptyTable: window.translations.datatable.empty_table,
+                    zeroRecords: window.translations.datatable.zero_records,
+                    lengthMenu: window.translations.datatable.length_menu,
+                    info: window.translations.datatable.info,
+                    infoEmpty: window.translations.datatable.info_empty,
+                    infoFiltered: window.translations.datatable.info_filtered,
+                    paginate: {
+                        next: '<i class="ri-arrow-right-s-line"></i>',
+                        previous: '<i class="ri-arrow-left-s-line"></i>',
+                    },
+                },
+                buttons: [
+                    {
+                        extend: "collection",
+                        className:
+                            "btn btn-label-primary dropdown-toggle me-4 waves-effect waves-light",
+                        text: '<i class="ri-external-link-line me-sm-1"></i> <span class="d-none d-sm-inline-block">Export</span>',
+                        buttons: [
+                            {
+                                extend: "print",
+                                text: '<i class="ri-printer-line me-1" ></i>Print',
+                                className: "dropdown-item",
+                                exportOptions: {
+                                    columns: exportColumns,
+                                },
+                                customize: function (win) {
+                                    //customize print view for dark
+                                    $(win.document.body)
+                                        .css(
+                                            "color",
+                                            config.colors.headingColor
+                                        )
+                                        .css(
+                                            "border-color",
+                                            config.colors.borderColor
+                                        )
+                                        .css(
+                                            "background-color",
+                                            config.colors.bodyBg
+                                        );
+                                    $(win.document.body)
+                                        .find("table")
+                                        .addClass("compact")
+                                        .css("color", "inherit")
+                                        .css("border-color", "inherit")
+                                        .css("background-color", "inherit");
+                                },
+                            },
+                            {
+                                extend: "csv",
+                                text: '<i class="ri-file-text-line me-1" ></i>Csv',
+                                className: "dropdown-item",
+                                exportOptions: {
+                                    columns: exportColumns,
+                                },
+                            },
+                            {
+                                extend: "excel",
+                                text: '<i class="ri-file-excel-line me-1"></i>Excel',
+                                className: "dropdown-item",
+                                exportOptions: {
+                                    columns: exportColumns,
+                                },
+                            },
+                            {
+                                extend: "pdf",
+                                text: '<i class="ri-file-pdf-line me-1"></i>Pdf',
+                                className: "dropdown-item",
+                                exportOptions: {
+                                    columns: exportColumns,
+                                },
+                            },
+                            {
+                                extend: "copy",
+                                text: '<i class="ri-file-copy-line me-1" ></i>Copy',
+                                className: "dropdown-item",
+                                exportOptions: {
+                                    columns: exportColumns,
+                                },
+                            },
+                        ],
+                    },
+                ],
+                responsive: {
+                    details: {
+                        display: $.fn.dataTable.Responsive.display.modal({
+                            header: function (row) {
+                                var data = row.data();
+                                return window.translations.detailsOf + ': ' + data["name"];
+                            },
+                        }),
+                        type: "column",
+                        renderer: function (api, rowIdx, columns) {
+                            var data = $.map(columns, function (col, i) {
+                                if (i !== 0) {
+                                    return col.title !== "" // ? Do not show row in modal popup if title is blank (for check box)
+                                        ? '<tr data-dt-row="' +
+                                            col.rowIndex +
+                                            '" data-dt-column="' +
+                                            col.columnIndex +
+                                            '">' +
+                                            "<td>" +
+                                            col.title +
+                                            ":" +
+                                            "</td> " +
+                                            "<td>" +
+                                            col.data +
+                                            "</td>" +
+                                            "</tr>"
+                                        : "";
+                                }
+                                return "";
+                            }).join("");
+
+                            return data
+                                ? $('<table class="table"/><tbody />').append(
+                                    data
+                                  )
+                                : false;
+                        },
+                    },
+                },
+            });
+
+            table.on("init", function () {
+                fields = ["print", "csv", "excel", "pdf", "copy"];
+                $.each(fields, function (key, field) {
+                    $("." + field + "-button").on("click", function () {
+                        table.button(".buttons-" + field).trigger();
+                    });
+                });
+            });
+        }
+        else {
+            toastr.error(errorMessage);
+        }
+    });
+}
+
+function initializePostDataTable(tableId, ajaxUrl, exportColumns, columns, extraData = {}, formSelector = null) {
+    $(document).ready(function () {
+        let table = $(tableId);
+
+        if (table.length) {
+            table = table.DataTable({
+                processing: true,
+                serverSide: true,
+                bDestroy : true,
+                ajax: {
+                    url: ajaxUrl,
+                    type: 'POST',
+                    data: function (d) {
+                        let token;
+                        if (formSelector && $(formSelector).length) {
+                            token = $(formSelector + ' input[name="_token"]').val();
+                        }
+                        if (!token) {
+                            token = $('meta[name="csrf-token"]').attr('content');
+                        }
+                        return $.extend({}, d, extraData, {
+                            _token: token,
+                        });
+                    },
+                    dataSrc: function(response) {
+                        setTimeout(function() {
+                            submitButton.prop('disabled', false);
+                        }, 1500);
+
+                        return response.data || [];
+                    },
+                    error: function(xhr, status, error) {
+                        if (xhr.status === 429) {
+                            toastr.error(tooManyRequestsMessage);
+                        } else if (xhr.responseJSON) {
+                            if (xhr.responseJSON.errors) {
+                                $.each(xhr.responseJSON.errors, function(key, val) {
+                                    const inputElement = $(formSelector + ' #' + key);
+                                    const errorElement = $(formSelector + ' #' + key + '_error');
+                                    inputElement.addClass('is-invalid');
+                                    errorElement.text(val[0]).addClass('d-block').removeClass('d-none');
+                                });
+                            } else if (xhr.responseJSON.error) {
+                                toastr.error(xhr.responseJSON.error);
+                            } else {
+                                toastr.error(errorMessage);
+                            }
+                        } else {
+                            toastr.error(errorMessage);
+                        }
+
+                        setTimeout(function() {
+                            submitButton.prop('disabled', false);
+                        }, 1500);
+                    },
+                },
+                columns: columns,
+                columnDefs: [
+                    {
+                        // For Responsive
+                        targets: 0,
+                        responsivePriority: 2,
+                        className: "control",
+                        render: function (data, type, full, meta) {
+                            return "";
+                        },
+                    },
+                ],
+                displayLength: 7,
+                lengthMenu: [7, 10, 25, 50, 75, 100, 500],
                 language: {
                     search: window.translations.datatable.search,
                     emptyTable: window.translations.datatable.empty_table,
@@ -520,9 +731,10 @@ function fetchMultipleDataByAjax(triggerSelector, urlTemplate, targetSelector, r
         e.preventDefault();
 
         const selectedValue  = $(this).val();
+        const secondSelectedValue = $(this).closest('form').find('select').not(triggerSelector).val();
 
         if (selectedValue  && selectedValue .length > 0) {
-            const url = urlTemplate.replace('__ID__', selectedValue);
+            const url = urlTemplate.replace('__ID__', selectedValue).replace('__SECOND_ID__', secondSelectedValue);
 
             $.ajax({
                 url: url,

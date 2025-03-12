@@ -15,18 +15,27 @@ class StudentGroupSeeder extends Seeder
     {
         $this->truncateTables(['student_group']);
 
-        $students = Student::with('teachers.groups')->select('id')->get();
+        // Eager load students with their teachers and grade
+        $students = Student::with(['teachers.groups', 'grade'])->get();
 
         foreach ($students as $student) {
-            $teachersIds = $student->teachers()->pluck('teachers.id')->toArray();
+            // Get the student's grade ID
+            $studentGradeId = $student->grade_id;
 
-            $relatedGroupIds = Group::whereHas('teacher', function($query) use ($teachersIds) {
-                $query->whereIn('id', $teachersIds);
-            })->pluck('id')->toArray();
+            // Process each teacher the student has
+            foreach ($student->teachers as $teacher) {
+                // Get groups for this teacher in the student's grade
+                $teacherGroups = $teacher->groups()
+                    ->where('grade_id', $studentGradeId)
+                    ->get();
 
-            if (!empty($relatedGroupIds)) {
-                $randomGroupsIds = $this->getRandomElements($relatedGroupIds, rand(1, 2));
-                $student->groups()->attach($randomGroupsIds);
+                if ($teacherGroups->isNotEmpty()) {
+                    // Select one random group from this teacher's groups
+                    $groupToJoin = $teacherGroups->random();
+
+                    // Attach the student to this group
+                    $student->groups()->syncWithoutDetaching($groupToJoin->id);
+                }
             }
         }
     }

@@ -36,4 +36,8 @@ return [
     'refunds' => 'Refunds',
     'teachersRefunds' => 'Teachers Refunds',
     'studentsRefunds' => 'Students Refunds',
+
+    # Activities
+    'activities' => 'Student Activities',
+    'attendance' => 'Attendance',
 ];

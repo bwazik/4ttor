@@ -2,7 +2,8 @@
 <x-offcanvas offcanvasType="add" offcanvasTitle="{{ trans('main.addItem', ['item' => trans('admin/groups.group')]) }}" action="{{ route('admin.groups.insert') }}">
     <x-basic-input context="offcanvas" type="text" name="name_ar" label="{{ trans('main.name_ar') }}" placeholder="{{ trans('admin/groups.placeholders.name_ar') }}" required/>
     <x-basic-input context="offcanvas" type="text" name="name_en" label="{{ trans('main.name_en') }}" placeholder="{{ trans('admin/groups.placeholders.name_en') }}" required/>
-    <x-select-input context="offcanvas" name="teacher_id" label="{{ trans('main.teacher') }}" :options="$teachers"  required/>
+    <x-select-input context="offcanvas" name="teacher_id" label="{{ trans('main.teacher') }}" :options="$teachers" required/>
+    <x-select-input context="offcanvas" name="grade_id" label="{{ trans('main.grade') }}" :options="$grades" required/>
     <x-select-input context="offcanvas" name="day_1" label="{{ trans('admin/groups.day_1') }}" :options="trans('main.weekdays')"/>
     <x-select-input context="offcanvas" name="day_2" label="{{ trans('admin/groups.day_2') }}" :options="trans('main.weekdays')"/>
     <x-basic-input context="offcanvas" type="text" name="time" classes="flatpickr-timeB" label="{{ trans('admin/groups.time') }}" placeholder="1:00"/>
@@ -12,6 +13,7 @@
     <x-basic-input context="offcanvas" type="text" name="name_ar" label="{{ trans('main.name_ar') }}" placeholder="{{ trans('admin/groups.placeholders.name_ar') }}" required/>
     <x-basic-input context="offcanvas" type="text" name="name_en" label="{{ trans('main.name_en') }}" placeholder="{{ trans('admin/groups.placeholders.name_en') }}" required/>
     <x-select-input context="offcanvas" name="teacher_id" label="{{ trans('main.teacher') }}" :options="$teachers"  required/>
+    <x-select-input context="offcanvas" name="grade_id" label="{{ trans('main.grade') }}" :options="$grades" required/>
     <x-select-input context="offcanvas" name="day_1" label="{{ trans('admin/groups.day_1') }}" :options="trans('main.weekdays')"/>
     <x-select-input context="offcanvas" name="day_2" label="{{ trans('admin/groups.day_2') }}" :options="trans('main.weekdays')"/>
     <x-basic-input context="offcanvas" type="text" name="time" classes="flatpickr-timeB" label="{{ trans('admin/groups.time') }}" placeholder="1:00"/>
