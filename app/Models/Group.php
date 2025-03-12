@@ -17,6 +17,7 @@ class Group extends Model
     protected $fillable = [
         'name',
         'teacher_id',
+        'grade_id',
         'day_1',
         'day_2',
         'time',
@@ -30,6 +31,11 @@ class Group extends Model
     public function teacher()
     {
         return $this->belongsTo(Teacher::class, 'teacher_id');
+    }
+
+    public function grade()
+    {
+        return $this->belongsTo(Grade::class, 'grade_id');
     }
 
     public function students()

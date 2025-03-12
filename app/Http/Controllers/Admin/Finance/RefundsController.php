@@ -45,7 +45,7 @@ class RefundsController extends Controller
 
         $mapping = self::TYPE_MAPPING[$type];
 
-        $refundsQuery = Refund::query()->select(['id', 'date', $mapping['relation_id'], 'debit', 'description', 'created_at', 'updated_at'])->whereNotNull($mapping['relation_id']);;
+        $refundsQuery = Refund::query()->select(['id', 'date', $mapping['relation_id'], 'credit', 'description', 'created_at', 'updated_at'])->whereNotNull($mapping['relation_id']);;
 
         if ($request->ajax()) {
             return $this->refundService->getRefundsForDatatable($refundsQuery, $type);

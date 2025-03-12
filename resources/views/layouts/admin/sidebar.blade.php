@@ -234,15 +234,26 @@
             <ul class="menu-sub">
                 <li class="menu-item {{ isActiveRoute('admin.refunds.teachers.index') ? 'active' : '' }}">
                     <a href="{{ route('admin.refunds.teachers.index') }}" class="menu-link">
-                        <div>{{ trans('layouts/sidebar.teachersReceipts') }}</div>
+                        <div>{{ trans('layouts/sidebar.teachersRefunds') }}</div>
                     </a>
                 </li>
                 <li class="menu-item {{ isActiveRoute('admin.refunds.students.index') ? 'active' : '' }}">
                     <a href="{{ route('admin.refunds.students.index') }}" class="menu-link">
-                        <div>{{ trans('layouts/sidebar.studentsReceipts') }}</div>
+                        <div>{{ trans('layouts/sidebar.studentsRefunds') }}</div>
                     </a>
                 </li>
             </ul>
+        </li>
+
+        <!-- Activities -->
+        <li class="menu-header mt-5">
+            <span class="menu-header-text">{{ trans('layouts/sidebar.activities') }}</span>
+        </li>
+        <li class="menu-item {{ isActiveRoute('admin.attendance.index') ? 'active' : '' }}">
+            <a href="{{ route('admin.attendance.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons ri-file-list-3-line"></i>
+                <div>{{ trans('layouts/sidebar.attendance') }}</div>
+            </a>
         </li>
     </ul>
 </aside>

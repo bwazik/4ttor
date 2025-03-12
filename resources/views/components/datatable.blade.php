@@ -69,6 +69,16 @@
                         </button>
                         @endif
                     @endisset
+                    @isset($otherButton)
+                        @if ($otherButton)
+                            <button id="other-button" class="btn btn-primary waves-effect waves-light">
+                                <span>
+                                    <i class="{{ $otherIcon }} ri-16px me-sm-2"></i>
+                                    <span class="d-none d-sm-inline-block">{{ $otherButton }}</span>
+                                </span>
+                            </button>
+                        @endif
+                    @endisset
                 </div>
             </div>
         </div>

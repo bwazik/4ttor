@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\Finance\FeesController;
 use App\Http\Controllers\Admin\Finance\InvoicesController;
 use App\Http\Controllers\Admin\Finance\ReceiptsController;
 use App\Http\Controllers\Admin\Finance\RefundsController;
+use App\Http\Controllers\Admin\Activities\AttendanceController;
 
 Route::group(
     [
@@ -57,6 +58,7 @@ Route::group(
             # Grades
             Route::prefix('grades')->controller(GradesController::class)->name('grades.')->group(function() {
                 Route::get('/', 'index')->name('index');
+                Route::get('{id}/teachers', 'getGradeTeachers')->name('teachers');
                 Route::middleware('throttle:10,1')->group(function() {
                     Route::post('insert', 'insert')->name('insert');
                     Route::post('update', 'update')->name('update');
@@ -93,8 +95,9 @@ Route::group(
                 Route::controller(TeachersController::class)->group(function() {
                     Route::get('/', 'index')->name('index');
                     Route::get('/archived', 'archived')->name('archived');
-                    Route::post('/groups', 'groups')->name('groups');
-                    Route::get('{id}/grades', 'grades')->name('grades');
+                    Route::post('groups', 'getTeacherGroups')->name('groups');
+                    Route::get('{id}/grade/{grade_id}/groups', 'getTeacherGroupsByGrade')->name('groupsByGrade');
+                    Route::get('{id}/grades', 'getTeacherGrades')->name('grades');
                     Route::get('{id}/fees', 'getTeacherFees')->name('fees');
                     Route::get('{id}/account-balance', 'getTeacherAccountBalance')->name('accountBalance');
                     Route::middleware('throttle:10,1')->group(function() {
@@ -117,6 +120,7 @@ Route::group(
             # Groups
             Route::prefix('groups')->controller(GroupsController::class)->name('groups.')->group(function() {
                 Route::get('/', 'index')->name('index');
+                Route::get('{id}/students', 'getGroupStudents')->name('students');
                 Route::middleware('throttle:10,1')->group(function() {
                     Route::post('insert', 'insert')->name('insert');
                     Route::post('update', 'update')->name('update');
@@ -254,6 +258,15 @@ Route::group(
             });
         # End Finance Managment
 
+        # Start Activities
+            Route::prefix('attendance')->controller(AttendanceController::class)->name('attendance.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::post('students', 'getStudentsByFilter')->name('students');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                });
+            });
+        # End Activities
     });
 });
 

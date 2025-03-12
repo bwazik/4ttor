@@ -33,6 +33,7 @@ return [
     'grade' => 'الصف الدراسي',
     'parent' => 'ولي الأمر',
     'teacher' => 'المدرس',
+    'group' => 'المجموعة',
     'amount' => 'المبلغ',
     'date' => 'التاريخ',
     'student' => 'الطالب',
@@ -109,6 +110,7 @@ return [
     # Buttons
     'submit' => 'تمام',
     'cancel' => 'إلغاء',
+    'search' => 'بحث',
     'yes_delete' => 'آه, إمسح',
     'yes_archive' => 'آه, أرشف',
     'yes_restore' => 'آه, رجعهم',

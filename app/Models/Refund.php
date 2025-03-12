@@ -15,7 +15,7 @@ class Refund extends Model
         'date',
         'teacher_id',
         'student_id',
-        'debit',
+        'credit',
         'description',
         'created_at',
         'updated_at',

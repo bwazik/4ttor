@@ -32,7 +32,7 @@
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 { data: 'date', name: 'date' },
                 { data: 'student_id', name: 'student_id' },
-                { data: 'debit', name: 'debit' },
+                { data: 'credit', name: 'credit' },
                 { data: 'description', name: 'description' },
                 { data: 'created_at', name: 'created_at', orderable: false, searchable: false },
                 { data: 'updated_at', name: 'updated_at', orderable: false, searchable: false },

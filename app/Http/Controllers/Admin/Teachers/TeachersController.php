@@ -13,7 +13,6 @@ use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
 use App\Services\Admin\TeacherService;
 use App\Http\Requests\Admin\TeachersRequest;
-use App\Models\TeacherAccount;
 
 class TeachersController extends Controller
 {
@@ -194,7 +193,7 @@ class TeachersController extends Controller
     //     }
     // }
 
-    public function groups(Request $request)
+    public function getTeacherGroups(Request $request)
     {
         $validated = $request->validate([
             'teachers' => 'required|array',
@@ -212,10 +211,41 @@ class TeachersController extends Controller
         return response()->json(['status' => 'success', 'data' => $groups]);
     }
 
-    public function grades($id)
+    public function getTeacherGroupsByGrade($id, $grade_id)
     {
         try {
-            $teacher = Teacher::select('id')->findOrFail($id);
+            Teacher::select('id')->findOrFail($id);
+
+            $groups = Group::where('teacher_id', $id)
+            ->where('grade_id', $grade_id)
+            ->select('id', 'name', 'teacher_id')
+            ->with('teacher:id,name')
+            ->orderBy('id')
+            ->get()
+            ->mapWithKeys(fn($group) => [$group->id => $group->name . ' - ' . $group->teacher->name]);
+
+            if ($groups->isEmpty()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => trans('main.noGroupsAssigned'),
+                ], 404);
+            }
+
+            return response()->json(['status' => 'success', 'data' => $groups]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => config('app.env') === 'production'
+                    ? trans('main.errorMessage')
+                    : $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getTeacherGrades($id)
+    {
+        try {
+            Teacher::select('id')->findOrFail($id);
 
             $grades = Grade::whereHas('teachers', function ($query) use ($id) {
                 $query->where('teacher_id', $id);

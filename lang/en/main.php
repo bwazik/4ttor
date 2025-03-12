@@ -33,6 +33,7 @@ return [
     'grade' => 'Grade',
     'parent' => 'Parent',
     'teacher' => 'Teacher',
+    'group' => 'Group',
     'amount' => 'Amount',
     'date' => 'Date',
     'student' => 'Student',
@@ -109,6 +110,7 @@ return [
     # Buttons
     'submit' => 'Submit',
     'cancel' => 'Cancel',
+    'search' => 'Search',
     'yes_delete' => 'Yes, Delete',
     'yes_archive' => 'Yes, Archive',
     'yes_restore' => 'Yes, Restore',

@@ -3,6 +3,7 @@
 namespace App\Services\Admin;
 
 use App\Models\Group;
+use App\Models\Teacher;
 use Illuminate\Support\Facades\DB;
 use App\Traits\PreventDeletionIfRelated;
 
@@ -27,6 +28,9 @@ class GroupService
             ->editColumn('teacher_id', function ($row) {
                 return "<a target='_blank' href='" . route('admin.teachers.details', $row->teacher_id) . "'>" . ($row->teacher_id ? $row->teacher->name : '-') . "</a>";
             })
+            ->editColumn('grade_id', function ($row) {
+                return  $row->grade_id ? $row->grade->name : '-';
+            })
             ->editColumn('day_1', function ($row) {
                 return $row->day_1 ? getDayName($row->day_1) : '-';
             })
@@ -43,7 +47,7 @@ class GroupService
                         <button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light"
                             tabindex="0" type="button" data-bs-toggle="offcanvas" data-bs-target="#edit-modal"
                             id="edit-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '" data-is_active="' . ($row->is_active == 0 ? '0' : '1') . '"
-                            data-teacher_id="' . $row->teacher_id . '" data-day_1="' . $row->day_1 . '" data-day_2="' . $row->day_2 . '" data-time="' . $row->time . '">
+                            data-teacher_id="' . $row->teacher_id . '" data-grade_id="' . $row->grade_id . '" data-day_1="' . $row->day_1 . '" data-day_2="' . $row->day_2 . '" data-time="' . $row->time . '">
                             <i class="ri-edit-box-line ri-20px"></i>
                         </button>
                     </span>' .
@@ -66,6 +70,7 @@ class GroupService
             Group::create([
                 'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
                 'teacher_id' => $request['teacher_id'],
+                'grade_id' => $request['grade_id'],
                 'day_1' => $request['day_1'] ?? null,
                 'day_2' => $request['day_2'] ?? null,
                 'time' => $request['time'],
@@ -96,9 +101,23 @@ class GroupService
         try {
             $group = Group::findOrFail($id);
 
+            $teacherHasGrade = Teacher::where('teachers.id', $request['teacher_id'])
+            ->whereHas('grades', function ($query) use ($request) {
+                $query->where('grades.id', $request['grade_id']);
+            })
+            ->exists();
+
+            if (!$teacherHasGrade) {
+                return [
+                    'status' => 'error',
+                    'message' => trans('main.validateTeacherGroup'),
+                ];
+            }
+
             $group->update([
                 'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
                 'teacher_id' => $request['teacher_id'],
+                'grade_id' => $request['grade_id'],
                 'day_1' => $request['day_1'],
                 'day_2' => $request['day_2'],
                 'time' => $request['time'],

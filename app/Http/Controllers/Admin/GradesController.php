@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Fee;
 use App\Models\Grade;
 use App\Models\Stage;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
@@ -81,5 +82,36 @@ class GradesController extends Controller
         }
 
         return response()->json(['error' => $result['message']], 500);
+    }
+
+    public function getGradeTeachers($id)
+    {
+        try {
+            Grade::select('id')->findOrFail($id);
+
+            $teachers = Teacher::whereHas('grades', function ($query) use ($id) {
+                $query->where('grade_id', $id);
+            })
+            ->select('id', 'name')
+            ->orderBy('id')
+            ->get()
+            ->mapWithKeys(fn($teacher) => [$teacher->id => $teacher->name]);
+
+            if ($teachers->isEmpty()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => trans('main.noGradesAssigned'),
+                ], 404);
+            }
+
+            return response()->json(['status' => 'success', 'data' => $teachers]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => config('app.env') === 'production'
+                    ? trans('main.errorMessage')
+                    : $e->getMessage(),
+            ], 500);
+        }
     }
 }
