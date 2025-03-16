@@ -49,6 +49,16 @@ class Grade extends Model
         return $this->hasMany(Fee::class, 'grade_id');
     }
 
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'grade_id');
+    }
+
+    public function zooms()
+    {
+        return $this->hasMany(Zoom::class, 'grade_id');
+    }
+    
     # Scopes
     public function scopeActive($query)
     {

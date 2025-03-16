@@ -69,6 +69,12 @@ return [
     # Main inputs
     'name_ar' => 'Name (AR)',
     'name_en' => 'Name (EN)',
+    'topic' => 'Topic',
+    'topic_ar' => 'Topic (AR)',
+    'topic_en' => 'Topic (EN)',
+    'duration' => 'Duration (Minutes)',
+    'start_time' => 'Start Time',
+    'join_url' => 'Join URL',
     'realName_ar' => 'Full Name (AR)',
     'realName_en' => 'Full Name (EN)',
     'password' => 'Password',
@@ -89,6 +95,8 @@ return [
     'select_option' => 'Select an option from the list',
     'studentAccount' => 'Student Account',
     'teacherAccount' => 'Teacher Account',
+    'attendances' => 'Attendances',
+    'zoomAccount' => 'Zoom Account',
     'dependencyDept' => ':dependency Dept',
 
     # Modals
@@ -131,4 +139,6 @@ return [
     'validateTeacherGroups' => 'The student must be with the specified teacher to join their group.',
     'validateTeacherGrade' => 'The student must be in the specified grade to be with the specified teacher.',
     'validateTeacherGrades' => 'The teacher must be assigned to the specified grade.',
+    'validateTeacherGradesGroups' => 'The teacher must be assigned to the specified grade and group.',
+    'validateTeacherZoomAccount' => 'The teacher must have a Zoom account to be able to add zooms.',
 ];

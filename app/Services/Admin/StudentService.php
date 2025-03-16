@@ -13,7 +13,7 @@ class StudentService
 {
     use PreventDeletionIfRelated;
 
-    protected $relationships = ['invoices', 'studentAccount', 'receipts', 'refunds'];
+    protected $relationships = ['invoices', 'studentAccount', 'receipts', 'refunds', 'attendances'];
     protected $transModelKey = 'admin/students.students';
 
     public function getStudentsForDatatable($studentsQuery)

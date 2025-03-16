@@ -255,5 +255,11 @@
                 <div>{{ trans('layouts/sidebar.attendance') }}</div>
             </a>
         </li>
+        <li class="menu-item {{ isActiveRoute('admin.zooms.index') ? 'active' : '' }}">
+            <a href="{{ route('admin.zooms.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons ri-video-on-line"></i>
+                <div>{{ trans('layouts/sidebar.zooms') }}</div>
+            </a>
+        </li>
     </ul>
 </aside>

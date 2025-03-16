@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\Finance\InvoicesController;
 use App\Http\Controllers\Admin\Finance\ReceiptsController;
 use App\Http\Controllers\Admin\Finance\RefundsController;
 use App\Http\Controllers\Admin\Activities\AttendanceController;
+use App\Http\Controllers\Admin\Activities\ZoomsController;
 
 Route::group(
     [
@@ -259,11 +260,23 @@ Route::group(
         # End Finance Managment
 
         # Start Activities
+            # Attendance
             Route::prefix('attendance')->controller(AttendanceController::class)->name('attendance.')->group(function() {
                 Route::get('/', 'index')->name('index');
                 Route::post('students', 'getStudentsByFilter')->name('students');
                 Route::middleware('throttle:10,1')->group(function() {
                     Route::post('insert', 'insert')->name('insert');
+                });
+            });
+
+            # Zooms
+            Route::prefix('zooms')->controller(ZoomsController::class)->name('zooms.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
                 });
             });
         # End Activities

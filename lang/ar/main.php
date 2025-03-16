@@ -69,6 +69,12 @@ return [
     # Main inputs
     'name_ar' => 'الإسم بالعربي',
     'name_en' => 'الإسم بالإنجليزي',
+    'topic' => 'عنوان الحصة',
+    'topic_ar' => 'عنوان الحصة بالعربي',
+    'topic_en' => 'عنوان الحصة بالإنجليزي',
+    'duration' => 'المدة (بالدقائق)',
+    'start_time' => 'وقت البداية',
+    'join_url' => 'لينك الحصة',
     'realName_ar' => 'الإسم  الثلاثي بالعربي',
     'realName_en' => 'الإسم الثلاثي بالإنجليزي',
     'password' => 'الباسوورد',
@@ -89,6 +95,8 @@ return [
     'select_option' => 'اختار حاجة من الاختيارات',
     'studentAccount' => 'حساب الطالب',
     'teacherAccount' => 'حساب المدرس',
+    'attendances' => 'الحضور والغياب',
+    'zoomAccount' => 'أكونت الزوم',
     'dependencyDept' => 'مديونية ال:dependency',
 
     # Modals
@@ -130,5 +138,7 @@ return [
     'errorDependencies' => ':model دي (:name) مش هينفع تتمسح علشان عندها علاقات مرتبطة مع :dependency.',
     'validateTeacherGroups' => 'لازم يكون الطالب مع المستر المحدد عشان يخش مجموعته.',
     'validateTeacherGrade' => 'لازم يكون الطالب مع الصف المحدد عشان يبقي مع المستر المحدد.',
-    'validateTeacherGrades' => 'لازم يكون المدرس مع الصف المحدد عشان يقدر يضيف المصاريف.',
+    'validateTeacherGrades' => 'لازم يكون المدرس مع الصف المحدد.',
+    'validateTeacherGradesGroups' => 'لازم يكون المدرس مع الصف والمجموعة المحددين.',
+    'validateTeacherZoomAccount' => 'لازم يكون المدرس عنده حساب زوم عشان يقدر يضيف حصص.',
 ];

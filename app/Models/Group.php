@@ -43,6 +43,16 @@ class Group extends Model
         return $this->belongsToMany(Student::class, 'student_group');
     }
 
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'group_id');
+    }
+
+    public function zooms()
+    {
+        return $this->hasMany(Zoom::class, 'group_id');
+    }
+
     # Scopes
     public function scopeActive($query)
     {
