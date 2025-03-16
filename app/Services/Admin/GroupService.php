@@ -11,7 +11,7 @@ class GroupService
 {
     use PreventDeletionIfRelated;
 
-    protected $relationships = ['students'];
+    protected $relationships = ['students', 'attendances', 'zooms'];
     protected $transModelKey = 'admin/groups.groups';
 
     public function getGroupsForDatatable($groupsQuery)

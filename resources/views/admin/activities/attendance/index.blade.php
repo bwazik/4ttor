@@ -93,7 +93,7 @@
 @section('title', pageTitle('admin/attendance.attendance'))
 
 @section('content')
-    @include('admin.reports.attendance.form')
+    @include('admin.activities.attendance.form')
     <!-- DataTable with Buttons -->
     <x-datatable datatableTitle="{{ trans('main.datatableTitle', ['item' => trans('admin/attendance.attendance')]) }}"
         dataToggle="offcanvas" otherButton="{{ trans('admin/attendance.submit') }}" otherIcon="ri-add-line">

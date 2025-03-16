@@ -41,4 +41,5 @@ return [
     # Activities
     'activities' => 'الأنشطة الطلابية',
     'attendance' => 'الحضور والغياب',
+    'zooms' => 'حصص الزوم',
 ];

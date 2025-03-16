@@ -3,6 +3,7 @@
     'offcanvasTitle',
     'action',
     'id' => false,
+    'meeting_id' => false,
     'hasFiles' => false,
 ])
 
@@ -16,6 +17,9 @@
             @csrf
             @if($id)
                 <input type="hidden" id="id" name="id">
+            @endif
+            @if($meeting_id)
+                <input type="hidden" id="meeting_id" name="meeting_id">
             @endif
             {{ $slot }}
             <div class="col-sm-12">

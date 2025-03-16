@@ -52,7 +52,9 @@ trait PreventDeletionIfRelated
     {
         $accountTranslations = [
             'admin/studentAccount.studentAccount' => trans('main.studentAccount'),
-            'admin/teacherAccount.teacherAccount' => trans('main.teacherAccount')
+            'admin/teacherAccount.teacherAccount' => trans('main.teacherAccount'),
+            'admin/attendances.attendances' => trans('main.attendances'),
+            'admin/zoomAccount.zoomAccount' => trans('main.zoomAccount'),
         ];
 
         // Ensure we work with a collection of models (even if a single model is passed)

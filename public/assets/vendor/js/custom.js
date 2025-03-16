@@ -124,6 +124,7 @@ toastr.options = {
 document.addEventListener('DOMContentLoaded', function () {
     const datePickers = document.querySelectorAll('.flatpickr-date');
     const timePickers = document.querySelectorAll('.flatpickr-timeB');
+    const dateTimePickers = document.querySelectorAll('.flatpickr-date-time');
 
     Array.from(datePickers).forEach((datepicker) => {
         flatpickr(datepicker, {
@@ -136,6 +137,12 @@ document.addEventListener('DOMContentLoaded', function () {
             enableTime: true,
             noCalendar: true,
             allowInput: true,
+        });
+    });
+    Array.from(dateTimePickers).forEach((dateTimePicker) => {
+        flatpickr(dateTimePicker, {
+            enableTime: true,
+            dateFormat: 'Y-m-d H:i'
         });
     });
 });

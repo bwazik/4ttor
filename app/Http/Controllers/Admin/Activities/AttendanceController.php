@@ -21,7 +21,7 @@ class AttendanceController extends Controller
     {
         $teachers = Teacher::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
 
-        return view('admin.reports.attendance.index', compact('teachers'));
+        return view('admin.activities.attendance.index', compact('teachers'));
     }
 
     public function getStudentsByFilter(StudentSearchRequest $request)

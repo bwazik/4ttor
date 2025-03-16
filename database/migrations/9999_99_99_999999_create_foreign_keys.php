@@ -170,6 +170,22 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });
+        Schema::table('zoom_accounts', function (Blueprint $table) {
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('zooms', function (Blueprint $table) {
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('grade_id')->references('id')->on('grades')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('group_id')->references('id')->on('groups')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
         # End Activities Tables
 
     }
@@ -260,7 +276,14 @@ return new class extends Migration
             $table->dropForeign('attendances_group_id_foreign');
             $table->dropForeign('attendances_student_id_foreign');
         });
-
+        Schema::table('zoom_accounts', function (Blueprint $table) {
+            $table->dropForeign('zoom_accounts_teacher_id_foreign');
+        });
+        Schema::table('zooms', function (Blueprint $table) {
+            $table->dropForeign('zooms_teacher_id_foreign');
+            $table->dropForeign('zooms_grade_id_foreign');
+            $table->dropForeign('zooms_group_id_foreign');
+        });
         # End Activities Tables
     }
 };

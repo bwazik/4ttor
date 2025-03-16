@@ -12,7 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('zoom_accounts', function (Blueprint $table) {
-            $table->id();
+			$table->increments('id');
+            $table->integer('teacher_id')->unsigned()->unique();
+            $table->text('account_id');
+            $table->text('client_id');
+            $table->text('client_secret');
             $table->timestamps();
         });
     }

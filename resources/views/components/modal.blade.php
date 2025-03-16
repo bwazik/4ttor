@@ -4,6 +4,7 @@
     'action',
     'id' => false,
     'ids' => false,
+    'meeting_id' => false,
     'submitButton' => trans('main.submit'),
     'submitColor' => 'primary',
     'modalSize' => null,
@@ -23,6 +24,9 @@
                     <input type="hidden" id="id" name="id">
                 @elseif($ids)
                     <div id="ids-container"></div>
+                @endif
+                @if($meeting_id)
+                    <input type="hidden" id="meeting_id" name="meeting_id">
                 @endif
                 <div class="modal-body">
                     {{ $slot }}

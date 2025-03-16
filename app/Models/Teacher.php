@@ -92,6 +92,36 @@ class Teacher extends Authenticatable
         return $this->hasMany(Refund::class, 'teacher_id');
     }
 
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'teacher_id');
+    }
+
+    public function zoomAccount()
+    {
+        return $this->hasOne(ZoomAccount::class, 'teacher_id');
+    }
+
+    public function zooms()
+    {
+        return $this->hasMany(Zoom::class, 'teacher_id');
+    }
+
+    public function accountID()
+    {
+        return $this->zoomAccount?->account_id;
+    }
+
+    public function clientID()
+    {
+        return $this->zoomAccount?->client_id;
+    }
+
+    public function clientSecret()
+    {
+        return $this->zoomAccount?->client_secret;
+    }
+
     # Scopes
     public function scopeActive($query)
     {
