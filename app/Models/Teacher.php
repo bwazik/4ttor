@@ -122,6 +122,11 @@ class Teacher extends Authenticatable
         return $this->zoomAccount?->client_secret;
     }
 
+    public function quizzes()
+    {
+        return $this->hasMany(Quiz::class, 'teacher_id');
+    }
+    
     # Scopes
     public function scopeActive($query)
     {

@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('quiz_groups', function (Blueprint $table) {
+        Schema::create('quiz_group', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('quiz_id')->unsigned();
             $table->integer('group_id')->unsigned();
-            $table->timestamps();
 
             $table->unique(['quiz_id', 'group_id']);
         });
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('quiz_groups');
+        Schema::dropIfExists('quiz_group');
     }
 };

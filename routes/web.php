@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\Finance\ReceiptsController;
 use App\Http\Controllers\Admin\Finance\RefundsController;
 use App\Http\Controllers\Admin\Activities\AttendanceController;
 use App\Http\Controllers\Admin\Activities\ZoomsController;
+use App\Http\Controllers\Admin\Activities\QuizzesController;
 
 Route::group(
     [
@@ -271,6 +272,17 @@ Route::group(
 
             # Zooms
             Route::prefix('zooms')->controller(ZoomsController::class)->name('zooms.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
+            });
+
+            # Quizzes
+            Route::prefix('quizzes')->controller(QuizzesController::class)->name('quizzes.')->group(function() {
                 Route::get('/', 'index')->name('index');
                 Route::middleware('throttle:10,1')->group(function() {
                     Route::post('insert', 'insert')->name('insert');

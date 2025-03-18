@@ -53,6 +53,11 @@ class Group extends Model
         return $this->hasMany(Zoom::class, 'group_id');
     }
 
+    public function quizzes()
+    {
+        return $this->belongsToMany(Quiz::class, 'quiz_group');
+    }
+
     # Scopes
     public function scopeActive($query)
     {
