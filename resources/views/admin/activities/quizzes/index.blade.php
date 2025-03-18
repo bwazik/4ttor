@@ -4,7 +4,7 @@
 
 @endsection
 
-@section('title', pageTitle('admin/quizzes.quizzes'))
+@section('title', pageTitle('admiسn/quizzes.quizzes'))
 
 @section('content')
     <!-- DataTable with Buttons -->
