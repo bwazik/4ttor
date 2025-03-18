@@ -83,6 +83,21 @@ class Student extends Authenticatable
         return $this->hasMany(Attendance::class, 'student_id');
     }
 
+    public function studentAnswers()
+    {
+        return $this->hasMany(StudentAnswer::class, 'student_id');
+    }
+
+    public function studentResults()
+    {
+        return $this->hasMany(StudentResult::class, 'student_id');
+    }
+
+    public function StudentViolations()
+    {
+        return $this->hasMany(StudentViolation::class, 'student_id');
+    }
+
     # Scopes
     public function scopeMale($query)
     {

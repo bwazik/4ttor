@@ -74,6 +74,7 @@ return [
     'topic_en' => 'Topic (EN)',
     'duration' => 'Duration (Minutes)',
     'start_time' => 'Start Time',
+    'end_time' => 'End Time',
     'join_url' => 'Join URL',
     'realName_ar' => 'Full Name (AR)',
     'realName_en' => 'Full Name (EN)',

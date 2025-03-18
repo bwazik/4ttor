@@ -62,7 +62,14 @@ if(!function_exists('mapDaysToNames')) {
 if(!function_exists('isoFormat')) {
     function isoFormat(string $value)
     {
-        return Carbon::parse($value)->isoFormat('dddd D MMMM YYYY h:mm A');
+        return Carbon::parse($value)->isoFormat('dddd D MMMM h:mm A');
+    }
+}
+
+if(!function_exists('humanFormat')) {
+    function humanFormat(string $value)
+    {
+        return Carbon::parse($value)->format('Y-m-d H:i');
     }
 }
 

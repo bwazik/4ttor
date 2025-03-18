@@ -58,7 +58,12 @@ class Grade extends Model
     {
         return $this->hasMany(Zoom::class, 'grade_id');
     }
-    
+
+    public function quizzes()
+    {
+        return $this->hasMany(Quiz::class, 'grade_id');
+    }
+
     # Scopes
     public function scopeActive($query)
     {

@@ -186,6 +186,62 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });
+        Schema::table('quizzes', function (Blueprint $table) {
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('grade_id')->references('id')->on('grades')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('questions', function (Blueprint $table) {
+            $table->foreign('quiz_id')->references('id')->on('quizzes')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('answers', function (Blueprint $table) {
+            $table->foreign('question_id')->references('id')->on('questions')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('student_answers', function (Blueprint $table) {
+            $table->foreign('student_id')->references('id')->on('students')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('quiz_id')->references('id')->on('quizzes')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('question_id')->references('id')->on('questions')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('answer_id')->references('id')->on('answers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('student_results', function (Blueprint $table) {
+            $table->foreign('student_id')->references('id')->on('students')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('quiz_id')->references('id')->on('quizzes')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('student_violations', function (Blueprint $table) {
+            $table->foreign('student_id')->references('id')->on('students')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('quiz_id')->references('id')->on('quizzes')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('quiz_group', function (Blueprint $table) {
+            $table->foreign('quiz_id')->references('id')->on('quizzes')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('group_id')->references('id')->on('groups')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
         # End Activities Tables
 
     }
@@ -283,6 +339,34 @@ return new class extends Migration
             $table->dropForeign('zooms_teacher_id_foreign');
             $table->dropForeign('zooms_grade_id_foreign');
             $table->dropForeign('zooms_group_id_foreign');
+        });
+        Schema::table('quizzes', function (Blueprint $table) {
+            $table->dropForeign('quizzes_teacher_id_foreign');
+            $table->dropForeign('quizzes_grade_id_foreign');
+        });
+        Schema::table('questions', function (Blueprint $table) {
+            $table->dropForeign('questions_quiz_id_foreign');
+        });
+        Schema::table('answers', function (Blueprint $table) {
+            $table->dropForeign('answers_question_id_foreign');
+        });
+        Schema::table('student_answers', function (Blueprint $table) {
+            $table->dropForeign('student_answers_student_id_foreign');
+            $table->dropForeign('student_answers_quiz_id_foreign');
+            $table->dropForeign('student_answers_question_id_foreign');
+            $table->dropForeign('student_answers_answer_id_foreign');
+        });
+        Schema::table('student_results', function (Blueprint $table) {
+            $table->dropForeign('student_results_student_id_foreign');
+            $table->dropForeign('student_results_quiz_id_foreign');
+        });
+        Schema::table('student_violations', function (Blueprint $table) {
+            $table->dropForeign('student_violations_student_id_foreign');
+            $table->dropForeign('student_violations_quiz_id_foreign');
+        });
+        Schema::table('quiz_group', function (Blueprint $table) {
+            $table->dropForeign('quiz_group_quiz_id_foreign');
+            $table->dropForeign('quiz_group_group_id_foreign');
         });
         # End Activities Tables
     }

@@ -261,5 +261,11 @@
                 <div>{{ trans('layouts/sidebar.zooms') }}</div>
             </a>
         </li>
+        <li class="menu-item {{ isActiveRoute('admin.quizzes.index') ? 'active' : '' }}">
+            <a href="{{ route('admin.quizzes.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons ri-brain-line"></i>
+                <div>{{ trans('layouts/sidebar.quizzes') }}</div>
+            </a>
+        </li>
     </ul>
 </aside>

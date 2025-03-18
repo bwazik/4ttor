@@ -12,7 +12,6 @@ use App\Jobs\HandleZoomMeetingJob;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Traits\PreventDeletionIfRelated;
-use Jubaer\Zoom\Facades\Zoom as ZoomFacade;
 
 class ZoomService
 {
@@ -55,7 +54,8 @@ class ZoomService
                 return $remainingMinutes . ' ' . trans('admin/zooms.minutes') . '';
             })
             ->editColumn('start_time', function ($row) {
-                return \Carbon\Carbon::parse($row->start_time)->diffForHumans();
+                // return \Carbon\Carbon::parse($row->start_time)->diffForHumans();
+                return isoFormat($row->start_time);
             })
             ->editColumn('join_url', function ($row) {
                 return '<a href="'.$row->join_url.'" target="_blank" class="btn btn-sm btn-label-success waves-effect">'.trans('main.join_url').'</a>';
@@ -68,7 +68,7 @@ class ZoomService
                             tabindex="0" type="button" data-bs-toggle="offcanvas" data-bs-target="#edit-modal"
                             id="edit-button" data-id=' . $row->id . ' data-meeting_id="' . $row -> meeting_id . '" data-topic_ar="' . $row->getTranslation('topic', 'ar') . '" data-topic_en="' . $row->getTranslation('topic', 'en') . '"
                             data-teacher_id="' . $row->teacher_id . '" data-grade_id="' . $row->grade_id . '" data-group_id="' . $row->group_id . '"
-                            data-duration="' . $row->duration . '" data-start_time="' . \Carbon\Carbon::parse($row -> start_time)->format('Y-m-d H:i') . '">
+                            data-duration="' . $row->duration . '" data-start_time="' . humanFormat($row -> start_time) . '">
                             <i class="ri-edit-box-line ri-20px"></i>
                         </button>
                     </span>' .
