@@ -59,7 +59,7 @@
                                         <div class="me-1 text-nowrap">{{ $index + 1 }} -</div>
                                     </div>
 
-                                    <span class="flex-grow-1">{{ $question->question_text }}</span>
+                                    <span class="flex-grow-1 text-break" style="line-break: anywhere">{{ $question->question_text }}</span>
                                 </button>
 
                                 <div class="d-flex align-items-center ms-2">
