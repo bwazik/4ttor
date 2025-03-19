@@ -158,7 +158,7 @@ class QuizService
         }
     }
 
-    public function deleteQuiz($id, $meeting_id): array
+    public function deleteQuiz($id): array
     {
         DB::beginTransaction();
 

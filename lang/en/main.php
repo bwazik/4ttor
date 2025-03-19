@@ -94,6 +94,7 @@ return [
     'allowed' => 'Allowed',
     'notallowed' => 'Not Allowed',
     'select_option' => 'Select an option from the list',
+    'selectAll' => 'Select All',
     'studentAccount' => 'Student Account',
     'teacherAccount' => 'Teacher Account',
     'attendances' => 'Attendances',

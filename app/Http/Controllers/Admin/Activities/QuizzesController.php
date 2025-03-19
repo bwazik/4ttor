@@ -68,7 +68,7 @@ class QuizzesController extends Controller
     {
         $this->validateExistence($request, 'quizzes');
 
-        $result = $this->quizService->deleteQuiz($request->id, $request->meeting_id);
+        $result = $this->quizService->deleteQuiz($request->id);
 
         if ($result['status'] === 'success') {
             return response()->json(['success' => $result['message']], 200);
