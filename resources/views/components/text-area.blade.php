@@ -6,6 +6,7 @@
     'id' => null,
     'context' => null,
     'divClasses' => null,
+    'maxlength' => 255,
 ])
 
 @php
@@ -20,7 +21,7 @@
 
 <div class="{{ $divClasses }}">
     <div class="form-floating form-floating-outline">
-        <textarea id="{{ $id ?? $name }}" class="form-control h-px-100" name="{{ $name }}" {{ $required ? 'required' : '' }} placeholder="{{ $placeholder }}" aria-label="{{ $placeholder }}" maxlength="255"></textarea>
+        <textarea id="{{ $id ?? $name }}" class="form-control h-px-100" name="{{ $name }}" {{ $required ? 'required' : '' }} placeholder="{{ $placeholder }}" aria-label="{{ $placeholder }}" maxlength="{{ $maxlength }}"></textarea>
         <label for="{{ $id ?? $name }}">{{ $label }}</label>
     </div>
     <span class="invalid-feedback" id="{{ $id ?? $name }}_error" role="alert"></span>

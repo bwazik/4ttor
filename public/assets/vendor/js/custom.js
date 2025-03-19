@@ -651,7 +651,11 @@ function handleFormSubmit(formId, fields, modalId, modalType, datatableId) {
                     } else if (modalType === 'modal') {
                         $(modalId).modal('hide');
                     }
-                    refreshDataTable(datatableId);
+                    if ($(datatableId).length) {
+                        refreshDataTable(datatableId);
+                    } else {
+                        location.reload();
+                    }
                 } else {
                     toastr.error(response.error || errorMessage);
                     setTimeout(function() {
@@ -709,7 +713,11 @@ function handleDeletionFormSubmit(formId, modalId, datatableId) {
                         submitButton.prop('disabled', false);
                     }, 1500);
                     $(modalId).modal('hide')
-                    refreshDataTable(datatableId);
+                    if ($(datatableId).length) {
+                        refreshDataTable(datatableId);
+                    } else {
+                        location.reload();
+                    }
                 } else {
                     toastr.error(response.error || errorMessage);
                     setTimeout(function() {
