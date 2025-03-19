@@ -41,8 +41,8 @@ class QuizService
 
                 if ($hours > 0) {
                     return $hours . ' ' . trans('admin/zooms.hours') . '' .
-                    ($remainingMinutes > 0 ? ' ' . trans('admin/zooms.and') . ' ' .
-                    $remainingMinutes . ' ' . trans('admin/zooms.minute') . '' : '');
+                        ($remainingMinutes > 0 ? ' ' . trans('admin/zooms.and') . ' ' .
+                            $remainingMinutes . ' ' . trans('admin/zooms.minute') . '' : '');
                 }
                 return $remainingMinutes . ' ' . trans('admin/zooms.minutes') . '';
             })
@@ -57,24 +57,29 @@ class QuizService
                 $groups = implode(',', $groupIds);
 
                 return
-                    '<div class="align-items-center">' .
-                    '<span class="text-nowrap">
-                        <button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light"
-                            tabindex="0" type="button" data-bs-toggle="offcanvas" data-bs-target="#edit-modal"
-                            id="edit-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
-                            data-teacher_id="' . $row->teacher_id . '" data-grade_id="' . $row->grade_id . '" data-groups="' . $groups . '"
-                            data-duration="' . $row->duration . '" data-start_time="' . humanFormat($row -> start_time) . '"
-                            data-end_time="' . humanFormat($row -> end_time) . '">
-                            <i class="ri-edit-box-line ri-20px"></i>
-                        </button>
-                    </span>' .
-                    '<button class="btn btn-sm btn-icon btn-text-danger rounded-pill text-body waves-effect waves-light me-1"
-                            id="delete-button" data-id=' . $row->id . ' data-meeting_id=' . $row->meeting_id . '
-                            data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
-                            data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
-                            <i class="ri-delete-bin-7-line ri-20px text-danger"></i>
-                        </button>' .
-                    '</div>';
+                    '<div class="d-inline-block">
+                        <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ri-more-2-line"></i></a>
+                        <ul class="dropdown-menu dropdown-menu-end m-0">
+                            <li><a target="_blank" href="' . route('admin.questions.index', $row->id) . '" class="dropdown-item">' . trans('admin/questions.questions') . '</a></li>
+                            <div class="dropdown-divider"></div>
+                            <li>
+                                <a href="javascript:;" class="dropdown-item text-danger"
+                                    id="delete-button" data-id="' . $row->id . '" data-meeting_id="' . $row->meeting_id . '"
+                                    data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
+                                    data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
+                                    ' . trans('main.delete') . '
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light"
+                        tabindex="0" type="button" data-bs-toggle="offcanvas" data-bs-target="#edit-modal"
+                        id="edit-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
+                        data-teacher_id="' . $row->teacher_id . '" data-grade_id="' . $row->grade_id . '" data-groups="' . $groups . '"
+                        data-duration="' . $row->duration . '" data-start_time="' . humanFormat($row->start_time) . '"
+                        data-end_time="' . humanFormat($row->end_time) . '">
+                        <i class="ri-edit-box-line ri-20px"></i>
+                    </button>';
             })
             ->rawColumns(['selectbox', 'teacher_id', 'actions'])
             ->make(true);

@@ -2,10 +2,7 @@
 
 namespace App\Services\Admin\Activities;
 
-use Carbon\Carbon;
 use App\Models\Question;
-use App\Models\Group;
-use App\Models\Teacher;
 use Illuminate\Support\Facades\DB;
 use App\Traits\PreventDeletionIfRelated;
 
@@ -163,39 +160,4 @@ class QuestionService
     {
         return $this->checkForMultipleDependencies($questions, $this->relationships, $this->transModelKey);
     }
-
-    private function verifyTeacherAuthorization(array $request): ?array
-    {
-        $isAuthorized = Teacher::where('id', $request['teacher_id'])
-            ->whereHas('grades', function ($query) use ($request) {
-                $query->where('grades.id', $request['grade_id']);
-            })
-            ->whereHas('groups', function ($query) use ($request) {
-                $query->whereIn('groups.id', $request['groups'])
-                    ->where('groups.grade_id', $request['grade_id']);
-            })
-            ->exists();
-
-        if (!$isAuthorized) {
-            return [
-                'status' => 'error',
-                'message' => trans('main.validateTeacherGradesGroups'),
-            ];
-        }
-
-        $validGroupCount = Group::whereIn('id', $request['groups'])
-            ->where('teacher_id', $request['teacher_id'])
-            ->where('grade_id', $request['grade_id'])
-            ->count();
-
-        if ($validGroupCount !== count($request['groups'])) {
-            return [
-                'status' => 'error',
-                'message' => trans('main.validateTeacherGroups'),
-            ];
-        }
-
-        return null;
-    }
-
 }
