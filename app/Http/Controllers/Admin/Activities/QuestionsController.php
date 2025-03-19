@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Activities;
 
+use App\Models\Quiz;
 use App\Models\Question;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
@@ -22,11 +23,12 @@ class QuestionsController extends Controller
 
     public function index($quizId)
     {
-        $questions = Question::query()->select('id', 'quiz_id', 'question_text')->where('quiz_id', $quizId)->get();
-
-        if ($questions->isEmpty()) {
+        $quizExists = Quiz::where('id', $quizId)->exists();
+        if (!$quizExists) {
             abort(404);
         }
+
+        $questions = Question::query()->select('id', 'quiz_id', 'question_text')->where('quiz_id', $quizId)->get();
 
         return view('admin.activities.questions.index', compact('questions', 'quizId'));
     }
