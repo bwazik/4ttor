@@ -73,7 +73,7 @@
             modalId: '#delete-modal',
             fields: {
                 id: button => button.data('id'),
-                itemToDelete: button => `${button.data('topic_ar')} - ${button.data('topic_en')}`
+                itemToDelete: button => `${button.data('name_ar')} - ${button.data('name_en')}`
             }
         });
 
