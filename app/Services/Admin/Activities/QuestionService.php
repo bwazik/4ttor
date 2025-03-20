@@ -23,7 +23,7 @@ class QuestionService
                 return ['status' => 'error', 'message' => trans('admin/questions.quizHasMaxQuestions')];
             }
 
-            $question = Question::create([
+            Question::create([
                 'quiz_id' => $quizId,
                 'question_text' => ['en' => $request['question_text_en'], 'ar' => $request['question_text_ar']],
             ]);

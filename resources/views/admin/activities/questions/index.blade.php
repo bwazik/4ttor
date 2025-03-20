@@ -59,7 +59,7 @@
                                         <div class="me-1 text-nowrap">{{ $index + 1 }} -</div>
                                     </div>
 
-                                    <span class="flex-grow-1 text-break" style="line-break: anywhere">{{ $question->question_text }}</span>
+                                    <span class="flex-grow-1 text-break">{{ $question->question_text }}</span>
                                 </button>
 
                                 <div class="d-flex align-items-center ms-2">
@@ -83,11 +83,7 @@
                             <div id="accordionPopout{{ $index }}" class="accordion-collapse collapse"
                                 aria-labelledby="headingPopout{{ $index }}" data-bs-parent="#accordionPopout" style="">
                                 <div class="accordion-body">
-                                    Lemon drops chocolate cake gummies carrot cake chupa chups muffin topping. Sesame
-                                    snaps icing
-                                    marzipan gummi bears macaroon dragée danish caramels powder. Bear claw dragée pastry
-                                    topping
-                                    soufflé.
+                                    @include('admin.activities.answers.datatable')
                                 </div>
                             </div>
                         </div>
@@ -97,61 +93,11 @@
         </div>
     </div>
     @include('admin.activities.questions.modals')
+    @include('admin.activities.answers.modals')
 @endsection
 
 @section('page-js')
     <script>
-        // initializeDataTable('#datatable', "{{ route('admin.questions.index', 1) }}", [2, 3, 4, 5, 6, 7, 8],
-        //     [{
-        //             data: "",
-        //             orderable: false,
-        //             searchable: false
-        //         },
-        //         {
-        //             data: 'selectbox',
-        //             name: 'selectbox',
-        //             orderable: false,
-        //             searchable: false
-        //         },
-        //         {
-        //             data: 'DT_RowIndex',
-        //             name: 'DT_RowIndex',
-        //             orderable: false,
-        //             searchable: false
-        //         },
-        //         {
-        //             data: 'name',
-        //             name: 'name'
-        //         },
-        //         {
-        //             data: 'teacher_id',
-        //             name: 'teacher_id'
-        //         },
-        //         {
-        //             data: 'grade_id',
-        //             name: 'grade_id'
-        //         },
-        //         {
-        //             data: 'duration',
-        //             name: 'duration'
-        //         },
-        //         {
-        //             data: 'start_time',
-        //             name: 'start_time'
-        //         },
-        //         {
-        //             data: 'end_time',
-        //             name: 'end_time'
-        //         },
-        //         {
-        //             data: 'actions',
-        //             name: 'actions',
-        //             orderable: false,
-        //             searchable: false
-        //         }
-        //     ],
-        // );
-
         // Setup edit modal
         setupModal({
             buttonId: '#edit-button',
@@ -202,4 +148,5 @@
             });
         });
     </script>
+    @include('admin.activities.answers.scripts')
 @endsection

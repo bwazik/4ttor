@@ -11,11 +11,12 @@
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
 
 <style>
-    #datatable th, td{
+    table[id^="datatable"] th,
+    table[id^="datatable"] td {
         white-space: nowrap;
         text-align: center !important;
     }
-    #datatable {
+    table[id^="datatable"] {
         text-align: center !important;
         width: 100% !important;
     }

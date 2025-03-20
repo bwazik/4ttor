@@ -312,9 +312,11 @@ Route::group(
                 Route::get('/', 'index')->name('index');
                 Route::middleware('throttle:10,1')->group(function() {
                     Route::post('insert', 'insert')->name('insert');
-                    Route::post('update', 'update')->name('update');
-                    Route::post('delete', 'delete')->name('delete');
                 });
+            });
+            Route::prefix('answers')->controller(AnswersController::class)->name('answers.')->middleware('throttle:10,1')->group(function() {
+                Route::post('update', 'update')->name('update');
+                Route::post('delete', 'delete')->name('delete');
             });
         # End Activities
     });

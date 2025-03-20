@@ -611,7 +611,7 @@ function setupModal({ buttonId, modalId, fields = {}, onShow = null }) {
     });
 }
 
-function handleFormSubmit(formId, fields, modalId, modalType, datatableId) {
+function handleFormSubmit(formId, fields, modalId, modalType, getDatatableId) {
     $(formId).on('submit', function(e) {
         e.preventDefault();
         submitButton = $(this).find('button[type="submit"]');
@@ -624,6 +624,7 @@ function handleFormSubmit(formId, fields, modalId, modalType, datatableId) {
         });
 
         const formData = new FormData(this);
+        let datatableId = typeof getDatatableId === 'function' ? getDatatableId() : getDatatableId;
 
         $.ajax({
             url: $(this).attr('action'),
@@ -691,13 +692,14 @@ function handleFormSubmit(formId, fields, modalId, modalType, datatableId) {
     });
 }
 
-function handleDeletionFormSubmit(formId, modalId, datatableId) {
+function handleDeletionFormSubmit(formId, modalId, getDatatableId) {
     $(formId).on('submit', function(e) {
         e.preventDefault();
         submitButton = $(this).find('button[type="submit"]');
         submitButton.prop('disabled', true);
 
         const formData = new FormData(this);
+        let datatableId = typeof getDatatableId === 'function' ? getDatatableId() : getDatatableId;
 
         $.ajax({
             url: $(this).attr('action'),
