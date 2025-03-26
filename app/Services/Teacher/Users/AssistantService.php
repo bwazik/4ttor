@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Admin;
+namespace App\Services\Teacher\Users;
 
 use App\Models\Assistant;
 use Illuminate\Support\Facades\DB;

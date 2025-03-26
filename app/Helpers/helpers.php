@@ -1,6 +1,7 @@
 <?php
 
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Route;
 
 
@@ -73,4 +74,35 @@ if(!function_exists('humanFormat')) {
     }
 }
 
+if (!function_exists('isAdmin')) {
+    function isAdmin()
+    {
+        return auth()->guard('web')->check();
+    }
+}
+
+if (!function_exists('filterByRelation')) {
+    function filterByRelation($query, $relation, $column, $keyword)
+    {
+        $query->whereHas($relation, function ($q) use ($column, $keyword) {
+            $q->where($column, 'LIKE', "%$keyword%");
+        });
+    }
+}
+
+if (!function_exists('filterByStatus')) {
+    function filterByStatus($query, $keyword, $column = 'is_active')
+    {
+        $keyword = trim(mb_strtolower($keyword, 'UTF-8'));
+
+        $activeKeywords = ['active', 'مفعل'];
+        $inactiveKeywords = ['inactive', 'غير', 'غير مفعل'];
+
+        if (Str::contains($keyword, $activeKeywords)) {
+            $query->where($column, 1);
+        } elseif (Str::contains($keyword, $inactiveKeywords)) {
+            $query->where($column, 0);
+        }
+    }
+}
 

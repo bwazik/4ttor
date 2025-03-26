@@ -14,8 +14,8 @@ class AnswersRequest extends FormRequest
     public function rules()
     {
         return [
-            'answer_text_ar' => 'required|string|min:3|max:500',
-            'answer_text_en' => 'required|string|min:3|max:500',
+            'answer_text_ar' => 'required|string|max:500',
+            'answer_text_en' => 'required|string|max:500',
             'is_correct' => 'required|boolean',
             'score' => 'required|numeric|min:0|max:100',
         ];

@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Services\Admin;
+namespace App\Services\Teacher\Platform;
 
 use App\Models\Group;
-use App\Traits\PreventDeletionIfRelated;
+use Illuminate\Support\Str;
 use App\Traits\PublicValidatesTrait;
+use Illuminate\Support\Facades\Auth;
 use App\Traits\DatabaseTransactionTrait;
+use App\Traits\PreventDeletionIfRelated;
 
 class GroupService
 {
@@ -24,24 +26,20 @@ class GroupService
                 </td>'
             )
             ->editColumn('name', fn($row) => $row->name)
-            ->editColumn('teacher_id', fn($row) =>
-                "<a target='_blank' href='" . route('admin.teachers.details', $row->teacher_id) . "'>"
-                    . ($row->teacher_id ? $row->teacher->name : '-') .
-                "</a>"
-            )
             ->editColumn('grade_id', fn($row) => $row->grade_id ? $row->grade->name : '-')
             ->editColumn('day_1', fn($row) => $row->day_1 ? getDayName($row->day_1) : '-')
             ->editColumn('day_2', fn($row) => $row->day_2 ? getDayName($row->day_2) : '-')
-            ->editColumn('is_active', fn($row) =>
+            ->editColumn(
+                'is_active',
+                fn($row) =>
                 $row->is_active
-                    ? '<span class="badge rounded-pill bg-label-success" text-capitalized="">' . trans('main.active') . '</span>'
-                    : '<span class="badge rounded-pill bg-label-secondary" text-capitalized="">' . trans('main.inactive') . '</span>'
+                ? '<span class="badge rounded-pill bg-label-success" text-capitalized="">' . trans('main.active') . '</span>'
+                : '<span class="badge rounded-pill bg-label-secondary" text-capitalized="">' . trans('main.inactive') . '</span>'
             )
             ->addColumn('actions', fn($row) => $this->generateActionButtons($row))
-            ->filterColumn('teacher_id', fn($query, $keyword) => filterByRelation($query, 'teacher', 'name', $keyword))
             ->filterColumn('grade_id', fn($query, $keyword) => filterByRelation($query, 'grade', 'name', $keyword))
             ->filterColumn('is_active', fn($query, $keyword) => filterByStatus($query, $keyword))
-            ->rawColumns(['selectbox', 'teacher_id', 'is_active', 'actions'])
+            ->rawColumns(['selectbox', 'is_active', 'actions'])
             ->make(true);
     }
 
@@ -56,7 +54,6 @@ class GroupService
             ' data-name_ar="' . $row->getTranslation('name', 'ar') . '"' .
             ' data-name_en="' . $row->getTranslation('name', 'en') . '"' .
             ' data-is_active="' . ($row->is_active ? '1' : '0') . '"' .
-            ' data-teacher_id="' . $row->teacher_id . '"' .
             ' data-grade_id="' . $row->grade_id . '"' .
             ' data-day_1="' . $row->day_1 . '"' .
             ' data-day_2="' . $row->day_2 . '"' .
@@ -76,14 +73,13 @@ class GroupService
 
     public function insertGroup(array $request)
     {
-        return $this->executeTransaction(function () use ($request)
-        {
+        return $this->executeTransaction(function () use ($request) {
             if ($validationResult = $this->validateTeacherGrade($request['grade_id']))
                 return $validationResult;
 
             Group::create([
                 'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
-                'teacher_id' => $request['teacher_id'],
+                'teacher_id' => Auth::id(),
                 'grade_id' => $request['grade_id'],
                 'day_1' => $request['day_1'] ?? null,
                 'day_2' => $request['day_2'] ?? null,
@@ -96,8 +92,7 @@ class GroupService
 
     public function updateGroup($id, array $request)
     {
-        return $this->executeTransaction(function () use ($id, $request)
-        {
+        return $this->executeTransaction(function () use ($id, $request) {
             $group = Group::findOrFail($id);
 
             if ($validationResult = $this->validateTeacherGrade($request['grade_id']))
@@ -105,7 +100,6 @@ class GroupService
 
             $group->update([
                 'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
-                'teacher_id' => $request['teacher_id'],
                 'grade_id' => $request['grade_id'],
                 'day_1' => $request['day_1'],
                 'day_2' => $request['day_2'],
@@ -119,8 +113,7 @@ class GroupService
 
     public function deleteGroup($id): array
     {
-        return $this->executeTransaction(function () use ($id)
-        {
+        return $this->executeTransaction(function () use ($id) {
             $group = Group::select('id', 'name')->findOrFail($id);
 
             if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($group)) {
@@ -139,8 +132,7 @@ class GroupService
             return $this->errorResponse(trans('main.noItemsSelected'));
         }
 
-        return $this->executeTransaction(function () use ($ids)
-        {
+        return $this->executeTransaction(function () use ($ids) {
             $groups = Group::whereIn('id', $ids)->select('id', 'name')->orderBy('id')->get();
 
             if ($dependencyCheck = $this->checkDependenciesForMultipleDeletion($groups)) {

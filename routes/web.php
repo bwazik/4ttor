@@ -94,7 +94,7 @@ Route::group(
         # End Platform Managment
 
         # Start Users Managment
-            # Manage Teachers
+            # Teachers
             Route::prefix('teachers')->name('teachers.')->group(function() {
                 Route::controller(TeachersController::class)->group(function() {
                     Route::get('/', 'index')->name('index');
@@ -129,15 +129,11 @@ Route::group(
                     Route::post('insert', 'insert')->name('insert');
                     Route::post('update', 'update')->name('update');
                     Route::post('delete', 'delete')->name('delete');
-                    Route::post('archive', 'archive')->name('archive');
-                    Route::post('restore', 'restore')->name('restore');
                     Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
-                    Route::post('archive-selected', 'archiveSelected')->name('archiveSelected');
-                    Route::post('restore-selected', 'restoreSelected')->name('restoreSelected');
                 });
             });
 
-            # Manage Assistants
+            # Assistants
             Route::prefix('assistants')->name('assistants.')->group(function() {
                 Route::controller(AssistantsController::class)->group(function() {
                     Route::get('/', 'index')->name('index');
@@ -159,7 +155,7 @@ Route::group(
                 });
             });
 
-            # Manage Students
+            # Students
             Route::prefix('students')->name('students.')->group(function() {
                 Route::controller(StudentsController::class)->group(function() {
                     Route::get('/', 'index')->name('index');
@@ -185,7 +181,7 @@ Route::group(
                 });
             });
 
-            # Manage Parents
+            # Parents
             Route::prefix('parents')->name('parents.')->group(function() {
                 Route::controller(ParentsController::class)->group(function() {
                     Route::get('/', 'index')->name('index');

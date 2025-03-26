@@ -13,16 +13,21 @@ class GroupsRequest extends FormRequest
 
     public function rules()
     {
-        return [
+        $rules = [
             'name_ar' => 'required|min:3|max:100',
             'name_en' => 'required|min:3|max:100',
-            'teacher_id' => 'required|integer|exists:teachers,id',
             'grade_id' => 'required|integer|exists:grades,id',
-            'day_1' => 'nullable|integer|between:1,7',
-            'day_2' => 'nullable|integer|between:1,7|different:day_1',
+            'day_1' => 'required|integer|between:1,7',
+            'day_2' => 'required|integer|between:1,7|different:day_1',
             'time' => 'required|date_format:H:i',
             'is_active' => 'nullable|boolean',
         ];
+
+        if (isAdmin()) {
+            $rules['teacher_id'] = 'required|integer|exists:teachers,id';
+        }
+
+        return $rules;
     }
 
     public function messages()

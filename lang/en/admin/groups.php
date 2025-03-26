@@ -3,6 +3,14 @@
 return [
     'group' => 'Group',
     'groups' => 'Groups',
+    'total_groups' => 'Total Groups',
+    'all_active_inactive' => 'All Active & Inactive',
+    'active_groups' => 'Active Groups',
+    'currently_running' => 'Currently Running',
+    'inactive_groups' => 'Inactive Groups',
+    'paused_or_closed' => 'Paused or Closed',
+    'top_grade' => 'Top Grade',
+    'most_populated_grade' => 'Most Populated Grade',
     'selectedGroups' => 'Selected Groups',
     'placeholders' => [
         'name_ar' => 'اللغة العربية',
