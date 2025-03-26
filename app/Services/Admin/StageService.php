@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class StageService
 {
     use PreventDeletionIfRelated;
-    
+
     protected $relationships = ['grades'];
     protected $transModelKey = 'admin/stages.stages';
 
@@ -17,10 +17,11 @@ class StageService
     {
         return datatables()->eloquent($stagesQuery)
             ->addIndexColumn()
-            ->addColumn('selectbox', function ($row) {
-                $btn = '<td class="dt-checkboxes-cell"><input type="checkbox" value="' . $row->id . '" class="dt-checkboxes form-check-input"></td>';
-                return $btn;
-            })
+            ->addColumn('selectbox', fn($row) =>
+                '<td class="dt-checkboxes-cell">
+                    <input type="checkbox" value="' . $row->id . '" class="dt-checkboxes form-check-input">
+                </td>'
+            )
             ->editColumn('name', function ($row) {
                 return $row->name;
             })

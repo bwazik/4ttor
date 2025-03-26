@@ -20,10 +20,11 @@ class TeacherService
     {
         return datatables()->eloquent($teachersQuery)
             ->addIndexColumn()
-            ->addColumn('selectbox', function ($row) {
-                $btn = '<td class="dt-checkboxes-cell"><input type="checkbox" value="' . $row->id . '" class="dt-checkboxes form-check-input"></td>';
-                return $btn;
-            })
+            ->addColumn('selectbox', fn($row) =>
+                '<td class="dt-checkboxes-cell">
+                    <input type="checkbox" value="' . $row->id . '" class="dt-checkboxes form-check-input">
+                </td>'
+            )
             ->addColumn('details', function ($row) {
                 $profilePic =  '<img src="' . asset($row->profile_pic ? 'storage/profiles/teachers/' . $row->profile_pic : 'assets/img/avatars/default.jpg') . '" alt="Profile Picture" class="rounded-circle">';
 
@@ -91,10 +92,11 @@ class TeacherService
     {
         return datatables()->eloquent($teachersQuery)
             ->addIndexColumn()
-            ->addColumn('selectbox', function ($row) {
-                $btn = '<td class="dt-checkboxes-cell"><input type="checkbox" value="' . $row->id . '" class="dt-checkboxes form-check-input"></td>';
-                return $btn;
-            })
+            ->addColumn('selectbox', fn($row) =>
+                '<td class="dt-checkboxes-cell">
+                    <input type="checkbox" value="' . $row->id . '" class="dt-checkboxes form-check-input">
+                </td>'
+            )
             ->addColumn('details', function ($row) {
                 $profilePic = $row->profile_pic ?
                 '<img src="' . asset('storage/' . $row->profile_picture) . '" alt="Profile Picture" class="rounded-circle">' :

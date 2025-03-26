@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Teachers;
+namespace App\Http\Controllers\Teacher\Platform;
 
 use App\Models\Grade;
 use App\Models\Group;
-use App\Models\Student;
-use App\Models\Teacher;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Services\Admin\GroupService;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Admin\GroupsRequest;
+use App\Services\Teacher\Platform\GroupService;
 
 class GroupsController extends Controller
 {
@@ -26,27 +25,33 @@ class GroupsController extends Controller
 
     public function index(Request $request)
     {
-        $groupsQuery = Group::query()->select('id', 'name', 'teacher_id', 'grade_id', 'day_1', 'day_2', 'time', 'is_active', 'created_at', 'updated_at');
+        $teacherId = Auth::id();
+
+        $groupsQuery = Group::query()
+            ->select('id', 'name', 'grade_id', 'day_1', 'day_2', 'time', 'is_active', 'created_at', 'updated_at')
+            ->where('teacher_id', $teacherId);
 
         if ($request->ajax()) {
             return $this->groupService->getGroupsForDatatable($groupsQuery);
         }
 
         $pageStatistics = [
-            'totalGroups' => Group::count(),
-            'activeGroups' => Group::active()->count(),
-            'inactiveGroups' => Group::inactive()->count(),
-            'topGrade' => Group::select('grade_id', DB::raw('COUNT(*) as group_count'))
+            'totalGroups' => Group::where('teacher_id', $teacherId)->count(),
+            'activeGroups' => Group::where('teacher_id', $teacherId)->active()->count(),
+            'inactiveGroups' => Group::where('teacher_id', $teacherId)->inactive()->count(),
+            'topGrade' => Group::where('teacher_id', $teacherId)
+                ->select('grade_id', DB::raw('COUNT(*) as group_count'))
                 ->groupBy('grade_id')
                 ->orderByDesc('group_count')
                 ->with('grade:id,name')
                 ->first()
         ];
+        
+        $grades = Grade::whereHas('teachers', function ($query) use ($teacherId) {
+            $query->where('teacher_id', $teacherId);
+        })->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
 
-        $teachers = Teacher::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
-        $grades = Grade::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
-
-        return view('admin.groups.index', compact('teachers', 'grades', 'pageStatistics'));
+        return view('teacher.platform.groups.index', compact('grades', 'pageStatistics'));
     }
 
     public function insert(GroupsRequest $request)
@@ -95,37 +100,5 @@ class GroupsController extends Controller
         }
 
         return response()->json(['error' => $result['message']], 500);
-    }
-
-    public function getGroupStudents($id)
-    {
-        try {
-            Group::select('id')->findOrFail($id);
-
-            $students = Student::whereHas('groups', function ($query) use ($id) {
-                $query->where('group_id', $id);
-            })
-                ->select('id', 'name')
-                ->orderBy('id')
-                ->get()
-                ->mapWithKeys(fn($student) => [$student->id => $student->name]);
-
-            if ($students->isEmpty()) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => trans('main.noStudentsAssigned'),
-                ], 404);
-            }
-
-            return response()->json(['status' => 'success', 'data' => $students]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ], 500);
-        }
-
     }
 }
