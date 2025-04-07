@@ -8,8 +8,8 @@ use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\MyParent;
 use Illuminate\Http\Request;
-use App\Models\StudentAccount;
 use App\Traits\ValidatesExistence;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Services\Admin\StudentService;
 use App\Http\Requests\Admin\StudentsRequest;
@@ -33,21 +33,36 @@ class StudentsController extends Controller
             return $this->studentService->getStudentsForDatatable($studentsQuery);
         }
 
+        $pageStatistics = [
+            'totalStudents' => Student::count(),
+            'activeStudents' => Student::active()->count(),
+            'inactiveStudents' => Student::inactive()->count(),
+            'archivedStudents' => Student::onlyTrashed()->count(),
+            'exemptedStudents' => Student::exempted()->count(),
+            'discountedStudents' => Student::where('fees_discount', '>', 0)->count(),
+            'topGrade' => Student::select('grade_id', DB::raw('COUNT(*) as student_count'))
+            ->groupBy('grade_id')
+            ->orderByDesc('student_count')
+            ->with('grade:id,name')
+            ->first()
+        ];
+
         $grades = Grade::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
         $parents = MyParent::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
         $teachers = Teacher::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
-        $groups = Group::query()->select('id', 'name', 'teacher_id')
-            ->with('teacher:id,name')->orderBy('id')->get()
+        $groups = Group::query()->select('id', 'name', 'teacher_id', 'grade_id')
+            ->with(['teacher:id,name', 'grade:id,name'])->orderBy('id')->get()
             ->mapWithKeys(function ($group) {
-                return [$group->id => $group->name . ' - ' . $group->teacher->name];
+                return [$group->id => $group->name . ' - ' . $group->grade->name . ' - ' . $group->teacher->name];
             });
 
-        return view('admin.students.manage.index', compact('teachers', 'grades', 'parents', 'groups'));
+
+        return view('admin.students.manage.index', compact('pageStatistics', 'teachers', 'grades', 'parents', 'groups'));
     }
 
     public function archived(Request $request)
     {
-        $studentsQuery = Student::query()->onlyTrashed()->select('id', 'username', 'name', 'phone', 'grade_id', 'profile_pic');
+        $studentsQuery = Student::query()->onlyTrashed()->select('id', 'username', 'name', 'phone', 'email', 'grade_id', 'profile_pic');
 
         if ($request->ajax()) {
             return $this->studentService->getArchivedStudentsForDatatable($studentsQuery);

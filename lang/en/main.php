@@ -37,6 +37,7 @@ return [
     'amount' => 'Amount',
     'date' => 'Date',
     'student' => 'Student',
+    'students' => 'Students',
     'fee' => 'Fee',
     'description' => 'Description',
     'status' => 'Status',

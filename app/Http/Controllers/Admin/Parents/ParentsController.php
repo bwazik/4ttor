@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Parents;
 
+use App\Models\Student;
 use App\Models\MyParent;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
@@ -28,7 +29,16 @@ class ParentsController extends Controller
             return $this->parentService->getParentsForDatatable($parentsQuery);
         }
 
-        return view('admin.parents.manage.index');
+        $pageStatistics = [
+            'totalParents' => MyParent::count(),
+            'activeParents' => MyParent::active()->count(),
+            'inactiveParents' => MyParent::inactive()->count(),
+            'archivedParents' => MyParent::onlyTrashed()->count(),
+        ];
+
+        $students = Student::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
+
+        return view('admin.parents.manage.index', compact('pageStatistics', 'students'));
     }
 
     public function archived(Request $request)

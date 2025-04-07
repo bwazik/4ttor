@@ -1,6 +1,6 @@
 <div class="row g-6 mb-6">
     <div class="col-sm-6 col-xl-3">
-        <div class="card">
+        <div class="card card-border-shadow-primary">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div class="me-1">
@@ -20,7 +20,7 @@
         </div>
     </div>
     <div class="col-sm-6 col-xl-3">
-        <div class="card">
+        <div class="card card-border-shadow-success">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div class="me-1">
@@ -28,8 +28,7 @@
                         <div class="d-flex align-items-center">
                             <h4 class="mb-1 me-2">{{ $pageStatistics['activeGroups'] }}</h4>
                             <p class="text-success mb-1">
-                                ({{ round(($pageStatistics['activeGroups'] / $pageStatistics['totalGroups']) * 100, 2) }}%)
-                            </p>
+                                ({{ $pageStatistics['totalGroups'] > 0 ? round(($pageStatistics['activeGroups'] / $pageStatistics['totalGroups']) * 100, 2) : 0 }}%)                            </p>
                         </div>
                         <small class="mb-0">{{ trans('admin/groups.currently_running') }}</small>
                     </div>
@@ -43,7 +42,7 @@
         </div>
     </div>
     <div class="col-sm-6 col-xl-3">
-        <div class="card">
+        <div class="card card-border-shadow-danger">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div class="me-1">
@@ -51,7 +50,7 @@
                         <div class="d-flex align-items-center">
                             <h4 class="mb-1 me-2">{{ $pageStatistics['inactiveGroups'] }}</h4>
                             <p class="text-danger mb-1">
-                                ({{ round(($pageStatistics['inactiveGroups'] / $pageStatistics['totalGroups']) * 100, 2) }}%)
+                                ({{ $pageStatistics['totalGroups'] > 0 ? round(($pageStatistics['inactiveGroups'] / $pageStatistics['totalGroups']) * 100, 2) : 0 }}%)
                             </p>
                         </div>
                         <small class="mb-0">{{ trans('admin/groups.paused_or_closed') }}</small>
@@ -66,7 +65,7 @@
         </div>
     </div>
     <div class="col-sm-6 col-xl-3">
-        <div class="card">
+        <div class="card card-border-shadow-warning">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div class="me-1">

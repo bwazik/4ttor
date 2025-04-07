@@ -24,8 +24,10 @@ class Student extends Authenticatable
         'birth_date',
         'grade_id',
         'parent_id',
-        'is_active',
         'balance',
+        'is_active',
+        'is_exempted',
+        'fees_discount',
         'profile_pic',
     ];
 
@@ -117,5 +119,10 @@ class Student extends Authenticatable
     public function scopeInactive($query)
     {
         return $query->where('is_active', 0);
+    }
+
+    public function scopeExempted($query)
+    {
+        return $query->where('is_exempted', 1);
     }
 }

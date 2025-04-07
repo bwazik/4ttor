@@ -80,62 +80,23 @@
         <li class="menu-header mt-5">
             <span class="menu-header-text">{{ trans('layouts/sidebar.usersManagment') }}</span>
         </li>
-        <li
-            class="menu-item {{ isActiveRoute(['admin.assistants.index', 'admin.assistants.archived']) ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
+        <li class="menu-item {{ isActiveRoute(['teacher.assistants.index']) ? 'active open' : '' }}">
+            <a href="{{ route('teacher.assistants.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons ri-user-star-line"></i>
                 <div>{{ trans('layouts/sidebar.assistants') }}</div>
             </a>
-            <ul class="menu-sub">
-                <li class="menu-item {{ isActiveRoute('admin.assistants.index') ? 'active' : '' }}">
-                    <a href="{{ route('admin.assistants.index') }}" class="menu-link">
-                        <div>{{ trans('layouts/sidebar.assistantsManagment') }}</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ isActiveRoute('admin.assistants.archived') ? 'active' : '' }}">
-                    <a href="{{ route('admin.assistants.archived') }}" class="menu-link">
-                        <div>{{ trans('layouts/sidebar.archived') }}</div>
-                    </a>
-                </li>
-            </ul>
         </li>
-        <li
-            class="menu-item {{ isActiveRoute(['admin.students.index', 'admin.students.archived']) ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
+        <li class="menu-item {{ isActiveRoute(['teacher.students.index']) ? 'active open' : '' }}">
+            <a href="{{ route('teacher.students.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons ri-graduation-cap-line"></i>
                 <div>{{ trans('layouts/sidebar.students') }}</div>
             </a>
-            <ul class="menu-sub">
-                <li class="menu-item {{ isActiveRoute('admin.students.index') ? 'active' : '' }}">
-                    <a href="{{ route('admin.students.index') }}" class="menu-link">
-                        <div>{{ trans('layouts/sidebar.studentsManagment') }}</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ isActiveRoute('admin.students.archived') ? 'active' : '' }}">
-                    <a href="{{ route('admin.students.archived') }}" class="menu-link">
-                        <div>{{ trans('layouts/sidebar.archived') }}</div>
-                    </a>
-                </li>
-            </ul>
         </li>
-        <li
-            class="menu-item {{ isActiveRoute(['admin.parents.index', 'admin.parents.archived']) ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
+        <li class="menu-item {{ isActiveRoute(['teacher.parents.index']) ? 'active open' : '' }}">
+            <a href="{{ route('teacher.parents.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons ri-parent-line"></i>
                 <div>{{ trans('layouts/sidebar.parents') }}</div>
             </a>
-            <ul class="menu-sub">
-                <li class="menu-item {{ isActiveRoute('admin.parents.index') ? 'active' : '' }}">
-                    <a href="{{ route('admin.parents.index') }}" class="menu-link">
-                        <div>{{ trans('layouts/sidebar.parentsManagment') }}</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ isActiveRoute('admin.parents.archived') ? 'active' : '' }}">
-                    <a href="{{ route('admin.parents.archived') }}" class="menu-link">
-                        <div>{{ trans('layouts/sidebar.archived') }}</div>
-                    </a>
-                </li>
-            </ul>
         </li>
 
         <!-- Finance -->

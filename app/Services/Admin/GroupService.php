@@ -18,25 +18,13 @@ class GroupService
     {
         return datatables()->eloquent($groupsQuery)
             ->addIndexColumn()
-            ->addColumn('selectbox', fn($row) =>
-                '<td class="dt-checkboxes-cell">
-                    <input type="checkbox" value="' . $row->id . '" class="dt-checkboxes form-check-input">
-                </td>'
-            )
+            ->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
             ->editColumn('name', fn($row) => $row->name)
-            ->editColumn('teacher_id', fn($row) =>
-                "<a target='_blank' href='" . route('admin.teachers.details', $row->teacher_id) . "'>"
-                    . ($row->teacher_id ? $row->teacher->name : '-') .
-                "</a>"
-            )
+            ->editColumn('teacher_id', fn($row) => formatRelation($row->teacher_id, $row->teacher, 'name', 'admin.teachers.details'))
             ->editColumn('grade_id', fn($row) => $row->grade_id ? $row->grade->name : '-')
             ->editColumn('day_1', fn($row) => $row->day_1 ? getDayName($row->day_1) : '-')
             ->editColumn('day_2', fn($row) => $row->day_2 ? getDayName($row->day_2) : '-')
-            ->editColumn('is_active', fn($row) =>
-                $row->is_active
-                    ? '<span class="badge rounded-pill bg-label-success" text-capitalized="">' . trans('main.active') . '</span>'
-                    : '<span class="badge rounded-pill bg-label-secondary" text-capitalized="">' . trans('main.inactive') . '</span>'
-            )
+            ->editColumn('is_active', fn($row) => formatActiveStatus($row->is_active))
             ->addColumn('actions', fn($row) => $this->generateActionButtons($row))
             ->filterColumn('teacher_id', fn($query, $keyword) => filterByRelation($query, 'teacher', 'name', $keyword))
             ->filterColumn('grade_id', fn($query, $keyword) => filterByRelation($query, 'grade', 'name', $keyword))
@@ -49,28 +37,31 @@ class GroupService
     {
         return
             '<div class="align-items-center">' .
-            '<span class="text-nowrap">' .
-            '<button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light"' .
-            ' tabindex="0" type="button" data-bs-toggle="offcanvas" data-bs-target="#edit-modal"' .
-            ' id="edit-button" data-id="' . $row->id . '"' .
-            ' data-name_ar="' . $row->getTranslation('name', 'ar') . '"' .
-            ' data-name_en="' . $row->getTranslation('name', 'en') . '"' .
-            ' data-is_active="' . ($row->is_active ? '1' : '0') . '"' .
-            ' data-teacher_id="' . $row->teacher_id . '"' .
-            ' data-grade_id="' . $row->grade_id . '"' .
-            ' data-day_1="' . $row->day_1 . '"' .
-            ' data-day_2="' . $row->day_2 . '"' .
-            ' data-time="' . $row->time . '">' .
-            '<i class="ri-edit-box-line ri-20px"></i>' .
-            '</button>' .
-            '</span>' .
-            '<button class="btn btn-sm btn-icon btn-text-danger rounded-pill text-body waves-effect waves-light me-1"' .
-            ' id="delete-button" data-id="' . $row->id . '"' .
-            ' data-name_ar="' . $row->getTranslation('name', 'ar') . '"' .
-            ' data-name_en="' . $row->getTranslation('name', 'en') . '"' .
-            ' data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
-            '<i class="ri-delete-bin-7-line ri-20px text-danger"></i>' .
-            '</button>' .
+                '<span class="text-nowrap">' .
+                    '<button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light" ' .
+                        'tabindex="0" type="button" ' .
+                        'data-bs-toggle="offcanvas" data-bs-target="#edit-modal" ' .
+                        'id="edit-button" ' .
+                        'data-id="' . $row->id . '" ' .
+                        'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
+                        'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
+                        'data-is_active="' . ($row->is_active ? '1' : '0') . '" ' .
+                        'data-teacher_id="' . $row->teacher_id . '" ' .
+                        'data-grade_id="' . $row->grade_id . '" ' .
+                        'data-day_1="' . $row->day_1 . '" ' .
+                        'data-day_2="' . $row->day_2 . '" ' .
+                        'data-time="' . $row->time . '">' .
+                        '<i class="ri-edit-box-line ri-20px"></i>' .
+                    '</button>' .
+                '</span>' .
+                '<button class="btn btn-sm btn-icon btn-text-danger rounded-pill text-body waves-effect waves-light me-1" ' .
+                    'id="delete-button" ' .
+                    'data-id="' . $row->id . '" ' .
+                    'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
+                    'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
+                    'data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
+                    '<i class="ri-delete-bin-7-line ri-20px text-danger"></i>' .
+                '</button>' .
             '</div>';
     }
 

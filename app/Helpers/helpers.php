@@ -81,6 +81,14 @@ if (!function_exists('isAdmin')) {
     }
 }
 
+if (!function_exists('isTeacher')) {
+    function isTeacher()
+    {
+        return auth()->guard('teacher')->check();
+    }
+}
+
+
 if (!function_exists('filterByRelation')) {
     function filterByRelation($query, $relation, $column, $keyword)
     {
@@ -106,3 +114,76 @@ if (!function_exists('filterByStatus')) {
     }
 }
 
+if (!function_exists('filterDetailsColumn')) {
+    function filterDetailsColumn($query, $keyword, $secondaryField): void
+    {
+        $query->where(function ($q) use ($keyword, $secondaryField) {
+            $q->where('name', 'like', "%{$keyword}%")
+              ->orWhere($secondaryField, 'like', "%{$keyword}%");
+        });
+    }
+}
+
+if (!function_exists('generateSelectbox')) {
+    function generateSelectbox($id): string
+    {
+        return
+            '<td class="dt-checkboxes-cell">' .
+                '<input type="checkbox" value="' . $id . '" class="dt-checkboxes form-check-input">' .
+            '</td>';
+    }
+}
+
+if (!function_exists('generateDetailsColumn')) {
+    function generateDetailsColumn($name, $profilePic = null, $profilePath = 'storage/profiles', $secondaryText = null): string
+    {
+        $defaultPic = asset('assets/img/avatars/default.jpg');
+        $picSrc = $profilePic ? asset("{$profilePath}/{$profilePic}") : $defaultPic;
+
+        return
+            '<div class="d-flex justify-content-start align-items-center">' .
+                '<div class="avatar-wrapper">' .
+                    '<div class="avatar me-2">' .
+                        '<img src="' . $picSrc . '" alt="Profile Picture" class="rounded-circle">' .
+                    '</div>' .
+                '</div>' .
+                '<div class="d-flex flex-column align-items-start">' .
+                    '<span class="emp_name text-truncate text-heading fw-medium">' . $name . '</span>' .
+                    '<small class="emp_post text-truncate">' . ($secondaryText ?? '-') . '</small>' .
+                '</div>' .
+            '</div>';
+    }
+}
+
+
+if (!function_exists('formatActiveStatus')) {
+    function formatActiveStatus($isActive): string
+    {
+        return $isActive
+            ? '<span class="badge rounded-pill bg-label-success" text-capitalized="">' . trans('main.active') . '</span>'
+            : '<span class="badge rounded-pill bg-label-secondary" text-capitalized="">' . trans('main.inactive') . '</span>';
+    }
+}
+
+
+if (!function_exists('formatRelation')) {
+    function formatRelation($id, $related, string $attribute = 'name', ?string $routeName = null): string
+    {
+        if (!$id) {
+            return '-';
+        }
+
+        if (!$related) {
+            return '<span class="badge rounded-pill bg-label-danger">' . trans('teacher/errors.deleted') . '</span>';
+        }
+
+        $displayText = $related->$attribute ?? '-';
+
+        if ($routeName) {
+            $href = route($routeName, $id);
+            return "<a target='_blank' href='{$href}'>{$displayText}</a>";
+        }
+
+        return $displayText;
+    }
+}

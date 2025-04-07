@@ -11,7 +11,7 @@
     <x-datatable datatableTitle="{{ trans('main.datatableTitle', ['item' => trans('admin/subjects.subjects')]) }}"
         dataToggle="offcanvas" deleteButton addButton="{{ trans('main.addItem', ['item' => trans('admin/subjects.subject')]) }}">
         <th></th>
-        <th class="dt-checkboxes-cell dt-checkboxes-select-all"><input type="checkbox" id="select-all"class="form-check-input"></th>
+        <th class="dt-checkboxes-cell dt-checkboxes-select-all"><input type="checkbox" id="select-all" class="form-check-input"></th>
         <th>#</th>
         <th>{{ trans('main.name') }}</th>
         <th>{{ trans('main.status') }}</th>

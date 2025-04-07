@@ -21,7 +21,7 @@ return new class extends Migration
             $table->tinyInteger('gender')->comment('1=Male, 2=Female');
             $table->date('birth_date')->nullable();
             $table->unsignedInteger('grade_id');
-            $table->unsignedInteger('parent_id');
+            $table->unsignedInteger('parent_id')->nullable();
             $table->decimal('balance', 8, 2)->default(0.00);
             $table->boolean('is_active')->default(true);
             $table->boolean('is_exempted')->default(false);

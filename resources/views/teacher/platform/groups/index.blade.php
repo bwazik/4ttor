@@ -55,7 +55,6 @@
                 grade_id: () => '',
                 day_1: () => '',
                 day_2: () => '',
-                is_active: () => '',
             }
         });
         // Setup edit modal

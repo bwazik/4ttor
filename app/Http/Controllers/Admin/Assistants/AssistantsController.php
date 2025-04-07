@@ -29,14 +29,21 @@ class AssistantsController extends Controller
             return $this->assistantService->getAssistantsForDatatable($assistantsQuery);
         }
 
+        $pageStatistics = [
+            'totalAssistants' => Assistant::count(),
+            'activeAssistants' => Assistant::active()->count(),
+            'inactiveAssistants' => Assistant::inactive()->count(),
+            'archivedAssistants' => Assistant::onlyTrashed()->count(),
+        ];
+
         $teachers = Teacher::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
 
-        return view('admin.assistants.manage.index', compact('teachers'));
+        return view('admin.assistants.manage.index', compact('teachers', 'pageStatistics'));
     }
 
     public function archived(Request $request)
     {
-        $assistantsQuery = Assistant::query()->onlyTrashed()->select('id', 'username', 'name', 'phone', 'teacher_id', 'profile_pic');
+        $assistantsQuery = Assistant::query()->onlyTrashed()->select('id', 'username', 'name', 'phone', 'email', 'teacher_id', 'profile_pic');
 
         if ($request->ajax()) {
             return $this->assistantService->getArchivedAssistantsForDatatable($assistantsQuery);

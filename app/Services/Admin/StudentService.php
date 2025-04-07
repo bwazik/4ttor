@@ -3,15 +3,14 @@
 namespace App\Services\Admin;
 
 use App\Models\Student;
-use App\Models\Teacher;
-use App\Models\StudentAccount;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Traits\PreventDeletionIfRelated;
+use App\Traits\DatabaseTransactionTrait;
+use App\Traits\PublicValidatesTrait;
 
 class StudentService
 {
-    use PreventDeletionIfRelated;
+    use PreventDeletionIfRelated, PublicValidatesTrait, DatabaseTransactionTrait;
 
     protected $relationships = ['invoices', 'studentAccount', 'receipts', 'refunds', 'attendances'];
     protected $transModelKey = 'admin/students.students';
@@ -20,129 +19,132 @@ class StudentService
     {
         return datatables()->eloquent($studentsQuery)
             ->addIndexColumn()
-            ->addColumn('selectbox', fn($row) =>
-                '<td class="dt-checkboxes-cell">
-                    <input type="checkbox" value="' . $row->id . '" class="dt-checkboxes form-check-input">
-                </td>'
-            )
-            ->addColumn('details', function ($row) {
-                $profilePic =  '<img src="' . asset($row->profile_pic ? 'storage/profiles/students/' . $row->profile_pic : 'assets/img/avatars/default.jpg') . '" alt="Profile Picture" class="rounded-circle">';
-
-                return
-                '<div class="d-flex justify-content-start align-items-center">
-                    <div class="avatar-wrapper">
-                        <div class="avatar me-2">'.$profilePic.'</div>
-                    </div>
-                    <div class="d-flex flex-column align-items-start">
-                        <span class="emp_name text-truncate text-heading fw-medium">'.$row->name.'</span>
-                        <small class="emp_post text-truncate">'.$row->grade->name.'</small>
-                    </div>
-                </div>';
-            })
-            ->editColumn('parent_id', function ($row) {
-                return "<a target='_blank' href='" . route('admin.parents.details', $row->parent_id) . "'>" . ($row->parent_id ? $row->parent->name : '-') . "</a>";
-            })
-            ->editColumn('is_active', function ($row) {
-                return $row->is_active ? '<span class="badge rounded-pill bg-label-success" text-capitalized="">'.trans('main.active').'</span>' : '<span class="badge rounded-pill bg-label-secondary" text-capitalized="">'.trans('main.inactive').'</span>';
-            })
-            ->addColumn('actions', function ($row) {
-                $teacherIds = $row->teachers->pluck('id')->toArray();
-                $groupIds = $row->groups->pluck('id')->toArray();
-                $teachers = implode(',', $teacherIds);
-                $groups = implode(',', $groupIds);
-
-                return
-                '<div class="d-inline-block">
-                    <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ri-more-2-line"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end m-0">
-                        <li><a target="_blank" href="'.route('admin.students.details', $row->id).'" class="dropdown-item">'.trans('main.details').'</a></li>
-                        <li>
-                            <a href="javascript:;" class="dropdown-item"
-                                id="archive-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
-                                data-bs-target="#archive-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
-                                '.trans('main.archive').'
-                            </a>
-                        </li>
-                        <div class="dropdown-divider"></div>
-                        <li>
-                            <a href="javascript:;" class="dropdown-item text-danger"
-                                id="delete-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
-                                data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
-                                '.trans('main.delete').'
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light"
-                    tabindex="0" type="button" data-bs-toggle="modal" data-bs-target="#edit-modal"
-                    id="edit-button" data-id="' . $row->id . '" data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
-                    data-username="' . $row->username . '" data-email="' . $row->email . '" data-phone="' . $row->phone . '"
-                    data-password="" data-birth_date="'.$row->birth_date.'" data-gender="'.$row->gender.'" data-grade_id="' . $row->grade_id . '" data-parent_id="' . $row->parent_id . '" data-teachers="'. $teachers .'" data-groups="'. $groups .'" data-is_active="' . ($row->is_active == 0 ? '0' : '1') . '">
-                    <i class="ri-edit-box-line ri-20px"></i>
-                </button>';
-            })
-            ->rawColumns(['selectbox', 'details', 'parent_id', 'is_active', 'actions'])
+            ->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
+            ->addColumn('details', fn($row) => generateDetailsColumn($row->name, $row->profile_pic, 'storage/profiles/students', $row->email))
+            ->editColumn('grade_id', fn($row) => formatRelation($row->grade_id, $row->grade, 'name'))
+            ->editColumn('parent_id', fn($row) => formatRelation($row->parent_id, $row->parent, 'name', 'admin.parents.details'))
+            ->editColumn('is_active', fn($row) => formatActiveStatus($row->is_active))
+            ->addColumn('actions', fn($row) => $this->generateUnarchivedActionButtons($row))
+            ->filterColumn('details', fn($query, $keyword) => filterDetailsColumn($query, $keyword, 'email'))
+            ->filterColumn('grade_id', fn($query, $keyword) => filterByRelation($query, 'grade', 'name', $keyword))
+            ->filterColumn('parent_id', fn($query, $keyword) => filterByRelation($query, 'parent', 'name', $keyword))
+            ->filterColumn('is_active', fn($query, $keyword) => filterByStatus($query, $keyword))
+            ->rawColumns(['selectbox', 'details', 'grade_id', 'parent_id', 'is_active', 'actions'])
             ->make(true);
+    }
+
+    private function generateUnarchivedActionButtons($row)
+    {
+        $teacherIds = $row->teachers->pluck('id')->toArray();
+        $groupIds = $row->groups->pluck('id')->toArray();
+        $teachers = implode(',', $teacherIds);
+        $groups = implode(',', $groupIds);
+
+        return
+            '<div class="d-inline-block">' .
+                '<a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">' .
+                    '<i class="ri-more-2-line"></i>' .
+                '</a>' .
+                '<ul class="dropdown-menu dropdown-menu-end m-0">' .
+                    '<li>
+                        <a target="_blank" href="'.route('admin.students.details', $row->id).'" class="dropdown-item">'.trans('main.details').'</a>
+                    </li>' .
+                    '<li>' .
+                        '<a href="javascript:;" class="dropdown-item" ' .
+                            'id="archive-button" ' .
+                            'data-id="' . $row->id . '" ' .
+                            'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
+                            'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
+                            'data-bs-target="#archive-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
+                            trans('main.archive').
+                        '</a>' .
+                    '<li>' .
+                    '<div class="dropdown-divider"></div>' .
+                    '<li>' .
+                        '<a href="javascript:;" class="dropdown-item text-danger" ' .
+                            'id="delete-button" ' .
+                            'data-id="' . $row->id . '" ' .
+                            'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
+                            'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
+                            'data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
+                            trans('main.delete').
+                        '</a>' .
+                    '</li>' .
+                '</ul>' .
+            '</div>' .
+            '<button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light" ' .
+                'tabindex="0" type="button" data-bs-toggle="modal" data-bs-target="#edit-modal" ' .
+                'id="edit-button" ' .
+                'data-id="' . $row->id . '" ' .
+                'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
+                'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
+                'data-username="' . $row->username . '" ' .
+                'data-email="' . $row->email . '" ' .
+                'data-phone="' . $row->phone . '" ' .
+                'data-password="" ' .
+                'data-birth_date="' . $row->birth_date . '" ' .
+                'data-gender="' . $row->gender . '" ' .
+                'data-grade_id="' . $row->grade_id . '" ' .
+                'data-parent_id="' . $row->parent_id . '" ' .
+                'data-teachers="' . $teachers . '" ' .
+                'data-groups="' . $groups . '" ' .
+                'data-is_active="' . ($row->is_active ? '1' : '0') . '">' .
+                '<i class="ri-edit-box-line ri-20px"></i>' .
+            '</button>';
     }
 
     public function getArchivedStudentsForDatatable($studentsQuery)
     {
         return datatables()->eloquent($studentsQuery)
             ->addIndexColumn()
-            ->addColumn('selectbox', fn($row) =>
-                '<td class="dt-checkboxes-cell">
-                    <input type="checkbox" value="' . $row->id . '" class="dt-checkboxes form-check-input">
-                </td>'
-            )
-            ->addColumn('details', function ($row) {
-                $profilePic = $row->profile_pic ?
-                '<img src="' . asset('storage/' . $row->profile_picture) . '" alt="Profile Picture" class="rounded-circle">' :
-                '<img src="' . asset('assets/img/avatars/default.jpg') . '" alt="Profile Picture" class="rounded-circle">';
-
-                return
-                '<div class="d-flex justify-content-start align-items-center">
-                    <div class="avatar-wrapper">
-                        <div class="avatar me-2">'.$profilePic.'</div>
-                    </div>
-                    <div class="d-flex flex-column align-items-start">
-                        <span class="emp_name text-truncate text-heading fw-medium">'.$row->name.'</span>
-                        <small class="emp_post text-truncate">'.$row->grade->name.'</small>
-                    </div>
-                </div>';
-            })
-            ->addColumn('actions', function ($row) {
-                return
-                '<div class="d-inline-block">
-                    <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ri-more-2-line"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end m-0">
-                        <li><a href="javascript:;" class="dropdown-item">'.trans('main.details').'</a></li>
-                        <li>
-                            <a href="javascript:;" class="dropdown-item"
-                                id="restore-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
-                                data-bs-target="#restore-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
-                                '.trans('main.restore').'
-                            </a>
-                        </li>
-                        <div class="dropdown-divider"></div>
-                        <li>
-                            <a href="javascript:;" class="dropdown-item text-danger"
-                                id="delete-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
-                                data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
-                                '.trans('main.delete').'
-                            </a>
-                        </li>
-                    </ul>
-                </div>';
-            })
+            ->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
+            ->addColumn('details', fn($row) => generateDetailsColumn($row->name, $row->profile_pic, 'storage/profiles/students', $row->email))
+            ->addColumn('actions', fn($row) => $this->generateArchivedActionButtons($row))
+            ->filterColumn('details', fn($query, $keyword) => filterDetailsColumn($query, $keyword, 'email'))
             ->rawColumns(['selectbox', 'details', 'actions'])
             ->make(true);
     }
 
+    private function generateArchivedActionButtons($row)
+    {
+        return
+            '<div class="d-inline-block">' .
+                '<a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">' .
+                    '<i class="ri-more-2-line"></i>' .
+                '</a>' .
+                '<ul class="dropdown-menu dropdown-menu-end m-0">' .
+                    '<li>' .
+                        '<a href="javascript:;" class="dropdown-item" ' .
+                            'id="restore-button" ' .
+                            'data-id="' . $row->id . '" ' .
+                            'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
+                            'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
+                            'data-bs-target="#restore-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
+                            trans('main.restore') .
+                        '</a>' .
+                    '</li>' .
+                    '<div class="dropdown-divider"></div>' .
+                    '<li>' .
+                        '<a href="javascript:;" class="dropdown-item text-danger" ' .
+                            'id="delete-button" ' .
+                            'data-id="' . $row->id . '" ' .
+                            'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
+                            'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
+                            'data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
+                            trans('main.delete') .
+                        '</a>' .
+                    '</li>' .
+                '</ul>' .
+            '</div>';
+    }
+
     public function insertStudent(array $request)
     {
-        DB::beginTransaction();
+        return $this->executeTransaction(function () use ($request)
+        {
+            if ($validationResult = $this->validateTeacherGradeAndGroups($request['teachers'], $request['groups'], $request['grade_id']))
+                return $validationResult;
 
-        try {
             $student = Student::create([
                 'username' => $request['username'],
                 'password' => Hash::make($request['username']),
@@ -152,59 +154,26 @@ class StudentService
                 'birth_date' => $request['birth_date'],
                 'gender' => $request['gender'],
                 'grade_id' => $request['grade_id'],
-                'parent_id' => $request['parent_id'],
+                'parent_id' => $request['parent_id'] ?? null,
             ]);
 
-            $gradeValidationResult = $this->validateTeacherGrade($request['teachers'], $request['grade_id']);
-            if (!$gradeValidationResult) {
-                return [
-                    'status' => 'error',
-                    'message' => trans('main.validateTeacherGrade'),
-                ];
-            }
-
             $student->teachers()->attach($request['teachers']);
-
-            $validationResult = $this->validateTeacherGroups($request['teachers'], $request['groups']);
-            if (!$validationResult) {
-                return [
-                    'status' => 'error',
-                    'message' => trans('main.validateTeacherGroups'),
-                ];
-
-            }
             $student->groups()->attach($request['groups']);
 
-            DB::commit();
-
-            return [
-                'status' => 'success',
-                'message' => trans('main.added', ['item' => trans('admin/students.student')]),
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.added', ['item' => trans('admin/students.student')]));
+        });
     }
 
     public function updateStudent($id, array $request): array
     {
-        DB::beginTransaction();
+        return $this->executeTransaction(function () use ($id, $request)
+        {
+            if ($validationResult = $this->validateTeacherGradeAndGroups($request['teachers'], $request['groups'], $request['grade_id']))
+                return $validationResult;
 
-        try {
             $student = Student::findOrFail($id);
 
-            if (!empty($request['password'])) {
-                $request['password'] = Hash::make($request['password']);
-            } else {
-                unset($request['password']);
-            }
+            $this->processPassword($request);
 
             $student->update([
                 'username' => $request['username'],
@@ -215,52 +184,21 @@ class StudentService
                 'birth_date' => $request['birth_date'],
                 'gender' => $request['gender'],
                 'grade_id' => $request['grade_id'],
-                'parent_id' => $request['parent_id'],
+                'parent_id' => $request['parent_id'] ?? null,
                 'is_active' => $request['is_active'],
             ]);
 
-            $gradeValidationResult = $this->validateTeacherGrade($request['teachers'], $request['grade_id']);
-            if (!$gradeValidationResult) {
-                return [
-                    'status' => 'error',
-                    'message' => trans('main.validateTeacherGrade'),
-                ];
-            }
             $student->teachers()->sync($request['teachers'] ?? []);
-
-            $validationResult = $this->validateTeacherGroups($request['teachers'], $request['groups']);
-            if (!$validationResult) {
-                return [
-                    'status' => 'error',
-                    'message' => trans('main.validateTeacherGroups'),
-                ];
-
-            }
             $student->groups()->sync($request['groups'] ?? []);
 
-            DB::commit();
-
-            return [
-                'status' => 'success',
-                'message' => trans('main.edited', ['item' => trans('admin/students.student')]),
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.edited', ['item' => trans('admin/students.student')]));
+        });
     }
 
     public function deleteStudent($id): array
     {
-        DB::beginTransaction();
-
-        try {
+        return $this->executeTransaction(function () use ($id)
+        {
             $student = Student::withTrashed()->select('id', 'name')->findOrFail($id);
 
             if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($student)) {
@@ -269,88 +207,37 @@ class StudentService
 
             $student->forceDelete();
 
-            DB::commit();
-
-            return [
-                'status' => 'success',
-                'message' => trans('main.deleted', ['item' => trans('admin/students.student')]),
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.deleted', ['item' => trans('admin/students.student')]));
+        });
     }
 
     public function archiveStudent($id): array
     {
-        DB::beginTransaction();
+        return $this->executeTransaction(function () use ($id)
+        {
+            Student::findOrFail($id)->delete();
 
-        try {
-            $student = Student::findOrFail($id);
-            $student->delete();
-
-            DB::commit();
-
-            return [
-                'status' => 'success',
-                'message' => trans('main.archived', ['item' => trans('admin/students.student')]),
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.archived', ['item' => trans('admin/students.student')]));
+        });
     }
 
     public function restoreStudent($id): array
     {
-        DB::beginTransaction();
+        return $this->executeTransaction(function () use ($id)
+        {
+            Student::onlyTrashed()->findOrFail($id)->restore();
 
-        try {
-            $student = Student::onlyTrashed()->findOrFail($id);
-            $student->restore();
-
-            DB::commit();
-
-            return [
-                'status' => 'success',
-                'message' => trans('main.restored', ['item' => trans('admin/students.student')]),
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.restored', ['item' => trans('admin/students.student')]));
+        });
     }
 
     public function deleteSelectedStudents($ids)
     {
-        if (empty($ids)) {
-            return [
-                'status' => 'error',
-                'message' => trans('main.noItemsSelected'),
-            ];
-        }
+        if ($validationResult = $this->validateSelectedItems((array) $ids))
+            return $validationResult;
 
-        DB::beginTransaction();
-
-        try {
+        return $this->executeTransaction(function () use ($ids)
+        {
             $students = Student::whereIn('id', $ids)
             ->select('id', 'name')
             ->orderBy('id')
@@ -362,114 +249,34 @@ class StudentService
 
             Student::withTrashed()->whereIn('id', $ids)->forceDelete();
 
-            DB::commit();
-            return [
-                'status' => 'success',
-                'message' => trans('main.deletedSelected', ['item' => strtolower(trans('admin/students.students'))]),
-            ];
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.deletedSelected', ['item' => trans('admin/students.student')]));
+        });
     }
 
     public function archiveSelectedStudents($ids)
     {
-        if (empty($ids)) {
-            return [
-                'status' => 'error',
-                'message' => trans('main.noItemsSelected'),
-            ];
-        }
+        if ($validationResult = $this->validateSelectedItems((array) $ids))
+            return $validationResult;
 
-        DB::beginTransaction();
-
-        try {
+        return $this->executeTransaction(function () use ($ids)
+        {
             Student::whereIn('id', $ids)->delete();
 
-            DB::commit();
-            return [
-                'status' => 'success',
-                'message' => trans('main.archivedSelected', ['item' => strtolower(trans('admin/students.students'))]),
-            ];
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.archivedSelected', ['item' => trans('admin/students.student')]));
+        });
     }
 
     public function restoreSelectedStudents($ids)
     {
-        if (empty($ids)) {
-            return [
-                'status' => 'error',
-                'message' => trans('main.noItemsSelected'),
-            ];
-        }
+        if ($validationResult = $this->validateSelectedItems((array) $ids))
+            return $validationResult;
 
-        DB::beginTransaction();
-
-        try {
+        return $this->executeTransaction(function () use ($ids)
+        {
             Student::onlyTrashed()->whereIn('id', $ids)->restore();
 
-            DB::commit();
-            return [
-                'status' => 'success',
-                'message' => trans('main.restoredSelected', ['item' => strtolower(trans('admin/students.students'))]),
-            ];
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
-    }
-
-    public function validateTeacherGrade($teacherIds, $gradeId)
-    {
-        $validTeacherIds = Teacher::whereHas('grades', function ($query) use ($gradeId) {
-            $query->where('grades.id', $gradeId);
-        })->pluck('id')->toArray();
-
-        return empty(array_diff($teacherIds, $validTeacherIds));
-    }
-
-    public function validateTeacherGroups($teacherIds, $groupIds)
-    {
-        $teacherGroups = Teacher::whereIn('id', $teacherIds)
-            ->with('groups')
-            ->get()
-            ->pluck('groups')
-            ->flatten()
-            ->pluck('id')
-            ->toArray();
-
-        $invalidGroups = array_diff($groupIds, $teacherGroups);
-
-        if (!empty($invalidGroups)) {
-            return false;
-        }
-
-        return true;
+            return $this->successResponse(trans('main.restoredSelected', ['item' => trans('admin/students.student')]));
+        });
     }
 
     public function checkDependenciesForSingleDeletion($teacher): array|null
@@ -482,17 +289,17 @@ class StudentService
         return $this->checkForMultipleDependencies($teachers, $this->relationships, $this->transModelKey);
     }
 
-    public function getStudentAccountBalance($id): float
-    {
-        $studentAccount = StudentAccount::where('student_id', $id)->select('debit', 'credit')->get();
+    // public function getStudentAccountBalance($id): float
+    // {
+    //     $studentAccount = StudentAccount::where('student_id', $id)->select('debit', 'credit')->get();
 
-        if ($studentAccount->isEmpty()) {
-            return 0.00;
-        }
+    //     if ($studentAccount->isEmpty()) {
+    //         return 0.00;
+    //     }
 
-        $debit = $studentAccount->sum('debit');
-        $credit = $studentAccount->sum('credit');
+    //     $debit = $studentAccount->sum('debit');
+    //     $credit = $studentAccount->sum('credit');
 
-        return round($debit - $credit, 2);
-    }
+    //     return round($debit - $credit, 2);
+    // }
 }

@@ -3,172 +3,99 @@
 namespace App\Services\Teacher\Users;
 
 use App\Models\Assistant;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Traits\DatabaseTransactionTrait;
+use App\Traits\PublicValidatesTrait;
 
 class AssistantService
 {
+    use PublicValidatesTrait, DatabaseTransactionTrait;
+    
+    protected $teacherId;
+
+    public function __construct()
+    {
+        $this->teacherId = Auth::id();
+    }
+
     public function getAssistantsForDatatable($assistantsQuery)
     {
         return datatables()->eloquent($assistantsQuery)
             ->addIndexColumn()
-            ->addColumn('selectbox', fn($row) =>
-                '<td class="dt-checkboxes-cell">
-                    <input type="checkbox" value="' . $row->id . '" class="dt-checkboxes form-check-input">
-                </td>'
-            )
-            ->addColumn('details', function ($row) {
-                $profilePic =  '<img src="' . asset($row->profile_pic ? 'storage/profiles/assistants/' . $row->profile_pic : 'assets/img/avatars/default.jpg') . '" alt="Profile Picture" class="rounded-circle">';
-
-                return
-                '<div class="d-flex justify-content-start align-items-center">
-                    <div class="avatar-wrapper">
-                        <div class="avatar me-2">'.$profilePic.'</div>
-                    </div>
-                    <div class="d-flex flex-column align-items-start">
-                        <span class="emp_name text-truncate text-heading fw-medium">'.$row->name.'</span>
-                        <small class="emp_post text-truncate">'.$row->teacher->name.'</small>
-                    </div>
-                </div>';
-            })
-            ->editColumn('teacher_id', function ($row) {
-                return "<a target='_blank' href='" . route('admin.teachers.details', $row->teacher_id) . "'>" . ($row->teacher_id ? $row->teacher->name : '-') . "</a>";
-            })
-            ->editColumn('is_active', function ($row) {
-                return $row->is_active ? '<span class="badge rounded-pill bg-label-success" text-capitalized="">'.trans('main.active').'</span>' : '<span class="badge rounded-pill bg-label-secondary" text-capitalized="">'.trans('main.inactive').'</span>';
-            })
-            ->addColumn('actions', function ($row) {
-                return
-                '<div class="d-inline-block">
-                    <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ri-more-2-line"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end m-0">
-                        <li><a target="_blank" href="'.route('admin.assistants.details', $row->id).'" class="dropdown-item">'.trans('main.details').'</a></li>
-                        <li>
-                            <a href="javascript:;" class="dropdown-item"
-                                id="archive-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
-                                data-bs-target="#archive-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
-                                '.trans('main.archive').'
-                            </a>
-                        </li>
-                        <div class="dropdown-divider"></div>
-                        <li>
-                            <a href="javascript:;" class="dropdown-item text-danger"
-                                id="delete-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
-                                data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
-                                '.trans('main.delete').'
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light"
-                    tabindex="0" type="button" data-bs-toggle="offcanvas" data-bs-target="#edit-modal"
-                    id="edit-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
-                    data-username=' . $row->username . ' data-email=' . $row->email . ' data-phone=' . $row->phone . '
-                    data-password="" data-teacher_id=' . $row->teacher_id . ' data-is_active="' . ($row->is_active == 0 ? '0' : '1') . '">
-                    <i class="ri-edit-box-line ri-20px"></i>
-                </button>';
-            })
-            ->rawColumns(['selectbox', 'details', 'teacher_id', 'is_active', 'actions'])
+            ->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
+            ->addColumn('details', fn($row) => generateDetailsColumn($row->name, $row->profile_pic, 'storage/profiles/assistants', $row->email))
+            ->editColumn('is_active', fn($row) => formatActiveStatus($row->is_active))
+            ->addColumn('actions', fn($row) => $this->generateActionButtons($row))
+            ->filterColumn('details', fn($query, $keyword) => filterDetailsColumn($query, $keyword, 'email'))
+            ->filterColumn('is_active', fn($query, $keyword) => filterByStatus($query, $keyword))
+            ->rawColumns(['selectbox', 'details', 'is_active', 'actions'])
             ->make(true);
     }
 
-    public function getArchivedAssistantsForDatatable($assistantsQuery)
+    private function generateActionButtons($row)
     {
-        return datatables()->eloquent($assistantsQuery)
-            ->addIndexColumn()
-            ->addColumn('selectbox', fn($row) =>
-                '<td class="dt-checkboxes-cell">
-                    <input type="checkbox" value="' . $row->id . '" class="dt-checkboxes form-check-input">
-                </td>'
-            )
-            ->addColumn('details', function ($row) {
-                $profilePic = $row->profile_pic ?
-                '<img src="' . asset('storage/' . $row->profile_picture) . '" alt="Profile Picture" class="rounded-circle">' :
-                '<img src="' . asset('assets/img/avatars/default.jpg') . '" alt="Profile Picture" class="rounded-circle">';
-
-                return
-                '<div class="d-flex justify-content-start align-items-center">
-                    <div class="avatar-wrapper">
-                        <div class="avatar me-2">'.$profilePic.'</div>
-                    </div>
-                    <div class="d-flex flex-column align-items-start">
-                        <span class="emp_name text-truncate text-heading fw-medium">'.$row->name.'</span>
-                        <small class="emp_post text-truncate">'.$row->teacher->name.'</small>
-                    </div>
-                </div>';
-            })
-            ->addColumn('actions', function ($row) {
-                return
-                '<div class="d-inline-block">
-                    <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ri-more-2-line"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end m-0">
-                        <li><a href="javascript:;" class="dropdown-item">'.trans('main.details').'</a></li>
-                        <li>
-                            <a href="javascript:;" class="dropdown-item"
-                                id="restore-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
-                                data-bs-target="#restore-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
-                                '.trans('main.restore').'
-                            </a>
-                        </li>
-                        <div class="dropdown-divider"></div>
-                        <li>
-                            <a href="javascript:;" class="dropdown-item text-danger"
-                                id="delete-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
-                                data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
-                                '.trans('main.delete').'
-                            </a>
-                        </li>
-                    </ul>
-                </div>';
-            })
-            ->rawColumns(['selectbox', 'details', 'actions'])
-            ->make(true);
+        return
+            '<div class="d-inline-block">' .
+                '<a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">' .
+                    '<i class="ri-more-2-line"></i>' .
+                '</a>' .
+                '<ul class="dropdown-menu dropdown-menu-end m-0">' .
+                    '<li>
+                        <a target="_blank" href="#" class="dropdown-item">'.trans('main.details').'</a>
+                    </li>' .
+                    '<div class="dropdown-divider"></div>' .
+                    '<li>' .
+                        '<a href="javascript:;" class="dropdown-item text-danger" ' .
+                            'id="delete-button" ' .
+                            'data-id="' . $row->id . '" ' .
+                            'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
+                            'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
+                            'data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
+                            trans('main.delete') .
+                        '</a>' .
+                    '</li>' .
+                '</ul>' .
+            '</div>' .
+            '<button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light" ' .
+                'tabindex="0" type="button" data-bs-toggle="offcanvas" data-bs-target="#edit-modal" ' .
+                'id="edit-button" ' .
+                'data-id="' . $row->id . '" ' .
+                'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
+                'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
+                'data-username="' . $row->username . '" ' .
+                'data-email="' . $row->email . '" ' .
+                'data-phone="' . $row->phone . '" ' .
+                'data-password="" ' .
+                'data-is_active="' . ($row->is_active ? '1' : '0') . '">' .
+                '<i class="ri-edit-box-line ri-20px"></i>' .
+            '</button>';
     }
 
     public function insertAssistant(array $request)
     {
-        DB::beginTransaction();
-
-        try {
-            $assistant = Assistant::create([
+        return $this->executeTransaction(function () use ($request)
+        {
+            Assistant::create([
                 'username' => $request['username'],
                 'password' => Hash::make($request['username']),
                 'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
                 'phone' => $request['phone'],
                 'email' => $request['email'],
-                'teacher_id' => $request['teacher_id'],
+                'teacher_id' => $this->teacherId,
             ]);
 
-            DB::commit();
-
-            return [
-                'status' => 'success',
-                'message' => trans('main.added', ['item' => trans('admin/assistants.assistant')]),
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.added', ['item' => trans('admin/assistants.assistant')]));
+        });
     }
 
     public function updateAssistant($id, array $request): array
     {
-        DB::beginTransaction();
-
-        try {
+        return $this->executeTransaction(function () use ($id, $request)
+        {
             $assistant = Assistant::findOrFail($id);
 
-            if (!empty($request['password'])) {
-                $request['password'] = Hash::make($request['password']);
-            } else {
-                unset($request['password']);
-            }
+            $this->processPassword($request);
 
             $assistant->update([
                 'username' => $request['username'],
@@ -176,199 +103,34 @@ class AssistantService
                 'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
                 'phone' => $request['phone'],
                 'email' => $request['email'],
-                'teacher_id' => $request['teacher_id'],
                 'is_active' => $request['is_active'],
             ]);
 
-            DB::commit();
-
-            return [
-                'status' => 'success',
-                'message' => trans('main.edited', ['item' => trans('admin/assistants.assistant')]),
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.edited', ['item' => trans('admin/assistants.assistant')]));
+        });
     }
 
     public function deleteAssistant($id): array
     {
-        DB::beginTransaction();
-
-        try {
-            $assistant = Assistant::withTrashed()->findOrFail($id);
-            $assistant->forceDelete();
-
-            DB::commit();
-
-            return [
-                'status' => 'success',
-                'message' => trans('main.deleted', ['item' => trans('admin/assistants.assistant')]),
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
-    }
-
-    public function archiveAssistant($id): array
-    {
-        DB::beginTransaction();
-
-        try {
+        return $this->executeTransaction(function () use ($id)
+        {
             $assistant = Assistant::findOrFail($id);
             $assistant->delete();
 
-            DB::commit();
-
-            return [
-                'status' => 'success',
-                'message' => trans('main.archived', ['item' => trans('admin/assistants.assistant')]),
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
-    }
-
-    public function restoreAssistant($id): array
-    {
-        DB::beginTransaction();
-
-        try {
-            $assistant = Assistant::onlyTrashed()->findOrFail($id);
-            $assistant->restore();
-
-            DB::commit();
-
-            return [
-                'status' => 'success',
-                'message' => trans('main.restored', ['item' => trans('admin/assistants.assistant')]),
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.deleted', ['item' => trans('admin/assistants.assistant')]));
+        });
     }
 
     public function deleteSelectedAssistants($ids)
     {
-        if (empty($ids)) {
-            return [
-                'status' => 'error',
-                'message' => trans('main.noItemsSelected'),
-            ];
-        }
+        if ($validationResult = $this->validateSelectedItems((array) $ids))
+            return $validationResult;
 
-        DB::beginTransaction();
-
-        try {
-            Assistant::withTrashed()->whereIn('id', $ids)->forceDelete();
-
-            DB::commit();
-            return [
-                'status' => 'success',
-                'message' => trans('main.deletedSelected', ['item' => strtolower(trans('admin/assistants.assistants'))]),
-            ];
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
-    }
-
-    public function archiveSelectedAssistants($ids)
-    {
-        if (empty($ids)) {
-            return [
-                'status' => 'error',
-                'message' => trans('main.noItemsSelected'),
-            ];
-        }
-
-        DB::beginTransaction();
-
-        try {
+        return $this->executeTransaction(function () use ($ids)
+        {
             Assistant::whereIn('id', $ids)->delete();
 
-            DB::commit();
-            return [
-                'status' => 'success',
-                'message' => trans('main.archivedSelected', ['item' => strtolower(trans('admin/assistants.assistants'))]),
-            ];
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
-    }
-
-    public function restoreSelectedAssistants($ids)
-    {
-        if (empty($ids)) {
-            return [
-                'status' => 'error',
-                'message' => trans('main.noItemsSelected'),
-            ];
-        }
-
-        DB::beginTransaction();
-
-        try {
-            Assistant::onlyTrashed()->whereIn('id', $ids)->restore();
-
-            DB::commit();
-            return [
-                'status' => 'success',
-                'message' => trans('main.restoredSelected', ['item' => strtolower(trans('admin/assistants.assistants'))]),
-            ];
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.deletedSelected', ['item' => trans('admin/assistants.assistant')]));
+        });
     }
 }

@@ -11,7 +11,7 @@
     <x-datatable datatableTitle="{{ trans('main.datatableTitle2', ['item' => trans('admin/assistants.assistants')]) }}"
         dataToggle="modal" restoreButton deleteButton>
         <th></th>
-        <th class="dt-checkboxes-cell dt-checkboxes-select-all"><input type="checkbox" id="select-all"class="form-check-input">
+        <th class="dt-checkboxes-cell dt-checkboxes-select-all"><input type="checkbox" id="select-all" class="form-check-input">
         </th>
         <th>#</th>
         <th>{{ trans('main.name') }}</th>
@@ -46,8 +46,6 @@
                 {
                     data: 'details',
                     name: 'details',
-                    orderable: false,
-                    searchable: false
                 },
                 {
                     data: 'username',

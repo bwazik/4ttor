@@ -42,7 +42,7 @@ class TeachersController extends Controller
 
     public function archived(Request $request)
     {
-        $teachersQuery = Teacher::query()->onlyTrashed()->select('id', 'username', 'name', 'phone', 'subject_id', 'profile_pic');
+        $teachersQuery = Teacher::query()->onlyTrashed()->select('id', 'username', 'name', 'phone', 'email', 'profile_pic');
 
         if ($request->ajax()) {
             return $this->teacherService->getArchivedTeachersForDatatable($teachersQuery);
@@ -202,10 +202,10 @@ class TeachersController extends Controller
 
         $teacherIds = $validated['teachers'];
 
-        $groups = Group::whereIn('teacher_id', $teacherIds)->select('id', 'name', 'teacher_id')
-            ->with('teacher:id,name')->orderBy('id')->get()
+        $groups = Group::whereIn('teacher_id', $teacherIds)->select('id', 'name', 'teacher_id', 'grade_id')
+            ->with(['teacher:id,name', 'grade:id,name'])->orderBy('id')->get()
             ->mapWithKeys(function ($group) {
-                return [$group->id => $group->name . ' - ' . $group->teacher->name];
+                return [$group->id => $group->name . ' - ' . $group->grade->name . ' - ' . $group->teacher->name];
             });
 
         return response()->json(['status' => 'success', 'data' => $groups]);

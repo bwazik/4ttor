@@ -17,39 +17,42 @@ class GroupsController extends Controller
     use ValidatesExistence;
 
     protected $groupService;
+    protected $teacherId;
 
     public function __construct(GroupService $groupService)
     {
         $this->groupService = $groupService;
+        $this->teacherId = Auth::id();
     }
 
     public function index(Request $request)
     {
-        $teacherId = Auth::id();
-
         $groupsQuery = Group::query()
             ->select('id', 'name', 'grade_id', 'day_1', 'day_2', 'time', 'is_active', 'created_at', 'updated_at')
-            ->where('teacher_id', $teacherId);
+            ->where('teacher_id', $this->teacherId);
 
         if ($request->ajax()) {
             return $this->groupService->getGroupsForDatatable($groupsQuery);
         }
 
+        $baseStatsQuery = Group::where('teacher_id', $this->teacherId);
+
         $pageStatistics = [
-            'totalGroups' => Group::where('teacher_id', $teacherId)->count(),
-            'activeGroups' => Group::where('teacher_id', $teacherId)->active()->count(),
-            'inactiveGroups' => Group::where('teacher_id', $teacherId)->inactive()->count(),
-            'topGrade' => Group::where('teacher_id', $teacherId)
-                ->select('grade_id', DB::raw('COUNT(*) as group_count'))
+            'totalGroups' => (clone $baseStatsQuery)->count(),
+            'activeGroups' => (clone $baseStatsQuery)->active()->count(),
+            'inactiveGroups' => (clone $baseStatsQuery)->inactive()->count(),
+            'topGrade' => (clone $baseStatsQuery)->select('grade_id', DB::raw('COUNT(*) as group_count'))
                 ->groupBy('grade_id')
                 ->orderByDesc('group_count')
                 ->with('grade:id,name')
-                ->first()
+                ->first(),
         ];
-        
-        $grades = Grade::whereHas('teachers', function ($query) use ($teacherId) {
-            $query->where('teacher_id', $teacherId);
-        })->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
+
+        $grades = Grade::whereHas('teachers', fn($query) => $query->where('teacher_id', $this->teacherId))
+            ->select('id', 'name')
+            ->orderBy('id')
+            ->pluck('name', 'id')
+            ->toArray();
 
         return view('teacher.platform.groups.index', compact('grades', 'pageStatistics'));
     }
