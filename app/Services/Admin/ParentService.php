@@ -3,13 +3,14 @@
 namespace App\Services\Admin;
 
 use App\Models\MyParent;
-use Illuminate\Support\Facades\DB;
+use App\Traits\PublicValidatesTrait;
 use Illuminate\Support\Facades\Hash;
+use App\Traits\DatabaseTransactionTrait;
 use App\Traits\PreventDeletionIfRelated;
 
 class ParentService
 {
-    use PreventDeletionIfRelated;
+    use PreventDeletionIfRelated, PublicValidatesTrait, DatabaseTransactionTrait;
 
     protected $relationships = ['students'];
     protected $transModelKey = 'admin/parents.parents';
@@ -18,98 +19,118 @@ class ParentService
     {
         return datatables()->eloquent($parentsQuery)
             ->addIndexColumn()
-            ->addColumn('selectbox', fn($row) =>
-                '<td class="dt-checkboxes-cell">
-                    <input type="checkbox" value="' . $row->id . '" class="dt-checkboxes form-check-input">
-                </td>'
-            )
-            ->editColumn('name', function ($row) {
-                return $row->name;
-            })
-            ->editColumn('is_active', function ($row) {
-                return $row->is_active ? '<span class="badge rounded-pill bg-label-success" text-capitalized="">'.trans('main.active').'</span>' : '<span class="badge rounded-pill bg-label-secondary" text-capitalized="">'.trans('main.inactive').'</span>';
-            })
-            ->addColumn('actions', function ($row) {
-                return
-                '<div class="d-inline-block">
-                    <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ri-more-2-line"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end m-0">
-                        <li><a target="_blank" href="'.route('admin.parents.details', $row->id).'" class="dropdown-item">'.trans('main.details').'</a></li>
-                        <li>
-                            <a href="javascript:;" class="dropdown-item"
-                                id="archive-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
-                                data-bs-target="#archive-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
-                                '.trans('main.archive').'
-                            </a>
-                        </li>
-                        <div class="dropdown-divider"></div>
-                        <li>
-                            <a href="javascript:;" class="dropdown-item text-danger"
-                                id="delete-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
-                                data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
-                                '.trans('main.delete').'
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light"
-                    tabindex="0" type="button" data-bs-toggle="offcanvas" data-bs-target="#edit-modal"
-                    id="edit-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
-                    data-username=' . $row->username . ' data-email=' . $row->email . ' data-phone=' . $row->phone . '
-                    data-password="" data-gender="'.$row->gender.'" data-is_active="' . ($row->is_active == 0 ? '0' : '1') . '">
-                    <i class="ri-edit-box-line ri-20px"></i>
-                </button>';
-            })
+            ->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
+            ->editColumn('name', fn($row) => $row->name)
+            ->editColumn('is_active', fn($row) => formatActiveStatus($row->is_active))
+            ->addColumn('actions', fn($row) => $this->generateUnarchivedActionButtons($row))
+            ->filterColumn('is_active', fn($query, $keyword) => filterByStatus($query, $keyword))
             ->rawColumns(['selectbox', 'is_active', 'actions'])
             ->make(true);
+    }
+
+    private function generateUnarchivedActionButtons($row)
+    {
+        $studentIds = $row->students->pluck('id')->toArray();
+        $students = implode(',', $studentIds);
+
+        return
+            '<div class="d-inline-block">' .
+                '<a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">' .
+                    '<i class="ri-more-2-line"></i>' .
+                '</a>' .
+                '<ul class="dropdown-menu dropdown-menu-end m-0">' .
+                    '<li>
+                        <a target="_blank" href="'.route('admin.parents.details', $row->id).'" class="dropdown-item">'.trans('main.details').'</a>
+                    </li>' .
+                    '<li>' .
+                        '<a href="javascript:;" class="dropdown-item" ' .
+                            'id="archive-button" ' .
+                            'data-id="' . $row->id . '" ' .
+                            'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
+                            'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
+                            'data-bs-target="#archive-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
+                            trans('main.archive').
+                        '</a>' .
+                    '<li>' .
+                    '<div class="dropdown-divider"></div>' .
+                    '<li>' .
+                        '<a href="javascript:;" class="dropdown-item text-danger" ' .
+                            'id="delete-button" ' .
+                            'data-id="' . $row->id . '" ' .
+                            'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
+                            'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
+                            'data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
+                            trans('main.delete') .
+                        '</a>' .
+                    '</li>' .
+                '</ul>' .
+            '</div>' .
+            '<button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light" ' .
+                'tabindex="0" type="button" data-bs-toggle="modal" data-bs-target="#edit-modal" ' .
+                'id="edit-button" ' .
+                'data-id="' . $row->id . '" ' .
+                'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
+                'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
+                'data-username="' . $row->username . '" ' .
+                'data-email="' . $row->email . '" ' .
+                'data-phone="' . $row->phone . '" ' .
+                'data-password="" ' .
+                'data-gender="' . $row->gender . '" ' .
+                'data-students="' . $students . '" ' .
+                'data-is_active="' . ($row->is_active ? '1' : '0') . '">' .
+                '<i class="ri-edit-box-line ri-20px"></i>' .
+            '</button>';
     }
 
     public function getArchivedParentsForDatatable($parentsQuery)
     {
         return datatables()->eloquent($parentsQuery)
             ->addIndexColumn()
-            ->addColumn('selectbox', fn($row) =>
-                '<td class="dt-checkboxes-cell">
-                    <input type="checkbox" value="' . $row->id . '" class="dt-checkboxes form-check-input">
-                </td>'
-            )
-            ->editColumn('name', function ($row) {
-                return $row->name;
-            })
-            ->addColumn('actions', function ($row) {
-                return
-                '<div class="d-inline-block">
-                    <a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ri-more-2-line"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end m-0">
-                        <li><a href="javascript:;" class="dropdown-item">'.trans('main.details').'</a></li>
-                        <li>
-                            <a href="javascript:;" class="dropdown-item"
-                                id="restore-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
-                                data-bs-target="#restore-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
-                                '.trans('main.restore').'
-                            </a>
-                        </li>
-                        <div class="dropdown-divider"></div>
-                        <li>
-                            <a href="javascript:;" class="dropdown-item text-danger"
-                                id="delete-button" data-id=' . $row->id . ' data-name_ar="' . $row->getTranslation('name', 'ar') . '" data-name_en="' . $row->getTranslation('name', 'en') . '"
-                                data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
-                                '.trans('main.delete').'
-                            </a>
-                        </li>
-                    </ul>
-                </div>';
-            })
+            ->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
+            ->editColumn('name', fn($row) => $row->name)
+            ->addColumn('actions', fn($row) => $this->generateArchivedActionButtons($row))
             ->rawColumns(['selectbox', 'actions'])
             ->make(true);
     }
 
+    private function generateArchivedActionButtons($row)
+    {
+        return
+            '<div class="d-inline-block">' .
+                '<a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">' .
+                    '<i class="ri-more-2-line"></i>' .
+                '</a>' .
+                '<ul class="dropdown-menu dropdown-menu-end m-0">' .
+                    '<li>' .
+                        '<a href="javascript:;" class="dropdown-item" ' .
+                            'id="restore-button" ' .
+                            'data-id="' . $row->id . '" ' .
+                            'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
+                            'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
+                            'data-bs-target="#restore-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
+                            trans('main.restore') .
+                        '</a>' .
+                    '</li>' .
+                    '<div class="dropdown-divider"></div>' .
+                    '<li>' .
+                        '<a href="javascript:;" class="dropdown-item text-danger" ' .
+                            'id="delete-button" ' .
+                            'data-id="' . $row->id . '" ' .
+                            'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
+                            'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
+                            'data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
+                            trans('main.delete') .
+                        '</a>' .
+                    '</li>' .
+                '</ul>' .
+            '</div>';
+    }
+
     public function insertParent(array $request)
     {
-        DB::beginTransaction();
-
-        try {
-            MyParent::create([
+        return $this->executeTransaction(function () use ($request)
+        {
+            $parent = MyParent::create([
                 'username' => $request['username'],
                 'password' => Hash::make($request['username']),
                 'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
@@ -118,36 +139,19 @@ class ParentService
                 'gender' => $request['gender'],
             ]);
 
-            DB::commit();
+            $this->syncStudentParentRelation($request['students'] ?? [], $parent->id, isAdmin());
 
-            return [
-                'status' => 'success',
-                'message' => trans('main.added', ['item' => trans('admin/parents.parent')]),
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.added', ['item' => trans('admin/parents.parent')]));
+        });
     }
 
     public function updateParent($id, array $request): array
     {
-        DB::beginTransaction();
-
-        try {
+        return $this->executeTransaction(function () use ($id, $request)
+        {
             $parent = MyParent::findOrFail($id);
 
-            if (!empty($request['password'])) {
-                $request['password'] = Hash::make($request['password']);
-            } else {
-                unset($request['password']);
-            }
+            $this->processPassword($request);
 
             $parent->update([
                 'username' => $request['username'],
@@ -159,29 +163,16 @@ class ParentService
                 'is_active' => $request['is_active'],
             ]);
 
-            DB::commit();
+            $this->syncStudentParentRelation($request['students'] ?? [], $parent->id, true);
 
-            return [
-                'status' => 'success',
-                'message' => trans('main.edited', ['item' => trans('admin/parents.parent')]),
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.edited', ['item' => trans('admin/parents.parent')]));
+        });
     }
 
     public function deleteParent($id): array
     {
-        DB::beginTransaction();
-
-        try {
+        return $this->executeTransaction(function () use ($id)
+        {
             $parent = MyParent::withTrashed()->select('id', 'name')->findOrFail($id);
 
             if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($parent)) {
@@ -190,88 +181,37 @@ class ParentService
 
             $parent->forceDelete();
 
-            DB::commit();
-
-            return [
-                'status' => 'success',
-                'message' => trans('main.deleted', ['item' => trans('admin/parents.parent')]),
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.deleted', ['item' => trans('admin/parents.parent')]));
+        });
     }
 
     public function archiveParent($id): array
     {
-        DB::beginTransaction();
+        return $this->executeTransaction(function () use ($id)
+        {
+            MyParent::findOrFail($id)->delete();
 
-        try {
-            $parent = MyParent::findOrFail($id);
-            $parent->delete();
-
-            DB::commit();
-
-            return [
-                'status' => 'success',
-                'message' => trans('main.archived', ['item' => trans('admin/parents.parent')]),
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.archived', ['item' => trans('admin/parents.parent')]));
+        });
     }
 
     public function restoreParent($id): array
     {
-        DB::beginTransaction();
+        return $this->executeTransaction(function () use ($id)
+        {
+            MyParent::onlyTrashed()->findOrFail($id)->restore();
 
-        try {
-            $parent = MyParent::onlyTrashed()->findOrFail($id);
-            $parent->restore();
-
-            DB::commit();
-
-            return [
-                'status' => 'success',
-                'message' => trans('main.restored', ['item' => trans('admin/parents.parent')]),
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.restored', ['item' => trans('admin/parents.parent')]));
+        });
     }
 
     public function deleteSelectedParents($ids)
     {
-        if (empty($ids)) {
-            return [
-                'status' => 'error',
-                'message' => trans('main.noItemsSelected'),
-            ];
-        }
+        if ($validationResult = $this->validateSelectedItems((array) $ids))
+            return $validationResult;
 
-        DB::beginTransaction();
-
-        try {
+        return $this->executeTransaction(function () use ($ids)
+        {
             $parents = MyParent::whereIn('id', $ids)
             ->select('id', 'name')
             ->orderBy('id')
@@ -283,86 +223,34 @@ class ParentService
 
             MyParent::withTrashed()->whereIn('id', $ids)->forceDelete();
 
-            DB::commit();
-            return [
-                'status' => 'success',
-                'message' => trans('main.deletedSelected', ['item' => strtolower(trans('admin/parents.parents'))]),
-            ];
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.deletedSelected', ['item' => trans('admin/parents.parent')]));
+        });
     }
 
     public function archiveSelectedParents($ids)
     {
-        if (empty($ids)) {
-            return [
-                'status' => 'error',
-                'message' => trans('main.noItemsSelected'),
-            ];
-        }
+        if ($validationResult = $this->validateSelectedItems((array) $ids))
+            return $validationResult;
 
-        DB::beginTransaction();
-
-        try {
+        return $this->executeTransaction(function () use ($ids)
+        {
             MyParent::whereIn('id', $ids)->delete();
 
-            DB::commit();
-            return [
-                'status' => 'success',
-                'message' => trans('main.archivedSelected', ['item' => strtolower(trans('admin/parents.parents'))]),
-            ];
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.archivedSelected', ['item' => trans('admin/parents.parent')]));
+        });
     }
 
     public function restoreSelectedParents($ids)
     {
-        if (empty($ids)) {
-            return [
-                'status' => 'error',
-                'message' => trans('main.noItemsSelected'),
-            ];
-        }
+        if ($validationResult = $this->validateSelectedItems((array) $ids))
+            return $validationResult;
 
-        DB::beginTransaction();
-
-        try {
+        return $this->executeTransaction(function () use ($ids)
+        {
             MyParent::onlyTrashed()->whereIn('id', $ids)->restore();
 
-            DB::commit();
-            return [
-                'status' => 'success',
-                'message' => trans('main.restoredSelected', ['item' => strtolower(trans('admin/parents.parents'))]),
-            ];
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.restoredSelected', ['item' => trans('admin/parents.parent')]));
+        });
     }
 
     public function checkDependenciesForSingleDeletion($parent)

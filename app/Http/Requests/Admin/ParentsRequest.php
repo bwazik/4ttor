@@ -24,6 +24,8 @@ class ParentsRequest extends FormRequest
             'phone' => ['required','numeric','regex:/^(01)[0-9]{9}$/',new UniqueFieldAcrossModels('phone', $this->id)],
             'email' => ['nullable','email','max:100',new UniqueFieldAcrossModels('email', $this->id)],
             'gender' => 'required|integer|in:1,2',
+            'students' => 'required|array|min:1',
+            'students.*' => 'integer|exists:students,id',
             'is_active' => 'nullable|boolean',
         ];
     }

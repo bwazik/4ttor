@@ -7,11 +7,12 @@
 @section('title', pageTitle('admin/parents.parents'))
 
 @section('content')
+    @include('admin.parents.manage.statistics')
     <!-- DataTable with Buttons -->
     <x-datatable datatableTitle="{{ trans('main.datatableTitle', ['item' => trans('admin/parents.parents')]) }}"
-        dataToggle="offcanvas" deleteButton archiveButton addButton="{{ trans('main.addItem', ['item' => trans('admin/parents.parent')]) }}">
+        dataToggle="modal" deleteButton archiveButton addButton="{{ trans('main.addItem', ['item' => trans('admin/parents.parent')]) }}">
         <th></th>
-        <th class="dt-checkboxes-cell dt-checkboxes-select-all"><input type="checkbox" id="select-all"class="form-check-input">
+        <th class="dt-checkboxes-cell dt-checkboxes-select-all"><input type="checkbox" id="select-all" class="form-check-input">
         </th>
         <th>#</th>
         <th>{{ trans('main.name') }}</th>
@@ -27,45 +28,15 @@
 @section('page-js')
     <script>
         initializeDataTable('#datatable', "{{ route('admin.parents.index') }}", [2, 3, 4, 5, 6],
-            [{
-                    data: "",
-                    orderable: false,
-                    searchable: false
-                },
-                {
-                    data: 'selectbox',
-                    name: 'selectbox',
-                    orderable: false,
-                    searchable: false
-                },
-                {
-                    data: 'DT_RowIndex',
-                    name: 'DT_RowIndex',
-                    orderable: false,
-                    searchable: false
-                },
-                {
-                    data: 'name',
-                    name: 'name',
-                },
-                {
-                    data: 'username',
-                    name: 'username'
-                },
-                {
-                    data: 'phone',
-                    name: 'phone'
-                },
-                {
-                    data: 'is_active',
-                    name: 'is_active'
-                },
-                {
-                    data: 'actions',
-                    name: 'actions',
-                    orderable: false,
-                    searchable: false
-                }
+            [
+                { data: "", orderable: false, searchable: false },
+                { data: 'selectbox', name: 'selectbox', orderable: false, searchable: false },
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'name', name: 'name' },
+                { data: 'username', name: 'username' },
+                { data: 'phone', name: 'phone' },
+                { data: 'is_active', name: 'is_active' },
+                { data: 'actions', name: 'actions', orderable: false, searchable: false }
             ],
         );
 
@@ -75,6 +46,7 @@
             modalId: '#add-modal',
             fields: {
                 gender: () => '',
+                students: () => '',
             }
         });
         // Setup edit modal
@@ -90,6 +62,7 @@
                 phone: button => button.data('phone'),
                 email: button => button.data('email'),
                 gender: button => button.data('gender'),
+                students: button => button.data('students'),
                 is_active: button => button.data('is_active'),
             }
         });
@@ -112,14 +85,13 @@
             }
         });
 
-        let fields = ['name_ar', 'name_en', 'username', 'password', 'phone', 'email', 'gender'];
-        handleFormSubmit('#add-form', fields, '#add-modal', 'offcanvas', '#datatable');
-        handleFormSubmit('#edit-form', fields, '#edit-modal', 'offcanvas', '#datatable');
+        let fields = ['name_ar', 'name_en', 'username', 'password', 'phone', 'email', 'gender', 'students', 'is_active'];
+        handleFormSubmit('#add-form', fields, '#add-modal', 'modal', '#datatable');
+        handleFormSubmit('#edit-form', fields, '#edit-modal', 'modal', '#datatable');
         handleDeletionFormSubmit('#delete-form', '#delete-modal', '#datatable')
         handleDeletionFormSubmit('#archive-form', '#archive-modal', '#datatable')
         handleDeletionFormSubmit('#delete-selected-form', '#delete-selected-modal', '#datatable')
         handleDeletionFormSubmit('#archive-selected-form', '#archive-selected-modal', '#datatable')
-
         generateRandomUsername('p');
     </script>
 @endsection

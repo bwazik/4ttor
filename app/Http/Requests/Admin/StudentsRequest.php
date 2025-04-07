@@ -18,7 +18,7 @@ class StudentsRequest extends FormRequest
     {
         $isUpdate = $this->id ? true : false;
 
-        return [
+        $rules = [
             'username' => ['required','min:5','max:20',new UniqueFieldAcrossModels('username', $this->id)],
             'password' => $isUpdate ? 'nullable|min:8|max:100' : 'required|min:8|max:100',
             'name_ar' => 'required|min:3|max:100',
@@ -28,13 +28,18 @@ class StudentsRequest extends FormRequest
             'birth_date' => 'nullable|date|date_format:Y-m-d',
             'gender' => 'required|integer|in:1,2',
             'grade_id' => 'required|integer|exists:grades,id',
-            'parent_id' => 'required|integer|exists:parents,id',
+            'parent_id' => 'nullable|integer|exists:parents,id',
             'is_active' => 'nullable|boolean',
-            'teachers' => 'required|array|min:1',
-            'teachers.*' => 'integer|exists:teachers,id',
             'groups' => 'array|min:1',
             'groups.*' => 'integer|exists:groups,id',
         ];
+
+        if (isAdmin()) {
+            $rules['teachers'] = 'required|array|min:1';
+            $rules['teachers.*'] = 'integer|exists:teachers,id';
+        }
+
+        return $rules;
     }
 
     public function withValidator($validator)

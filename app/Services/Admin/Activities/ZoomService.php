@@ -25,11 +25,7 @@ class ZoomService
     {
         return datatables()->eloquent($zoomsQuery)
             ->addIndexColumn()
-            ->addColumn('selectbox', fn($row) =>
-                '<td class="dt-checkboxes-cell">
-                    <input type="checkbox" value="' . $row->id . '" class="dt-checkboxes form-check-input">
-                </td>'
-            )
+->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
             ->editColumn('topic', function ($row) {
                 return $row->topic;
             })

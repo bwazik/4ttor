@@ -7,11 +7,12 @@
 @section('title', pageTitle('admin/assistants.assistants'))
 
 @section('content')
+    @include('admin.assistants.manage.statistics')
     <!-- DataTable with Buttons -->
     <x-datatable datatableTitle="{{ trans('main.datatableTitle', ['item' => trans('admin/assistants.assistants')]) }}"
         dataToggle="offcanvas" deleteButton archiveButton addButton="{{ trans('main.addItem', ['item' => trans('admin/assistants.assistant')]) }}">
         <th></th>
-        <th class="dt-checkboxes-cell dt-checkboxes-select-all"><input type="checkbox" id="select-all"class="form-check-input">
+        <th class="dt-checkboxes-cell dt-checkboxes-select-all"><input type="checkbox" id="select-all" class="form-check-input">
         </th>
         <th>#</th>
         <th>{{ trans('main.name') }}</th>
@@ -48,8 +49,6 @@
                 {
                     data: 'details',
                     name: 'details',
-                    orderable: false,
-                    searchable: false
                 },
                 {
                     data: 'username',
@@ -119,7 +118,7 @@
             }
         });
 
-        let fields = ['name_ar', 'name_en', 'username', 'email', 'phone', 'password', 'teacher_id'];
+        let fields = ['name_ar', 'name_en', 'username', 'email', 'phone', 'password', 'teacher_id', 'is_active'];
         handleFormSubmit('#add-form', fields, '#add-modal', 'offcanvas', '#datatable');
         handleFormSubmit('#edit-form', fields, '#edit-modal', 'offcanvas', '#datatable');
         handleDeletionFormSubmit('#delete-form', '#delete-modal', '#datatable')

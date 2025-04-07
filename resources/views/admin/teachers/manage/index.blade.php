@@ -11,12 +11,13 @@
     <x-datatable datatableTitle="{{ trans('main.datatableTitle', ['item' => trans('admin/teachers.teachers')]) }}"
         dataToggle="modal" deleteButton archiveButton addButton="{{ trans('main.addItem', ['item' => trans('admin/teachers.teacher')]) }}">
         <th></th>
-        <th class="dt-checkboxes-cell dt-checkboxes-select-all"><input type="checkbox" id="select-all"class="form-check-input">
+        <th class="dt-checkboxes-cell dt-checkboxes-select-all"><input type="checkbox" id="select-all" class="form-check-input">
         </th>
         <th>#</th>
         <th>{{ trans('main.name') }}</th>
         <th>{{ trans('main.username') }}</th>
         <th>{{ trans('main.phone') }}</th>
+        <th>{{ trans('main.subject') }}</th>
         <th>{{ trans('main.plan') }}</th>
         <th>{{ trans('main.status') }}</th>
         <th>{{ trans('main.actions') }}</th>
@@ -27,52 +28,18 @@
 
 @section('page-js')
     <script>
-        initializeDataTable('#datatable', "{{ route('admin.teachers.index') }}", [2, 3, 4, 5, 6, 7],
-            [{
-                    data: "",
-                    orderable: false,
-                    searchable: false
-                },
-                {
-                    data: 'selectbox',
-                    name: 'selectbox',
-                    orderable: false,
-                    searchable: false
-                },
-                {
-                    data: 'DT_RowIndex',
-                    name: 'DT_RowIndex',
-                    orderable: false,
-                    searchable: false
-                },
-                {
-                    data: 'details',
-                    name: 'details',
-                    orderable: false,
-                    searchable: false
-                },
-                {
-                    data: 'username',
-                    name: 'username'
-                },
-                {
-                    data: 'phone',
-                    name: 'phone'
-                },
-                {
-                    data: 'plan_id',
-                    name: 'plan_id'
-                },
-                {
-                    data: 'is_active',
-                    name: 'is_active'
-                },
-                {
-                    data: 'actions',
-                    name: 'actions',
-                    orderable: false,
-                    searchable: false
-                }
+        initializeDataTable('#datatable', "{{ route('admin.teachers.index') }}", [2, 3, 4, 5, 6, 7, 8],
+            [
+                { data: "", orderable: false, searchable: false },
+                { data: 'selectbox', name: 'selectbox', orderable: false, searchable: false },
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'details', name: 'details' },
+                { data: 'username', name: 'username' },
+                { data: 'phone', name: 'phone' },
+                { data: 'subject_id', name: 'subject_id' },
+                { data: 'plan_id', name: 'plan_id' },
+                { data: 'is_active', name: 'is_active' },
+                { data: 'actions', name: 'actions', orderable: false, searchable: false }
             ],
         );
 

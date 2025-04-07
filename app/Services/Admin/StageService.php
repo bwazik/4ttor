@@ -17,11 +17,7 @@ class StageService
     {
         return datatables()->eloquent($stagesQuery)
             ->addIndexColumn()
-            ->addColumn('selectbox', fn($row) =>
-                '<td class="dt-checkboxes-cell">
-                    <input type="checkbox" value="' . $row->id . '" class="dt-checkboxes form-check-input">
-                </td>'
-            )
+->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
             ->editColumn('name', function ($row) {
                 return $row->name;
             })

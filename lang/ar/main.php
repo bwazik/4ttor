@@ -37,6 +37,7 @@ return [
     'amount' => 'المبلغ',
     'date' => 'التاريخ',
     'student' => 'الطالب',
+    'students' => 'الطلاب',
     'fee' => 'المصروف',
     'description' => 'ملاحظات',
     'status' => 'الحالة',
