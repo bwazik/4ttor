@@ -80,19 +80,19 @@
         <li class="menu-header mt-5">
             <span class="menu-header-text">{{ trans('layouts/sidebar.usersManagment') }}</span>
         </li>
-        <li class="menu-item {{ isActiveRoute(['teacher.assistants.index']) ? 'active open' : '' }}">
+        <li class="menu-item {{ isActiveRoute('teacher.assistants.index') ? 'active' : '' }}">
             <a href="{{ route('teacher.assistants.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons ri-user-star-line"></i>
                 <div>{{ trans('layouts/sidebar.assistants') }}</div>
             </a>
         </li>
-        <li class="menu-item {{ isActiveRoute(['teacher.students.index']) ? 'active open' : '' }}">
+        <li class="menu-item {{ isActiveRoute('teacher.students.index') ? 'active' : '' }}">
             <a href="{{ route('teacher.students.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons ri-graduation-cap-line"></i>
                 <div>{{ trans('layouts/sidebar.students') }}</div>
             </a>
         </li>
-        <li class="menu-item {{ isActiveRoute(['teacher.parents.index']) ? 'active open' : '' }}">
+        <li class="menu-item {{ isActiveRoute('teacher.parents.index') ? 'active' : '' }}">
             <a href="{{ route('teacher.parents.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons ri-parent-line"></i>
                 <div>{{ trans('layouts/sidebar.parents') }}</div>
