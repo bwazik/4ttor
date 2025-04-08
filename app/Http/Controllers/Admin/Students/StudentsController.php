@@ -53,7 +53,9 @@ class StudentsController extends Controller
         $groups = Group::query()->select('id', 'name', 'teacher_id', 'grade_id')
             ->with(['teacher:id,name', 'grade:id,name'])->orderBy('id')->get()
             ->mapWithKeys(function ($group) {
-                return [$group->id => $group->name . ' - ' . $group->grade->name . ' - ' . $group->teacher->name];
+                $gradeName = $group->grade->name ?? 'N/A';
+                $teacherName = $group->teacher->name ?? 'N/A';
+                return [$group->id => $group->name . ' - ' . $gradeName . ' - ' . $teacherName];
             });
 
 

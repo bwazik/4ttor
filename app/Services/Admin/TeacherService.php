@@ -237,7 +237,7 @@ class TeacherService
         });
     }
 
-    public function archiveSelectedStudents($ids)
+    public function archiveSelectedTeachers($ids)
     {
         if ($validationResult = $this->validateSelectedItems((array) $ids))
             return $validationResult;
