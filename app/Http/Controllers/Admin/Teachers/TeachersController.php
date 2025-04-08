@@ -10,6 +10,7 @@ use App\Models\Subject;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Services\Admin\TeacherService;
 use App\Http\Requests\Admin\TeachersRequest;
@@ -33,11 +34,23 @@ class TeachersController extends Controller
             return $this->teacherService->getTeachersForDatatable($teachersQuery);
         }
 
+        $pageStatistics = [
+            'totalTeachers' => Teacher::count(),
+            'activeTeachers' => Teacher::active()->count(),
+            'inactiveTeachers' => Teacher::inactive()->count(),
+            'archivedTeachers' => Teacher::onlyTrashed()->count(),
+            'topSubject' => Teacher::select('subject_id', DB::raw('COUNT(*) as teacher_count'))
+            ->groupBy('subject_id')
+            ->orderByDesc('teacher_count')
+            ->with('subject:id,name')
+            ->first()
+        ];
+
         $plans = Plan::active()->select('id', 'name', 'description', 'monthly_price')->orderBy('id')->get();
         $subjects = Subject::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
         $grades = Grade::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
 
-        return view('admin.teachers.manage.index', compact('plans', 'subjects', 'grades'));
+        return view('admin.teachers.manage.index', compact('pageStatistics', 'plans', 'subjects', 'grades'));
     }
 
     public function archived(Request $request)
@@ -205,7 +218,9 @@ class TeachersController extends Controller
         $groups = Group::whereIn('teacher_id', $teacherIds)->select('id', 'name', 'teacher_id', 'grade_id')
             ->with(['teacher:id,name', 'grade:id,name'])->orderBy('id')->get()
             ->mapWithKeys(function ($group) {
-                return [$group->id => $group->name . ' - ' . $group->grade->name . ' - ' . $group->teacher->name];
+                $gradeName = $group->grade->name ?? 'N/A';
+                $teacherName = $group->teacher->name ?? 'N/A';
+                return [$group->id => $group->name . ' - ' . $gradeName . ' - ' . $teacherName];
             });
 
         return response()->json(['status' => 'success', 'data' => $groups]);
