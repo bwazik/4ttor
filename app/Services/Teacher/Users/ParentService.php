@@ -2,10 +2,8 @@
 
 namespace App\Services\Teacher\Users;
 
-use App\Models\Student;
 use App\Models\MyParent;
 use App\Traits\PublicValidatesTrait;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Traits\DatabaseTransactionTrait;
 use App\Traits\PreventDeletionIfRelated;
@@ -18,7 +16,7 @@ class ParentService
 
     public function __construct()
     {
-        $this->teacherId = Auth::id();
+        $this->teacherId = auth()->guard('teacher')->user()->id;
     }
 
     public function getParentsForDatatable($parentsQuery)

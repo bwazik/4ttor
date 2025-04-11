@@ -7,6 +7,7 @@ use App\Http\Controllers\Teacher\Platform\GroupsController;
 use App\Http\Controllers\Teacher\Users\AssistantsController;
 use App\Http\Controllers\Teacher\Users\StudentsController;
 use App\Http\Controllers\Teacher\Users\ParentsController;
+use App\Http\Controllers\Teacher\Activities\AttendanceController;
 
 Route::group(
     [
@@ -75,5 +76,63 @@ Route::group(
                 });
             });
         # End Users Managment
+
+        # Start Activities
+            # Attendance
+            Route::prefix('attendance')->controller(AttendanceController::class)->name('attendance.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::post('students', 'getStudentsByFilter')->name('students');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                });
+            });
+
+            # Zooms
+            Route::prefix('zooms')->controller(ZoomsController::class)->name('zooms.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
+            });
+
+            # Quizzes
+            Route::prefix('quizzes')->controller(QuizzesController::class)->name('quizzes.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
+            });
+
+            # Questions
+            Route::prefix('quizzes/{quizId}/questions')->controller(QuestionsController::class)->name('questions.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                });
+            });
+            Route::prefix('questions')->controller(QuestionsController::class)->name('questions.')->middleware('throttle:10,1')->group(function() {
+                Route::post('update', 'update')->name('update');
+                Route::post('delete', 'delete')->name('delete');
+                Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+            });
+
+            # Answers
+            Route::prefix('questions/{questionId}/answers')->controller(AnswersController::class)->name('answers.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                });
+            });
+            Route::prefix('answers')->controller(AnswersController::class)->name('answers.')->middleware('throttle:10,1')->group(function() {
+                Route::post('update', 'update')->name('update');
+                Route::post('delete', 'delete')->name('delete');
+            });
+        # End Activities
     });
 });

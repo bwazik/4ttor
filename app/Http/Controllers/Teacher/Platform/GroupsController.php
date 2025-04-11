@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Admin\GroupsRequest;
 use App\Services\Teacher\Platform\GroupService;
 
@@ -22,7 +21,7 @@ class GroupsController extends Controller
     public function __construct(GroupService $groupService)
     {
         $this->groupService = $groupService;
-        $this->teacherId = Auth::id();
+        $this->teacherId = auth()->guard('teacher')->user()->id;
     }
 
     public function index(Request $request)

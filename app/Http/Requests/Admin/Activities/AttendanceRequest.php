@@ -13,8 +13,7 @@ class AttendanceRequest extends FormRequest
 
     public function rules()
     {
-        return [
-            'teacher_id' => 'required|integer|exists:teachers,id',
+        $rules = [
             'grade_id' => 'required|integer|exists:grades,id',
             'group_id' => 'required|integer|exists:groups,id',
             'date' => [
@@ -32,6 +31,12 @@ class AttendanceRequest extends FormRequest
             'attendance.*.status' => 'nullable|integer|in:1,2,3,4',
             'attendance.*.note' => 'nullable|string|max:255',
         ];
+
+        if (isAdmin()) {
+            $rules['teacher_id'] = 'required|integer|exists:teachers,id';
+        }
+
+        return $rules;
     }
 
     public function withValidator($validator)

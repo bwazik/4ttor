@@ -4,7 +4,6 @@ namespace App\Services\Teacher\Platform;
 
 use App\Models\Group;
 use App\Traits\PublicValidatesTrait;
-use Illuminate\Support\Facades\Auth;
 use App\Traits\DatabaseTransactionTrait;
 use App\Traits\PreventDeletionIfRelated;
 
@@ -16,7 +15,7 @@ class GroupService
 
     public function __construct()
     {
-        $this->teacherId = Auth::id();
+        $this->teacherId = auth()->guard('teacher')->user()->id;
     }
 
     public function getGroupsForDatatable($groupsQuery)
@@ -71,7 +70,7 @@ class GroupService
     {
         return $this->executeTransaction(function () use ($request)
         {
-            if ($validationResult = $this->validateTeacherGrade($request['grade_id']))
+            if ($validationResult = $this->validateTeacherGrade($request['grade_id'], $this->teacherId))
                 return $validationResult;
 
             Group::create([
@@ -93,7 +92,7 @@ class GroupService
         {
             $group = Group::findOrFail($id);
 
-            if ($validationResult = $this->validateTeacherGrade($request['grade_id']))
+            if ($validationResult = $this->validateTeacherGrade($request['grade_id'], $this->teacherId))
                 return $validationResult;
 
             $group->update([

@@ -99,7 +99,7 @@
             </a>
         </li>
 
-        <!-- Finance -->
+        {{-- <!-- Finance -->
         <li class="menu-header mt-5">
             <span class="menu-header-text">{{ trans('layouts/sidebar.financeManagment') }}</span>
         </li>
@@ -162,26 +162,26 @@
                     </a>
                 </li>
             </ul>
-        </li>
+        </li> --}}
 
         <!-- Activities -->
         <li class="menu-header mt-5">
             <span class="menu-header-text">{{ trans('layouts/sidebar.activities') }}</span>
         </li>
-        <li class="menu-item {{ isActiveRoute('admin.attendance.index') ? 'active' : '' }}">
-            <a href="{{ route('admin.attendance.index') }}" class="menu-link">
+        <li class="menu-item {{ isActiveRoute('teacher.attendance.index') ? 'active' : '' }}">
+            <a href="{{ route('teacher.attendance.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons ri-file-list-3-line"></i>
                 <div>{{ trans('layouts/sidebar.attendance') }}</div>
             </a>
         </li>
-        <li class="menu-item {{ isActiveRoute('admin.zooms.index') ? 'active' : '' }}">
-            <a href="{{ route('admin.zooms.index') }}" class="menu-link">
+        <li class="menu-item {{ isActiveRoute('teacher.zooms.index') ? 'active' : '' }}">
+            <a href="{{ route('teacher.zooms.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons ri-video-on-line"></i>
                 <div>{{ trans('layouts/sidebar.zooms') }}</div>
             </a>
         </li>
-        <li class="menu-item {{ isActiveRoute('admin.quizzes.index') ? 'active' : '' }}">
-            <a href="{{ route('admin.quizzes.index') }}" class="menu-link">
+        <li class="menu-item {{ isActiveRoute('teacher.quizzes.index') ? 'active' : '' }}">
+            <a href="{{ route('teacher.quizzes.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons ri-brain-line"></i>
                 <div>{{ trans('layouts/sidebar.quizzes') }}</div>
             </a>

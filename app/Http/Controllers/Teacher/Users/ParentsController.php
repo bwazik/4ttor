@@ -6,7 +6,6 @@ use App\Models\MyParent;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Admin\ParentsRequest;
 use App\Models\Student;
 use App\Services\Teacher\Users\ParentService;
@@ -21,7 +20,7 @@ class ParentsController extends Controller
     public function __construct(ParentService $parentService)
     {
         $this->parentService = $parentService;
-        $this->teacherId = Auth::id();
+        $this->teacherId = auth()->guard('teacher')->user()->id;
     }
 
     public function index(Request $request)

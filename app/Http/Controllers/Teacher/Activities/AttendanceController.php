@@ -1,27 +1,33 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Activities;
+namespace App\Http\Controllers\Teacher\Activities;
 
-use App\Models\Teacher;
+use App\Models\Grade;
 use App\Http\Controllers\Controller;
-use App\Services\Admin\Activities\AttendanceService;
-use App\Http\Requests\Admin\Activities\StudentSearchRequest;
+use App\Services\Teacher\Activities\AttendanceService;
 use App\Http\Requests\Admin\Activities\AttendanceRequest;
+use App\Http\Requests\Admin\Activities\StudentSearchRequest;
 
 class AttendanceController extends Controller
 {
     protected $attendanceService;
+    protected $teacherId;
 
     public function __construct(AttendanceService $attendanceService)
     {
         $this->attendanceService = $attendanceService;
+        $this->teacherId = auth()->guard('teacher')->user()->id;
     }
 
     public function index()
     {
-        $teachers = Teacher::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
+        $grades = Grade::whereHas('teachers', fn($query) => $query->where('teacher_id', $this->teacherId))
+            ->select('id', 'name')
+            ->orderBy('id')
+            ->pluck('name', 'id')
+            ->toArray();
 
-        return view('admin.activities.attendance.index', compact('teachers'));
+        return view('teacher.activities.attendance.index', compact('grades'));
     }
 
     public function getStudentsByFilter(StudentSearchRequest $request)
@@ -40,6 +46,7 @@ class AttendanceController extends Controller
 
         return response()->json(['error' => trans('main.errorMessage')], 500);
     }
+
 
     public function insert(AttendanceRequest $request)
     {

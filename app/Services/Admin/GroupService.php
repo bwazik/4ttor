@@ -69,7 +69,7 @@ class GroupService
     {
         return $this->executeTransaction(function () use ($request)
         {
-            if ($validationResult = $this->validateTeacherGrade($request['grade_id']))
+            if ($validationResult = $this->validateTeacherGrade($request['grade_id'], $request['teacher_id']))
                 return $validationResult;
 
             Group::create([
@@ -91,7 +91,7 @@ class GroupService
         {
             $group = Group::findOrFail($id);
 
-            if ($validationResult = $this->validateTeacherGrade($request['grade_id']))
+            if ($validationResult = $this->validateTeacherGrade($request['grade_id'], $request['teacher_id']))
                 return $validationResult;
 
             $group->update([
