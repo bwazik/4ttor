@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Admin\StudentsRequest;
 use App\Services\Teacher\Users\StudentService;
 
@@ -24,7 +23,7 @@ class StudentsController extends Controller
     public function __construct(StudentService $studentService)
     {
         $this->studentService = $studentService;
-        $this->teacherId = Auth::id();
+        $this->teacherId = auth()->guard('teacher')->user()->id;
     }
 
     public function index(Request $request)

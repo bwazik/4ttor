@@ -6,7 +6,6 @@ use App\Models\Assistant;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Admin\AssistantsRequest;
 use App\Services\Teacher\Users\AssistantService;
 
@@ -20,7 +19,7 @@ class AssistantsController extends Controller
     public function __construct(AssistantService $assistantService)
     {
         $this->assistantService = $assistantService;
-        $this->teacherId = Auth::id();
+        $this->teacherId = auth()->guard('teacher')->user()->id;
     }
 
     public function index(Request $request)

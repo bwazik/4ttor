@@ -13,12 +13,17 @@ class StudentSearchRequest extends FormRequest
 
     public function rules()
     {
-        return [
-            'teacher_id' => 'required|integer|exists:teachers,id',
+        $rules = [
             'grade_id' => 'required|integer|exists:grades,id',
             'group_id' => 'required|integer|exists:groups,id',
             'date' => 'required|date|date_format:Y-m-d',
         ];
+
+        if (isAdmin()) {
+            $rules['teacher_id'] = 'required|integer|exists:teachers,id';
+        }
+
+        return $rules;
     }
 
     public function messages()

@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Models\Group;
 use App\Http\Controllers\Controller;
 use App\Traits\PublicValidatesTrait;
-use Illuminate\Support\Facades\Auth;
-
 
 class DataFetchController extends Controller
 {
@@ -16,13 +14,13 @@ class DataFetchController extends Controller
 
     public function __construct()
     {
-        $this->teacherId = Auth::id();
+        $this->teacherId = auth()->guard('teacher')->user()->id;
     }
 
 
     public function getTeacherGroupsByGrade($grade)
     {
-        if ($validationResult = $this->validateTeacherGrade($grade))
+        if ($validationResult = $this->validateTeacherGrade($grade, $this->teacherId))
             return $validationResult;
 
         try {

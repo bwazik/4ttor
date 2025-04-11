@@ -1,11 +1,9 @@
 <?php
 
-namespace App\Services\Admin\Activities;
+namespace App\Services\Teacher\Activities;
 
 use App\Models\Student;
-use App\Models\Teacher;
 use App\Models\Attendance;
-use Illuminate\Support\Facades\DB;
 use App\Traits\PreventDeletionIfRelated;
 use App\Traits\DatabaseTransactionTrait;
 use App\Traits\PublicValidatesTrait;
@@ -14,21 +12,28 @@ class AttendanceService
 {
     use PreventDeletionIfRelated, PublicValidatesTrait, DatabaseTransactionTrait;
 
+    protected $teacherId;
+
+    public function __construct()
+    {
+        $this->teacherId = auth()->guard('teacher')->user()->id;
+    }
+
     public function getStudentsByFilter(array $request)
     {
-        if ($validationResult = $this->validateTeacherGradeAndGroups($request['teacher_id'], $request['group_id'], $request['grade_id'], true))
+        if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $request['group_id'], $request['grade_id'], true))
             return $validationResult;
 
-        $studentsQuery = Student::query()
+            $studentsQuery = Student::query()
             ->select('students.id', 'students.name', 'attendances.status', 'attendances.note')
             ->join('student_teacher', 'students.id', '=', 'student_teacher.student_id')
             ->join('student_group', 'students.id', '=', 'student_group.student_id')
             ->leftJoin('attendances', function ($join) use ($request) {
                 $join->on('students.id', '=', 'attendances.student_id')
-                    ->where('attendances.teacher_id', '=', $request['teacher_id'])
+                    ->where('attendances.teacher_id', '=', $this->teacherId)
                     ->where('attendances.date', '=', $request['date']);
             })
-            ->where('student_teacher.teacher_id', $request['teacher_id'])
+            ->where('student_teacher.teacher_id', $this->teacherId)
             ->where('students.grade_id', $request['grade_id'])
             ->where('student_group.group_id', $request['group_id']);
 
@@ -85,13 +90,12 @@ class AttendanceService
     {
         return $this->executeTransaction(function () use ($request)
         {
-            $teacherId = $request['teacher_id'];
             $gradeId = $request['grade_id'];
             $groupId = $request['group_id'];
             $date = $request['date'];
             $attendanceData = $request['attendance'];
 
-            if ($validationResult = $this->validateTeacherGradeAndGroups($teacherId, $groupId, $gradeId, true))
+            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $request['group_id'], $request['grade_id'], true))
                 return $validationResult;
 
             $studentIds = collect($attendanceData)->pluck('student_id')->toArray();
@@ -104,7 +108,7 @@ class AttendanceService
                     [
                         'student_id' => $entry['student_id'],
                         'date' => $date,
-                        'teacher_id' => $teacherId,
+                        'teacher_id' => $this->teacherId,
                     ],
                     [
                         'grade_id' => $gradeId,

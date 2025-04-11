@@ -3,7 +3,6 @@
 namespace App\Services\Teacher\Users;
 
 use App\Models\Assistant;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Traits\DatabaseTransactionTrait;
 use App\Traits\PublicValidatesTrait;
@@ -11,12 +10,12 @@ use App\Traits\PublicValidatesTrait;
 class AssistantService
 {
     use PublicValidatesTrait, DatabaseTransactionTrait;
-    
+
     protected $teacherId;
 
     public function __construct()
     {
-        $this->teacherId = Auth::id();
+        $this->teacherId = auth()->guard('teacher')->user()->id;
     }
 
     public function getAssistantsForDatatable($assistantsQuery)

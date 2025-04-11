@@ -3,7 +3,6 @@
 namespace App\Services\Teacher\Users;
 
 use App\Models\Student;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Traits\PreventDeletionIfRelated;
 use App\Traits\DatabaseTransactionTrait;
@@ -12,6 +11,12 @@ use App\Traits\PublicValidatesTrait;
 class StudentService
 {
     use PreventDeletionIfRelated, PublicValidatesTrait, DatabaseTransactionTrait;
+    protected $teacherId;
+
+    public function __construct()
+    {
+        $this->teacherId = auth()->guard('teacher')->user()->id;
+    }
 
     public function getStudentsForDatatable($studentsQuery)
     {
@@ -82,7 +87,7 @@ class StudentService
     {
         return $this->executeTransaction(function () use ($request)
         {
-            if ($validationResult = $this->validateTeacherGradeAndGroups(Auth::id(), $request['groups'], $request['grade_id'], true))
+            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $request['groups'], $request['grade_id'], true))
                 return $validationResult;
 
             $student = Student::create([
@@ -97,7 +102,7 @@ class StudentService
                 'parent_id' => $request['parent_id'] ?? null,
             ]);
 
-            $student->teachers()->attach(Auth::id());
+            $student->teachers()->attach($this->teacherId);
             $student->groups()->attach($request['groups']);
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/students.student')]));
@@ -108,7 +113,7 @@ class StudentService
     {
         return $this->executeTransaction(function () use ($id, $request)
         {
-            if ($validationResult = $this->validateTeacherGradeAndGroups(Auth::id(), $request['groups'], $request['grade_id'], true))
+            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $request['groups'], $request['grade_id'], true))
                 return $validationResult;
 
             $student = Student::findOrFail($id);
@@ -128,7 +133,7 @@ class StudentService
                 'is_active' => $request['is_active'],
             ]);
 
-            $student->teachers()->sync(Auth::id() ?? []);
+            $student->teachers()->sync($this->teacherId ?? []);
             $student->groups()->sync($request['groups'] ?? []);
 
             return $this->successResponse(trans('main.edited', ['item' => trans('admin/students.student')]));

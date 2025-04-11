@@ -13,9 +13,9 @@ trait PublicValidatesTrait
 {
     use ServiceResponseTrait;
 
-    protected function validateTeacherGrade($gradeId)
+    protected function validateTeacherGrade($gradeId, $teacherId)
     {
-        $teacherHasGrade = Teacher::where('id', Auth::id())
+        $teacherHasGrade = Teacher::where('id', $teacherId)
             ->whereHas('grades', fn($query) => $query->where('grades.id', $gradeId))
             ->exists();
 
@@ -44,7 +44,7 @@ trait PublicValidatesTrait
         return null;
     }
 
-    public function validateTeacherGradeAndGroups($teacherIds, $groupIds, $gradeId = null, $restrictToSingleTeacher = false)
+    protected function validateTeacherGradeAndGroups($teacherIds, $groupIds, $gradeId = null, $restrictToSingleTeacher = false)
     {
         $teacherIds = is_array($teacherIds) ? $teacherIds : [$teacherIds];
 
@@ -86,7 +86,7 @@ trait PublicValidatesTrait
         return null;
     }
 
-    private function syncStudentParentRelation(array $newStudentIds, int $parentId, bool $isAdmin = false): void
+    protected function syncStudentParentRelation(array $newStudentIds, int $parentId, bool $isAdmin = false): void
     {
         $existingStudentsQuery = Student::where('parent_id', $parentId);
 
@@ -113,4 +113,22 @@ trait PublicValidatesTrait
         }
     }
 
+    protected function verifyStudents(array $studentIds, int $gradeId, int $groupId)
+    {
+        $studentIds = array_unique($studentIds);
+
+        $query = Student::whereIn('id', $studentIds)
+            ->where('grade_id', $gradeId)
+            ->whereHas('groups', fn($q) => $q->where('groups.id', $groupId));
+
+        $validStudentCount = $query->count();
+
+        $isValid = $validStudentCount === count($studentIds);
+
+        if (!$isValid) {
+            return $this->errorResponse(trans('admin/attendance.studentsNotValid'));
+        }
+
+        return null;
+    }
 }

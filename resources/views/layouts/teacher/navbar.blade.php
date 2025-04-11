@@ -403,7 +403,7 @@
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <span class="fw-medium d-block small">John Doe</span>
+                                    <span class="fw-medium d-block small">{{ auth()->guard('teacher')->user()->username }}</span>
                                     <small class="text-muted">Admin</small>
                                 </div>
                             </div>

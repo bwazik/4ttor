@@ -1,4 +1,4 @@
-@extends('layouts.admin.master')
+@extends('layouts.teacher.master')
 
 @section('page-css')
     <style>
@@ -93,7 +93,7 @@
 @section('title', pageTitle('admin/attendance.attendance'))
 
 @section('content')
-    @include('admin.activities.attendance.form')
+    @include('teacher.activities.attendance.form')
     <!-- DataTable with Buttons -->
     <x-datatable datatableTitle="{{ trans('main.datatableTitle', ['item' => trans('admin/attendance.attendance')]) }}"
         dataToggle="offcanvas" otherButton="{{ trans('admin/attendance.submit') }}" otherIcon="ri-add-line">
@@ -119,7 +119,7 @@
                 submitButton = $(this).find('button[type="submit"]');
                 submitButton.prop('disabled', true);
 
-                const fields = ['teacher_id', 'grade_id', 'group_id', 'date'];
+                const fields = ['grade_id', 'group_id', 'date'];
                 // Clear previous error states
                 $.each(fields, function(_, field) {
                     $(formId + ' #' + field).removeClass('is-invalid');
@@ -128,14 +128,13 @@
                 });
 
                 const formData = {
-                    teacher_id: $(formId + ' #teacher_id').val(),
                     grade_id: $(formId + ' #grade_id').val(),
                     group_id: $(formId + ' #group_id').val(),
                     date: $(formId + ' #date').val()
                 };
 
-                if (!formData.teacher_id || !formData.grade_id || !formData.group_id || !formData.date) {
-                    toastr.error('Please select a teacher, grade, group, and date');
+                if (!formData.grade_id || !formData.group_id || !formData.date) {
+                    toastr.error('Please select a grade, group, and date');
                     setTimeout(function() {
                         submitButton.prop('disabled', false);
                     }, 1500);
@@ -147,33 +146,13 @@
                 }
 
                 datatable = initializePostDataTable('#datatable', url, [2, 3, 4],
-                    [{
-                            data: "",
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'DT_RowIndex',
-                            name: 'DT_RowIndex',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'name',
-                            name: 'name'
-                        },
-                        {
-                            data: 'note',
-                            name: 'note'
-                        },
-                        {
-                            data: 'actions',
-                            name: 'actions',
-                            orderable: false,
-                            searchable: false
-                        }
+                    [
+                        { data: "", orderable: false, searchable: false },
+                        { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                        { data: 'name', name: 'name' },
+                        { data: 'note', name: 'note' },
+                        { data: 'actions', name: 'actions', orderable: false, searchable: false }
                     ], {
-                        teacher_id: $('#students-form #teacher_id').val(),
                         grade_id: $('#students-form #grade_id').val(),
                         group_id: $('#students-form #group_id').val(),
                         date: $('#students-form #date').val(),
@@ -216,7 +195,6 @@
 
                 let payload = {
                     _token: $('meta[name="csrf-token"]').attr('content'),
-                    teacher_id: form.find('#teacher_id').val(),
                     grade_id: form.find('#grade_id').val(),
                     group_id: form.find('#group_id').val(),
                     date: form.find('#date').val(),
@@ -224,7 +202,7 @@
                 };
 
                 $.ajax({
-                    url: "{{ route('admin.attendance.insert') }}",
+                    url: "{{ route('teacher.attendance.insert') }}",
                     type: 'POST',
                     dataType: "json",
                     contentType: "application/json",
@@ -322,6 +300,7 @@
             }
         });
 
+
         function checkAllStatusSelected() {
             let allSelected = true;
             $('.status-container').each(function () {
@@ -335,13 +314,8 @@
 
         // Setup students form
         initializeSelect2('students-form', 'grade_id');
-        initializeSelect2('students-form', 'teacher_id');
         initializeSelect2('students-form', 'group_id');
         initializeSelect2('select2-primary', 'status_1');
-        fetchMultipleDataByAjax('#students-form #teacher_id', "{{ route('admin.teachers.grades', '__ID__') }}",
-            '#students-form #grade_id', 'teacher_id', 'GET');
-        fetchMultipleDataByAjax('#students-form #grade_id',
-            "{{ route('admin.teachers.groupsByGrade', ['__SECOND_ID__', '__ID__']) }}", '#students-form #group_id',
-            'grade_id', 'GET');
+        fetchMultipleDataByAjax('#students-form #grade_id', "{{ route('teacher.fetch.grade.groups', '__ID__') }}", '#students-form #group_id', 'grade_id', 'GET')
     </script>
 @endsection
