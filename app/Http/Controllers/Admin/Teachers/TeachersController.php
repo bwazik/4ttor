@@ -215,8 +215,11 @@ class TeachersController extends Controller
 
         $teacherIds = $validated['teachers'];
 
-        $groups = Group::whereIn('teacher_id', $teacherIds)->select('id', 'name', 'teacher_id', 'grade_id')
-            ->with(['teacher:id,name', 'grade:id,name'])->orderBy('id')->get()
+        $groups = Group::whereIn('teacher_id', $teacherIds)
+            ->select('id', 'name', 'teacher_id', 'grade_id')
+            ->with('teacher:id,name', 'grade:id,name')
+            ->orderBy('grade_id')
+            ->get()
             ->mapWithKeys(function ($group) {
                 $gradeName = $group->grade->name ?? 'N/A';
                 $teacherName = $group->teacher->name ?? 'N/A';
@@ -226,36 +229,36 @@ class TeachersController extends Controller
         return response()->json(['status' => 'success', 'data' => $groups]);
     }
 
-    public function getTeacherGroupsByGrade($id, $grade_id)
-    {
-        try {
-            Teacher::select('id')->findOrFail($id);
+    // public function getTeacherGroupsByGrade($id, $grade_id)
+    // {
+    //     try {
+    //         Teacher::select('id')->findOrFail($id);
 
-            $groups = Group::where('teacher_id', $id)
-            ->where('grade_id', $grade_id)
-            ->select('id', 'name', 'teacher_id')
-            ->with('teacher:id,name')
-            ->orderBy('id')
-            ->get()
-            ->mapWithKeys(fn($group) => [$group->id => $group->name . ' - ' . $group->teacher->name]);
+    //         $groups = Group::where('teacher_id', $id)
+    //         ->where('grade_id', $grade_id)
+    //         ->select('id', 'name', 'teacher_id')
+    //         ->with('teacher:id,name')
+    //         ->orderBy('id')
+    //         ->get()
+    //         ->mapWithKeys(fn($group) => [$group->id => $group->name . ' - ' . $group->teacher->name]);
 
-            if ($groups->isEmpty()) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => trans('main.noGroupsAssigned'),
-                ], 404);
-            }
+    //         if ($groups->isEmpty()) {
+    //             return response()->json([
+    //                 'status' => 'error',
+    //                 'message' => trans('main.noGroupsAssigned'),
+    //             ], 404);
+    //         }
 
-            return response()->json(['status' => 'success', 'data' => $groups]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ], 500);
-        }
-    }
+    //         return response()->json(['status' => 'success', 'data' => $groups]);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => config('app.env') === 'production'
+    //                 ? trans('main.errorMessage')
+    //                 : $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
 
     public function getTeacherGrades($id)
     {

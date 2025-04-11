@@ -6,7 +6,6 @@ use App\Models\Group;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Traits\ServiceResponseTrait;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 trait PublicValidatesTrait
