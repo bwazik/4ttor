@@ -21,13 +21,11 @@ class QuizService
     {
         return datatables()->eloquent($quizzesQuery)
             ->addIndexColumn()
-->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
+    ->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
             ->editColumn('name', function ($row) {
                 return $row->name;
             })
-            ->editColumn('teacher_id', function ($row) {
-                return "<a target='_blank' href='" . route('admin.teachers.details', $row->teacher_id) . "'>" . ($row->teacher_id ? $row->teacher->name : '-') . "</a>";
-            })
+            ->editColumn('teacher_id', fn($row) => formatRelation($row->teacher_id, $row->teacher, 'name', 'admin.teachers.details'))
             ->editColumn('grade_id', function ($row) {
                 return $row->grade_id ? $row->grade->name : '-';
             })

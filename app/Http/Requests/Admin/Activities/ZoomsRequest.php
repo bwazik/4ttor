@@ -13,8 +13,7 @@ class ZoomsRequest extends FormRequest
 
     public function rules()
     {
-        return [
-            'teacher_id' => 'required|integer|exists:teachers,id',
+        $rules =  [
             'grade_id' => 'required|integer|exists:grades,id',
             'group_id' => 'required|integer|exists:groups,id',
             'topic_ar' => 'required|min:3|max:100',
@@ -23,6 +22,12 @@ class ZoomsRequest extends FormRequest
             'start_time' => 'required|date|after_or_equal:now|date_format:Y-m-d H:i',
             'password' => 'nullable|min:4|max:8',
         ];
+
+        if (isAdmin()) {
+            $rules['teacher_id'] = 'required|integer|exists:teachers,id';
+        }
+
+        return $rules;
     }
 
     public function messages()

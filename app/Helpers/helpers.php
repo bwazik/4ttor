@@ -187,3 +187,31 @@ if (!function_exists('formatRelation')) {
         return $displayText;
     }
 }
+
+if (!function_exists('formatDuration')) {
+    function formatDuration($duration): string
+    {
+        $minutes = $duration;
+        $hours = floor($minutes / 60);
+        $remainingMinutes = $minutes % 60;
+
+        if ($hours > 0) {
+            return $hours . ' ' . trans('admin/zooms.hours') . '' .
+            ($remainingMinutes > 0 ? ' ' . trans('admin/zooms.and') . ' ' .
+            $remainingMinutes . ' ' . trans('admin/zooms.minute') . '' : '');
+        }
+
+        return $remainingMinutes . ' ' . trans('admin/zooms.minutes') . '';
+    }
+}
+
+if (!function_exists('formatJoinUrl')) {
+    function formatJoinUrl($url): string
+    {
+        return
+            '<a href="'.$url.'" target="_blank"' .
+            'class="btn btn-sm btn-label-success waves-effect">' .
+                trans('main.join_url') .
+            '</a>';
+    }
+}
