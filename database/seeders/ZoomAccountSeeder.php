@@ -18,7 +18,7 @@ class ZoomAccountSeeder extends Seeder
             'teacher_id' => 1,
             'account_id' => 'd-VD4ewPT8m1Ha11_jm2jA',
             'client_id' => 'WMuMYv6WQQWM15X4VHBjuw',
-            'client_secret' => '8yt9uRG7O46xDCJI8YKFx6dpDX29IF53',
+            'client_secret' => '31ZBvs01XzxIbXWWn0eIzQx9yg78tKQs',
         ]);
     }
 }

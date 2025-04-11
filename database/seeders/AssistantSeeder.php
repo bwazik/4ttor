@@ -24,7 +24,7 @@ class AssistantSeeder extends Seeder
         for ($i = 0; $i < 168; $i++) {
             Assistant::create([
                 'username' => $fakerEn->unique()->userName,
-                'password' => Hash::make('password'),
+                'password' => Hash::make('123456789'),
                 'name' => ['en' => $fakerEn -> name, 'ar' => $fakerAr -> name],
                 'phone' => '01' . $fakerEn->randomElement([0, 1, 2, 5]) . $fakerEn->numerify('########'),
                 'email' => $fakerEn->unique()->safeEmail,

@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Activities;
+namespace App\Http\Controllers\Teacher\Activities;
 
 use App\Models\Zoom;
 use App\Models\Grade;
 use App\Models\Group;
-use App\Models\Teacher;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
-use App\Services\Admin\Activities\ZoomService;
+use App\Services\Teacher\Activities\ZoomService;
 use App\Http\Requests\Admin\Activities\ZoomsRequest;
 
 class ZoomsController extends Controller
@@ -17,29 +16,38 @@ class ZoomsController extends Controller
     use ValidatesExistence;
 
     protected $zoomService;
+    protected $teacherId;
 
     public function __construct(ZoomService $zoomService)
     {
         $this->zoomService = $zoomService;
+        $this->teacherId = auth()->guard('teacher')->user()->id;
     }
 
     public function index(Request $request)
     {
-        $zoomsQuery = Zoom::query()->select('id', 'teacher_id', 'grade_id', 'group_id', 'meeting_id', 'topic', 'duration', 'start_time', 'start_url', 'join_url', 'created_at', 'updated_at');
+        $zoomsQuery = Zoom::query()->select('id', 'grade_id', 'group_id', 'meeting_id', 'topic', 'duration', 'start_time', 'start_url', 'join_url', 'created_at', 'updated_at');
 
         if ($request->ajax()) {
             return $this->zoomService->getZoomsForDatatable($zoomsQuery);
         }
 
-        $teachers = Teacher::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
-        $grades = Grade::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
-        $groups = Group::query()->select('id', 'name', 'teacher_id', 'grade_id')
-            ->with(['teacher:id,name', 'grade:id,name'])->orderBy('id')->get()
-            ->mapWithKeys(function ($group) {
-                return [$group->id => $group->name ?? 'N/A' . ' - ' . $group->teacher->name ?? 'N/A' . ' - ' . $group->grade->name ?? 'N/A'];
-            });
+        $grades = Grade::whereHas('teachers', fn($query) => $query->where('teacher_id', $this->teacherId))
+            ->select('id', 'name')
+            ->orderBy('id')
+            ->pluck('name', 'id')
+            ->toArray();
 
-        return view('admin.activities.zooms.index', compact('teachers', 'grades', 'groups'));
+        $groups = Group::query()
+            ->select('id', 'name', 'grade_id')
+            ->where('teacher_id', $this->teacherId)
+            ->with('grade:id,name')
+            ->orderBy('grade_id')
+            ->get()
+            ->mapWithKeys(fn($group) => [$group->id => $group->name . ' - ' . $group->grade->name]);
+
+
+        return view('teacher.activities.zooms.index', compact('grades', 'groups'));
     }
 
     public function insert(ZoomsRequest $request)

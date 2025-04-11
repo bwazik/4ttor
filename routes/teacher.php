@@ -8,6 +8,7 @@ use App\Http\Controllers\Teacher\Users\AssistantsController;
 use App\Http\Controllers\Teacher\Users\StudentsController;
 use App\Http\Controllers\Teacher\Users\ParentsController;
 use App\Http\Controllers\Teacher\Activities\AttendanceController;
+use App\Http\Controllers\Teacher\Activities\ZoomsController;
 
 Route::group(
     [

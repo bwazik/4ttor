@@ -5,6 +5,7 @@ namespace App\Traits;
 use App\Models\Group;
 use App\Models\Student;
 use App\Models\Teacher;
+use App\Models\ZoomAccount;
 use App\Traits\ServiceResponseTrait;
 use Illuminate\Support\Facades\Hash;
 
@@ -129,5 +130,30 @@ trait PublicValidatesTrait
         }
 
         return null;
+    }
+
+    protected function hasZoomAccount(int $teacherId): bool
+    {
+        return ZoomAccount::where('teacher_id', $teacherId)->exists();
+    }
+
+
+    protected function configureZoomAPI(int $teacherId)
+    {
+        if (!$this->hasZoomAccount($teacherId)) {
+            return $this->errorResponse(trans('teacher/errors.validateTeacherZoomAccount'));
+        }
+
+        $zoomAccount = ZoomAccount::where('teacher_id', $teacherId)
+            ->select('client_id', 'client_secret', 'account_id')
+            ->first();
+
+        config([
+            'zoom.client_id' => $zoomAccount->client_id,
+            'zoom.client_secret' => $zoomAccount->client_secret,
+            'zoom.account_id' => $zoomAccount->account_id,
+        ]);
+
+        return true;
     }
 }
