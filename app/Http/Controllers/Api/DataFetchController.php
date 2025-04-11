@@ -14,23 +14,38 @@ class DataFetchController extends Controller
 
     public function __construct()
     {
-        $this->teacherId = auth()->guard('teacher')->user()->id;
+        $this->teacherId = auth('teacher')->check() ? auth('teacher')->id() : null;
     }
 
 
-    public function getTeacherGroupsByGrade($grade)
+    public function getTeacherGroupsByGrade(...$args)
     {
-        if ($validationResult = $this->validateTeacherGrade($grade, $this->teacherId))
-            return $validationResult;
+        $isAdminContext = isAdmin() ? true : false;
 
         try {
-            $groups = Group::select('id', 'name', 'grade_id')
-            ->where('teacher_id', $this->teacherId)
-            ->where('grade_id', $grade)
-            ->with('grade:id,name')
-            ->orderBy('grade_id')
-            ->get()
-            ->mapWithKeys(fn($group) => [$group->id => $group->name . ' - ' . $group->grade->name]);
+            if ($isAdminContext) {
+                [$teacherId, $gradeId] = $args;
+                $effectiveTeacherId = $teacherId;
+            } else {
+                [$gradeId] = $args;
+                $effectiveTeacherId = $this->teacherId;
+            }
+
+            if ($validationResult = $this->validateTeacherGrade($gradeId, $effectiveTeacherId)) {
+                return $validationResult;
+            }
+
+            $query = Group::select('id', 'name', 'grade_id')
+                ->where('teacher_id', $effectiveTeacherId)
+                ->where('grade_id', $gradeId)
+                ->with('grade:id,name');
+
+            $groups = $query->orderBy($isAdminContext ? 'id' : 'grade_id')
+                ->get()
+                ->mapWithKeys(function ($group) {
+                    $gradeName = $group->grade?->name ?? 'Unknown Grade';
+                    return [$group->id => "{$group->name} - {$gradeName}"];
+            });
 
             if ($groups->isEmpty()) {
                 return $this->errorResponse(trans('teacher/errors.noGroupsForGrade'));

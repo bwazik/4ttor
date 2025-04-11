@@ -341,7 +341,7 @@
         fetchMultipleDataByAjax('#students-form #teacher_id', "{{ route('admin.teachers.grades', '__ID__') }}",
             '#students-form #grade_id', 'teacher_id', 'GET');
         fetchMultipleDataByAjax('#students-form #grade_id',
-            "{{ route('admin.teachers.groupsByGrade', ['__SECOND_ID__', '__ID__']) }}", '#students-form #group_id',
+            "{{ route('admin.fetch.teachers.grade.groups', ['__SECOND_ID__', '__ID__']) }}", '#students-form #group_id',
             'grade_id', 'GET');
     </script>
 @endsection

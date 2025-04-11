@@ -1,30 +1,31 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
+use App\Http\Controllers\Api\DataFetchController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\StagesController;
-use App\Http\Controllers\Admin\GradesController;
-use App\Http\Controllers\Admin\SubjectsController;
 use App\Http\Controllers\Admin\PlansController;
-use App\Http\Controllers\Admin\Teachers\TeachersController;
-use App\Http\Controllers\Admin\Teachers\TeachersDetailsController;
-use App\Http\Controllers\Admin\Teachers\GroupsController;
-use App\Http\Controllers\Admin\Students\StudentsController;
-use App\Http\Controllers\Admin\Students\StudentsDetailsController;
-use App\Http\Controllers\Admin\Parents\ParentsController;
-use App\Http\Controllers\Admin\Parents\ParentsDetailsController;
-use App\Http\Controllers\Admin\Assistants\AssistantsController;
-use App\Http\Controllers\Admin\Assistants\AssistantsDetailsController;
+use App\Http\Controllers\Admin\GradesController;
+use App\Http\Controllers\Admin\StagesController;
+use App\Http\Controllers\Admin\SubjectsController;
 use App\Http\Controllers\Admin\Finance\FeesController;
+use App\Http\Controllers\Admin\Finance\RefundsController;
+use App\Http\Controllers\Admin\Parents\ParentsController;
+use App\Http\Controllers\Admin\Teachers\GroupsController;
+use App\Http\Controllers\Admin\Activities\ZoomsController;
 use App\Http\Controllers\Admin\Finance\InvoicesController;
 use App\Http\Controllers\Admin\Finance\ReceiptsController;
-use App\Http\Controllers\Admin\Finance\RefundsController;
-use App\Http\Controllers\Admin\Activities\AttendanceController;
-use App\Http\Controllers\Admin\Activities\ZoomsController;
-use App\Http\Controllers\Admin\Activities\QuizzesController;
-use App\Http\Controllers\Admin\Activities\QuestionsController;
+use App\Http\Controllers\Admin\Students\StudentsController;
+use App\Http\Controllers\Admin\Teachers\TeachersController;
 use App\Http\Controllers\Admin\Activities\AnswersController;
+use App\Http\Controllers\Admin\Activities\QuizzesController;
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
+use App\Http\Controllers\Admin\Activities\QuestionsController;
+use App\Http\Controllers\Admin\Activities\AttendanceController;
+use App\Http\Controllers\Admin\Assistants\AssistantsController;
+use App\Http\Controllers\Admin\Parents\ParentsDetailsController;
+use App\Http\Controllers\Admin\Students\StudentsDetailsController;
+use App\Http\Controllers\Admin\Teachers\TeachersDetailsController;
+use App\Http\Controllers\Admin\Assistants\AssistantsDetailsController;
 
 Route::group(
     [
@@ -48,6 +49,12 @@ Route::group(
     })->name('web.dashboard');
 
     Route::name('admin.')->group(function() {
+
+        # Api Responses
+        Route::prefix('fetch')->controller(DataFetchController::class)->name('fetch.')->group(function () {
+            Route::get('teachers/{teacher}/grades/{grade}/groups', 'getTeacherGroupsByGrade')->name('teachers.grade.groups');
+        });
+
         # Start Platform Managment
             # Stages
             Route::prefix('stages')->controller(StagesController::class)->name('stages.')->group(function() {
@@ -100,7 +107,6 @@ Route::group(
                     Route::get('/', 'index')->name('index');
                     Route::get('/archived', 'archived')->name('archived');
                     Route::post('groups', 'getTeacherGroups')->name('groups');
-                    Route::get('{id}/grade/{grade_id}/groups', 'getTeacherGroupsByGrade')->name('groupsByGrade');
                     Route::get('{id}/grades', 'getTeacherGrades')->name('grades');
                     Route::get('{id}/fees', 'getTeacherFees')->name('fees');
                     Route::get('{id}/account-balance', 'getTeacherAccountBalance')->name('accountBalance');
