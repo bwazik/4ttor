@@ -126,9 +126,8 @@ class GroupService
 
     public function deleteSelectedGroups($ids)
     {
-        if (empty($ids)) {
-            return $this->errorResponse(trans('main.noItemsSelected'));
-        }
+        if ($validationResult = $this->validateSelectedItems((array) $ids))
+            return $validationResult;
 
         return $this->executeTransaction(function () use ($ids)
         {
@@ -139,7 +138,6 @@ class GroupService
             }
 
             Group::whereIn('id', $ids)->delete();
-
 
             return $this->successResponse(trans('main.deletedSelected', ['item' => strtolower(trans('admin/groups.groups'))]));
         });

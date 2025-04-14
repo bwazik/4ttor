@@ -36,7 +36,9 @@ class ZoomsController extends Controller
         $groups = Group::query()->select('id', 'name', 'teacher_id', 'grade_id')
             ->with(['teacher:id,name', 'grade:id,name'])->orderBy('id')->get()
             ->mapWithKeys(function ($group) {
-                return [$group->id => $group->name ?? 'N/A' . ' - ' . $group->teacher->name ?? 'N/A' . ' - ' . $group->grade->name ?? 'N/A'];
+                $gradeName = $group->grade->name ?? 'N/A';
+                $teacherName = $group->teacher->name ?? 'N/A';
+                return [$group->id => $group->name . ' - ' . $gradeName . ' - ' . $teacherName];
             });
 
         return view('admin.activities.zooms.index', compact('teachers', 'grades', 'groups'));

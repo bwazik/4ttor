@@ -9,6 +9,9 @@ use App\Http\Controllers\Teacher\Users\StudentsController;
 use App\Http\Controllers\Teacher\Users\ParentsController;
 use App\Http\Controllers\Teacher\Activities\AttendanceController;
 use App\Http\Controllers\Teacher\Activities\ZoomsController;
+use App\Http\Controllers\Teacher\Activities\QuizzesController;
+use App\Http\Controllers\Teacher\Activities\QuestionsController;
+use App\Http\Controllers\Teacher\Activities\AnswersController;
 
 Route::group(
     [

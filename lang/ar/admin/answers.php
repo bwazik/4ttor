@@ -11,5 +11,4 @@ return [
         'answer_text_ar' => 'القدس',
         'answer_text_en' => 'Jerusalem',
     ],
-    'questionHasMaxAnswers' => 'انت وصلت إلى أقصي عدد من الإجابات في السؤال',
 ];

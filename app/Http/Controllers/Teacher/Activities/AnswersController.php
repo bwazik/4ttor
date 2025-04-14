@@ -1,33 +1,39 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Activities;
+namespace App\Http\Controllers\Teacher\Activities;
 
 use App\Models\Answer;
 use App\Models\Question;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
-use App\Services\Admin\Activities\AnswerService;
+use App\Services\Teacher\Activities\AnswerService;
 use App\Http\Requests\Admin\Activities\AnswersRequest;
+use App\Traits\PublicValidatesTrait;
 
 class AnswersController extends Controller
 {
-    use ValidatesExistence;
+    use ValidatesExistence, PublicValidatesTrait;
 
     protected $answerService;
+    protected $teacherId;
 
     public function __construct(AnswerService $answerService)
     {
         $this->answerService = $answerService;
+        $this->teacherId = auth()->guard('teacher')->user()->id;
     }
 
     public function index(Request $request, $questionId)
     {
         $question = Question::where('id', $questionId)->select('id', 'quiz_id')->first();
-
+        
         if (!$question) {
-            return response()->json(['error' => trans('notfpund')], 404);
+            return response()->json(['error' => trans('notfound')], 404);
         }
+
+        if ($validationResult = $this->ensureQuizOwnership($question->quiz_id, $this->teacherId))
+            return $validationResult;
 
         $answersQuery = Answer::query()->where('question_id', $questionId)->select('id', 'question_id', 'answer_text', 'is_correct', 'score');
 

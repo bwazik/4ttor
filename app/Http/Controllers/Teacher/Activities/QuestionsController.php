@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Activities;
+namespace App\Http\Controllers\Teacher\Activities;
 
 use App\Models\Quiz;
 use App\Models\Question;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
-use App\Services\Admin\Activities\QuestionService;
+use App\Services\Teacher\Activities\QuestionService;
 use App\Http\Requests\Admin\Activities\QuestionsRequest;
 
 class QuestionsController extends Controller
@@ -15,15 +15,18 @@ class QuestionsController extends Controller
     use ValidatesExistence;
 
     protected $questionService;
+    protected $teacherId;
 
     public function __construct(QuestionService $questionService)
     {
         $this->questionService = $questionService;
+        $this->teacherId = auth()->guard('teacher')->user()->id;
     }
 
     public function index($quizId)
     {
-        $quiz = Quiz::where('id', $quizId)->first();
+        $quiz = Quiz::where('id', $quizId)
+            ->where('teacher_id', $this->teacherId)->first();
 
         if (!$quiz) {
             abort(404);
@@ -31,7 +34,7 @@ class QuestionsController extends Controller
 
         $questions = Question::query()->select('id', 'quiz_id', 'question_text')->where('quiz_id', $quizId)->get();
 
-        return view('admin.activities.questions.index', compact('questions', 'quizId'));
+        return view('teacher.activities.questions.index', compact('questions', 'quizId'));
     }
 
     public function insert(QuestionsRequest $request, $quizId)
