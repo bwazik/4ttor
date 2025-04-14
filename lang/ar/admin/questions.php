@@ -4,6 +4,7 @@ return [
     'question' => 'سؤال',
     'questions' => 'الأسئلة',
     'selectedQuestions' => 'الأسئلة المحددة',
+    'noQuestionsFound' => 'لسه مفيش أسئلة مضافة.',
     'question_text_ar' => 'نص السؤال بالعربية',
     'question_text_en' => 'نص السؤال بالإنجليزية',
     'placeholders' => [

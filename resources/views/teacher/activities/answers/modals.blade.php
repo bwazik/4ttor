@@ -39,7 +39,7 @@
         </form>
     </div>
 </div>
-<<!-- Delete Modal -->
+<!-- Delete Modal -->
 <div class="modal fade" id="delete-answer-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">

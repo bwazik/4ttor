@@ -47,9 +47,9 @@
                 </div>
 
                 <div class="accordion accordion-popout accordion-header-primary" id="accordionPopout">
-                    @foreach($questions as $index => $question)
+                    @forelse($questions as $index => $question)
                         <div class="accordion-item">
-                            <h2 class="accordion-header d-flex align-items-center" id="headingPopout{{ $index }}"">
+                            <h2 class="accordion-header d-flex align-items-center" id="headingPopout{{ $index }}">
                                 <button type="button" class="accordion-button collapsed flex-grow-1 d-flex align-items-center text-start" data-bs-toggle="collapse"
                                     data-bs-target="#accordionPopout{{ $index }}" aria-expanded="false" aria-controls="accordionPopout{{ $index }}">
                                     <div class="d-flex align-items-center">
@@ -87,7 +87,11 @@
                                 </div>
                             </div>
                         </div>
-                    @endforeach
+                    @empty
+                        <div class="text-center p-3 text-muted">
+                            {{ trans('admin/questions.noQuestionsFound') }}
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>
