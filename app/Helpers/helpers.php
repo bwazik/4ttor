@@ -165,6 +165,14 @@ if (!function_exists('formatActiveStatus')) {
     }
 }
 
+if (!function_exists('formatCorrectionStatus')) {
+    function formatCorrectionStatus($isCorrect): string
+    {
+        return $isCorrect
+            ? '<span class="badge rounded-pill bg-label-success" text-capitalized="">' . trans('main.correct') . '</span>'
+            : '<span class="badge rounded-pill bg-label-danger" text-capitalized="">' . trans('main.wrong') . '</span>';
+    }
+}
 
 if (!function_exists('formatRelation')) {
     function formatRelation($id, $related, string $attribute = 'name', ?string $routeName = null): string

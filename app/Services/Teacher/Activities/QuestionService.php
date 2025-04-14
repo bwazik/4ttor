@@ -1,163 +1,82 @@
 <?php
 
-namespace App\Services\Admin\Activities;
+namespace App\Services\Teacher\Activities;
 
 use App\Models\Question;
-use Illuminate\Support\Facades\DB;
 use App\Traits\PreventDeletionIfRelated;
+use App\Traits\DatabaseTransactionTrait;
+use App\Traits\PublicValidatesTrait;
 
 class QuestionService
 {
-    use PreventDeletionIfRelated;
+    use PreventDeletionIfRelated, PublicValidatesTrait, DatabaseTransactionTrait;
 
-    protected $relationships = ['answers', 'studentAnswers'];
+    protected $teacherId;
 
-    protected $transModelKey = 'admin/questions.questions';
+    public function __construct()
+    {
+        $this->teacherId = auth()->guard('teacher')->user()->id;
+    }
 
     public function insertQuestion(array $request, $quizId)
     {
-        DB::beginTransaction();
+        return $this->executeTransaction(function () use ($request, $quizId)
+        {
+            if ($validationResult = $this->ensureQuizOwnership($quizId, $this->teacherId))
+                return $validationResult;
 
-        try {
-            if (Question::where('quiz_id', $quizId)->count() >= 50) {
-                return ['status' => 'error', 'message' => trans('admin/questions.quizHasMaxQuestions')];
-            }
+            if ($validationResult = $this->ensureQuestionLimitNotExceeded($quizId))
+                return $validationResult;
 
             Question::create([
                 'quiz_id' => $quizId,
                 'question_text' => ['en' => $request['question_text_en'], 'ar' => $request['question_text_ar']],
             ]);
 
-            DB::commit();
-
-            return [
-                'status' => 'success',
-                'message' => trans('main.added', ['item' => trans('admin/questions.question')]),
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.added', ['item' => trans('admin/questions.question')]));
+        });
     }
 
     public function updateQuestion($id, array $request): array
     {
-        DB::beginTransaction();
-
-        try {
+        return $this->executeTransaction(function () use ($id, $request)
+        {
             $question = Question::findOrFail($id);
 
-            if (Question::where('quiz_id', $question->quiz_id)->count() >= 50) {
-                return ['status' => 'error', 'message' => trans('admin/questions.quizHasMaxQuestions')];
-            }
+            if ($validationResult = $this->ensureQuizOwnership($question->quiz_id, $this->teacherId))
+                return $validationResult;
+
+            if ($validationResult = $this->ensureQuestionLimitNotExceeded($question->quiz_id))
+                return $validationResult;
 
             $question->update([
                 'question_text' => ['en' => $request['question_text_en'], 'ar' => $request['question_text_ar']],
             ]);
 
-            DB::commit();
-
-            return [
-                'status' => 'success',
-                'message' => trans('main.edited', ['item' => trans('admin/questions.question')]),
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.edited', ['item' => trans('admin/questions.question')]));
+        });
     }
 
     public function deleteQuestion($id): array
     {
-        DB::beginTransaction();
+        return $this->executeTransaction(function () use ($id)
+        {
+            Question::findOrFail($id)->delete();
 
-        try {
-            $question = Question::select('id', 'question_text')->findOrFail($id);
-
-            if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($question)) {
-                return $dependencyCheck;
-            }
-
-            $question->delete();
-
-            DB::commit();
-
-            return [
-                'status' => 'success',
-                'message' => trans('main.deleted', ['item' => trans('admin/questions.question')]),
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
+            return $this->successResponse(trans('main.deleted', ['item' => trans('admin/questions.question')]));
+        });
     }
 
     public function deleteSelectedQuestions($ids)
     {
-        if (empty($ids)) {
-            return [
-                'status' => 'error',
-                'message' => trans('main.noItemsSelected'),
-            ];
-        }
+        if ($validationResult = $this->validateSelectedItems((array) $ids))
+            return $validationResult;
 
-        DB::beginTransaction();
-
-        try {
-            $questions = Question::whereIn('id', $ids)
-                ->select('id', 'question_text')
-                ->orderBy('id')
-                ->get();
-
-            if ($dependencyCheck = $this->checkDependenciesForMultipleDeletion($questions)) {
-                return $dependencyCheck;
-            }
-
+        return $this->executeTransaction(function () use ($ids)
+        {
             Question::whereIn('id', $ids)->delete();
 
-            DB::commit();
-            return [
-                'status' => 'success',
-                'message' => trans('main.deletedSelected', ['item' => strtolower(trans('admin/questions.questions'))]),
-            ];
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return [
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ];
-        }
-    }
-
-    public function checkDependenciesForSingleDeletion($question)
-    {
-        return $this->checkForSingleDependencies($question, $this->relationships, $this->transModelKey);
-    }
-
-    public function checkDependenciesForMultipleDeletion($questions)
-    {
-        return $this->checkForMultipleDependencies($questions, $this->relationships, $this->transModelKey);
+            return $this->successResponse(trans('main.deletedSelected', ['item' => trans('admin/questions.question')]));
+        });
     }
 }

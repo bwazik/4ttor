@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Activities;
+namespace App\Http\Controllers\Teacher\Activities;
 
 use App\Models\Quiz;
 use App\Models\Grade;
 use App\Models\Group;
-use App\Models\Teacher;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
-use App\Services\Admin\Activities\QuizService;
+use App\Services\Teacher\Activities\QuizService;
 use App\Http\Requests\Admin\Activities\QuizzesRequest;
 
 class QuizzesController extends Controller
@@ -17,32 +16,39 @@ class QuizzesController extends Controller
     use ValidatesExistence;
 
     protected $quizService;
+    protected $teacherId;
 
     public function __construct(QuizService $quizService)
     {
         $this->quizService = $quizService;
+        $this->teacherId = auth()->guard('teacher')->user()->id;
     }
 
     public function index(Request $request)
     {
         $quizzesQuery = Quiz::query()
-            ->select('id', 'teacher_id', 'grade_id', 'name', 'duration', 'start_time', 'end_time');
+            ->select('id', 'grade_id', 'name', 'duration', 'start_time', 'end_time')
+            ->where('teacher_id', $this->teacherId);
 
         if ($request->ajax()) {
             return $this->quizService->getQuizzesForDatatable($quizzesQuery);
         }
 
-        $teachers = Teacher::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
-        $grades = Grade::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
-        $groups = Group::query()->select('id', 'name', 'teacher_id', 'grade_id')
-            ->with(['teacher:id,name', 'grade:id,name'])->orderBy('id')->get()
-            ->mapWithKeys(function ($group) {
-                $gradeName = $group->grade->name ?? 'N/A';
-                $teacherName = $group->teacher->name ?? 'N/A';
-                return [$group->id => $group->name . ' - ' . $gradeName . ' - ' . $teacherName];
-            });
+        $grades = Grade::whereHas('teachers', fn($query) => $query->where('teacher_id', $this->teacherId))
+            ->select('id', 'name')
+            ->orderBy('id')
+            ->pluck('name', 'id')
+            ->toArray();
 
-        return view('admin.activities.quizzes.index', compact('teachers', 'grades', 'groups'));
+        $groups = Group::query()
+            ->select('id', 'name', 'grade_id')
+            ->where('teacher_id', $this->teacherId)
+            ->with('grade:id,name')
+            ->orderBy('grade_id')
+            ->get()
+            ->mapWithKeys(fn($group) => [$group->id => $group->name . ' - ' . $group->grade->name]);
+
+        return view('teacher.activities.quizzes.index', compact('grades', 'groups'));
     }
 
     public function insert(QuizzesRequest $request)

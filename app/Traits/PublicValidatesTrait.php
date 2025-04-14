@@ -2,9 +2,12 @@
 
 namespace App\Traits;
 
+use App\Models\Quiz;
 use App\Models\Group;
+use App\Models\Answer;
 use App\Models\Student;
 use App\Models\Teacher;
+use App\Models\Question;
 use App\Models\ZoomAccount;
 use App\Traits\ServiceResponseTrait;
 use Illuminate\Support\Facades\Hash;
@@ -12,6 +15,9 @@ use Illuminate\Support\Facades\Hash;
 trait PublicValidatesTrait
 {
     use ServiceResponseTrait;
+
+    protected $questionsLimit = 50;
+    protected $answersLimit = 5;
 
     protected function validateTeacherGrade($gradeId, $teacherId)
     {
@@ -155,5 +161,53 @@ trait PublicValidatesTrait
         ]);
 
         return true;
+    }
+
+    protected function ensureQuizOwnership($quizId, $teacherId)
+    {
+        $quiz = Quiz::where('id', $quizId)
+                    ->where('teacher_id', $teacherId)
+                    ->first();
+
+        if (!$quiz) {
+            return $this->errorResponse(trans('teacher/errors.validateTeacherQuiz'));
+        }
+
+        return null;
+    }
+
+    protected function ensureQuestionOwnership($questionId, $teacherId)
+    {
+        $question = Question::where('id', $questionId)
+                    ->whereHas('quiz', fn($query) => $query->where('teacher_id', $teacherId))
+                    ->first();
+
+        if (!$question) {
+            return $this->errorResponse(trans('teacher/errors.validateTeacherQuiz'));
+        }
+
+        return null;
+    }
+
+    protected function ensureQuestionLimitNotExceeded($quizId)
+    {
+        $questionCount = Question::where('quiz_id', $quizId)->count();
+
+        if ($questionCount >= $this->questionsLimit) {
+            return $this->errorResponse(trans('teacher/errors.quizHasMaxQuestions'));
+        }
+
+        return null;
+    }
+
+    protected function ensureAnswerLimitNotExceeded($questionId)
+    {
+        $answerCount = Answer::where('question_id', $questionId)->count();
+
+        if ($answerCount >= $this->answersLimit) {
+            return $this->errorResponse(trans('teacher/errors.questionHasMaxAnswers'));
+        }
+
+        return null;
     }
 }

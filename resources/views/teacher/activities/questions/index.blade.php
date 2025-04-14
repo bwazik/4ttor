@@ -1,4 +1,4 @@
-@extends('layouts.admin.master')
+@extends('layouts.teacher.master')
 
 @section('page-css')
     <style>
@@ -83,7 +83,7 @@
                             <div id="accordionPopout{{ $index }}" class="accordion-collapse collapse"
                                 aria-labelledby="headingPopout{{ $index }}" data-bs-parent="#accordionPopout" style="">
                                 <div class="accordion-body">
-                                    @include('admin.activities.answers.datatable')
+                                    @include('teacher.activities.answers.datatable')
                                 </div>
                             </div>
                         </div>
@@ -92,8 +92,8 @@
             </div>
         </div>
     </div>
-    @include('admin.activities.questions.modals')
-    @include('admin.activities.answers.modals')
+    @include('teacher.activities.questions.modals')
+    @include('teacher.activities.answers.modals')
 @endsection
 
 @section('page-js')
@@ -148,5 +148,5 @@
             });
         });
     </script>
-    @include('admin.activities.answers.scripts')
+    @include('teacher.activities.answers.scripts')
 @endsection

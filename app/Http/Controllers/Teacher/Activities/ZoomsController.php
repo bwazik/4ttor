@@ -26,7 +26,9 @@ class ZoomsController extends Controller
 
     public function index(Request $request)
     {
-        $zoomsQuery = Zoom::query()->select('id', 'grade_id', 'group_id', 'meeting_id', 'topic', 'duration', 'start_time', 'start_url', 'join_url', 'created_at', 'updated_at');
+        $zoomsQuery = Zoom::query()
+            ->select('id', 'grade_id', 'group_id', 'meeting_id', 'topic', 'duration', 'start_time', 'start_url', 'join_url', 'created_at', 'updated_at')
+            ->where('teacher_id', $this->teacherId);
 
         if ($request->ajax()) {
             return $this->zoomService->getZoomsForDatatable($zoomsQuery);

@@ -5,7 +5,7 @@
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body flex-grow-1">
-        <form id="add-answer-form" class="pt-0 row g-3" action="{{ route('admin.answers.insert', 555555555) }}" method="POST" autocomplete="off">
+        <form id="add-answer-form" class="pt-0 row g-3" action="{{ route('teacher.answers.insert', 555555555) }}" method="POST" autocomplete="off">
             @csrf
             <x-text-area context="offcanvas" name="answer_text_ar" label="{{ trans('admin/answers.answer_text_ar') }}" placeholder="{{ trans('admin/answers.placeholders.answer_text_ar') }}" maxlength=500 required/>
             <x-text-area context="offcanvas" name="answer_text_en" label="{{ trans('admin/answers.answer_text_en') }}" placeholder="{{ trans('admin/answers.placeholders.answer_text_en') }}" maxlength=500 required/>
@@ -25,7 +25,7 @@
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body flex-grow-1">
-        <form id="edit-answer-form" class="pt-0 row g-3" action="{{ route('admin.answers.update') }}" method="POST" autocomplete="off">
+        <form id="edit-answer-form" class="pt-0 row g-3" action="{{ route('teacher.answers.update') }}" method="POST" autocomplete="off">
             @csrf
             <input type="hidden" id="id" name="id">
             <x-text-area context="offcanvas" name="answer_text_ar" label="{{ trans('admin/answers.answer_text_ar') }}" placeholder="{{ trans('admin/answers.placeholders.answer_text_ar') }}" maxlength=500 required/>
@@ -47,7 +47,7 @@
                 <h4 class="modal-title">{{ trans('main.deleteItem', ['item' => trans('admin/answers.answer')]) }}</h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="delete-answer-form" action="{{ route('admin.answers.delete') }}" method="POST" autocomplete="off">
+            <form id="delete-answer-form" action="{{ route('teacher.answers.delete') }}" method="POST" autocomplete="off">
                 @csrf
                 <input type="hidden" id="id" name="id">
                 <div class="modal-body">

@@ -15,7 +15,7 @@
             const accordionBody = accordionItem.find('.accordion-collapse');
 
             if (!accordionBody.hasClass('show') && !$.fn.DataTable.isDataTable(tableId)) {
-                initializeDataTable(tableId, "{{ route('admin.answers.index', 'questionId') }}".replace(
+                initializeDataTable(tableId, "{{ route('teacher.answers.index', 'questionId') }}".replace(
                         'questionId', questionId),
                     [2, 3, 4, 5],
                     [
@@ -33,7 +33,7 @@
 
         $(document).on('click', '#add-answer-button', function() {
             const questionId = $(this).data('question_id');
-            const formAction = "{{ route('admin.answers.insert', 'questionId') }}".replace('questionId', questionId);
+            const formAction = "{{ route('teacher.answers.insert', 'questionId') }}".replace('questionId', questionId);
             $('#add-answer-form').attr('action', formAction);
             $('#add-answer-form').attr('data-question_id', questionId);
         });
