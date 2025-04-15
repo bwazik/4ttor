@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Translatable\HasTranslations;
 
@@ -13,6 +14,17 @@ class Group extends Model
     protected $table = 'groups';
 
     public $translatable = ['name'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
+    }
 
     protected $fillable = [
         'name',
@@ -58,7 +70,17 @@ class Group extends Model
         return $this->belongsToMany(Quiz::class, 'quiz_group');
     }
 
+    public function assignments()
+    {
+        return $this->belongsToMany(Assignment::class, 'assignment_group');
+    }
+
     # Scopes
+    public function scopeUuid($query, $uuid)
+    {
+        return $query->where('uuid', $uuid);
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', 1);

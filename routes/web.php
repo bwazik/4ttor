@@ -1,11 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\DataFetchController;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\PlansController;
 use App\Http\Controllers\Admin\GradesController;
 use App\Http\Controllers\Admin\StagesController;
+use App\Http\Controllers\Api\DataFetchController;
 use App\Http\Controllers\Admin\SubjectsController;
 use App\Http\Controllers\Admin\Finance\FeesController;
 use App\Http\Controllers\Admin\Finance\RefundsController;
@@ -47,6 +48,19 @@ Route::group(
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('web.dashboard');
+
+    Route::get('/test', function () {
+        try {
+            $files = Storage::disk('s3')->allFiles(); // Get all file paths
+
+            foreach ($files as $file) {
+                Storage::disk('s3')->delete($file);
+            }
+            return "Total size used in S3";
+        } catch (\Exception $e) {
+            return 'Failed to calculate S3 size: ' . $e->getMessage();
+        }
+    });
 
     Route::name('admin.')->group(function() {
 

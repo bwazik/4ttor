@@ -242,6 +242,40 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });
+        Schema::table('assignments', function (Blueprint $table) {
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('grade_id')->references('id')->on('grades')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('assignment_submissions', function (Blueprint $table) {
+            $table->foreign('assignment_id')->references('id')->on('assignments')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('student_id')->references('id')->on('students')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('assignment_files', function (Blueprint $table) {
+            $table->foreign('assignment_id')->references('id')->on('assignments')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('submission_files', function (Blueprint $table) {
+            $table->foreign('submission_id')->references('id')->on('assignment_submissions')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('assignment_group', function (Blueprint $table) {
+            $table->foreign('assignment_id')->references('id')->on('assignments')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('group_id')->references('id')->on('groups')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
         # End Activities Tables
 
     }
@@ -367,6 +401,24 @@ return new class extends Migration
         Schema::table('quiz_group', function (Blueprint $table) {
             $table->dropForeign('quiz_group_quiz_id_foreign');
             $table->dropForeign('quiz_group_group_id_foreign');
+        });
+        Schema::table('assignments', function (Blueprint $table) {
+            $table->dropForeign('assignments_teacher_id_foreign');
+            $table->dropForeign('assignments_grade_id_foreign');
+        });
+        Schema::table('assignment_submissions', function (Blueprint $table) {
+            $table->dropForeign('assignment_submissions_assignment_id_foreign');
+            $table->dropForeign('assignment_submissions_student_id_foreign');
+        });
+        Schema::table('assignment_files', function (Blueprint $table) {
+            $table->dropForeign('assignment_files_assignment_id_foreign');
+        });
+        Schema::table('submission_files', function (Blueprint $table) {
+            $table->dropForeign('submission_files_submission_id_foreign');
+        });
+        Schema::table('assignment_group', function (Blueprint $table) {
+            $table->dropForeign('assignment_group_assignment_id_foreign');
+            $table->dropForeign('assignment_group_group_id_foreign');
         });
         # End Activities Tables
     }

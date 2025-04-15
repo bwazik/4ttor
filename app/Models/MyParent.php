@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use Spatie\Translatable\HasTranslations;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class MyParent extends Authenticatable
@@ -13,6 +14,17 @@ class MyParent extends Authenticatable
     protected $table = 'parents';
 
     public $translatable = ['name'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
+    }
 
     protected $fillable = [
         'username',
@@ -42,8 +54,13 @@ class MyParent extends Authenticatable
     {
         return $this->morphMany(Image::class, 'imageable');
     }
-    
+
     # Scopes
+    public function scopeUuid($query, $uuid)
+    {
+        return $query->where('uuid', $uuid);
+    }
+
     public function scopeMale($query)
     {
         return $query->where('gender', 1);

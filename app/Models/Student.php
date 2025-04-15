@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use Spatie\Translatable\HasTranslations;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Student extends Authenticatable
@@ -13,6 +14,17 @@ class Student extends Authenticatable
     protected $table = 'students';
 
     public $translatable = ['name'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
+    }
 
     protected $fillable = [
         'username',
@@ -95,12 +107,22 @@ class Student extends Authenticatable
         return $this->hasMany(StudentResult::class, 'student_id');
     }
 
-    public function StudentViolations()
+    public function studentViolations()
     {
         return $this->hasMany(StudentViolation::class, 'student_id');
     }
 
+    public function assignmentSubmissions()
+    {
+        return $this->hasMany(AssignmentSubmission::class, 'student_id');
+    }
+    
     # Scopes
+    public function scopeUuid($query, $uuid)
+    {
+        return $query->where('uuid', $uuid);
+    }
+
     public function scopeMale($query)
     {
         return $query->where('gender', 1);

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('zooms', function (Blueprint $table) {
 			$table->increments('id');
+            $table->uuid('uuid')->unique();
             $table->integer('teacher_id')->unsigned();
             $table->integer('grade_id')->unsigned();
             $table->integer('group_id')->unsigned();

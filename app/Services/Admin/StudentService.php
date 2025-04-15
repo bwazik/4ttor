@@ -12,7 +12,7 @@ class StudentService
 {
     use PreventDeletionIfRelated, PublicValidatesTrait, DatabaseTransactionTrait;
 
-    protected $relationships = ['invoices', 'studentAccount', 'receipts', 'refunds', 'attendances'];
+    protected $relationships = ['invoices', 'studentAccount', 'receipts', 'refunds', 'attendances', 'assignmentSubmissions'];
     protected $transModelKey = 'admin/students.students';
 
     public function getStudentsForDatatable($studentsQuery)
