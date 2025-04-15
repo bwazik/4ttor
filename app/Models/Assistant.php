@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use Spatie\Translatable\HasTranslations;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Assistant extends Authenticatable
@@ -13,6 +14,17 @@ class Assistant extends Authenticatable
     protected $table = 'assistants';
 
     public $translatable = ['name'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
+    }
 
     protected $fillable = [
         'username',
@@ -40,6 +52,11 @@ class Assistant extends Authenticatable
     }
 
     # Scopes
+    public function scopeUuid($query, $uuid)
+    {
+        return $query->where('uuid', $uuid);
+    }
+    
     public function scopeActive($query)
     {
         return $query->where('is_active', 1);

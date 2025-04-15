@@ -6,11 +6,11 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Translatable\HasTranslations;
 
-class Zoom extends Model
+class Assignment extends Model
 {
     use HasTranslations;
 
-    protected $table = 'zooms';
+    protected $table = 'assignments';
 
     protected static function boot()
     {
@@ -23,24 +23,21 @@ class Zoom extends Model
         });
     }
 
-    public $translatable = ['topic'];
+    public $translatable = ['title'];
 
     protected $fillable = [
         'teacher_id',
         'grade_id',
         'group_id',
-        'meeting_id',
-        'topic',
-        'duration',
-        'password',
-        'start_time',
-        'start_url',
-        'join_url',
-        'created_at',
-        'updated_at',
+        'title',
+        'description',
+        'deadline',
+        'max_scores',
     ];
 
     protected $hidden = [
+        'created_at',
+        'updated_at',
     ];
 
     # Relationships
@@ -55,24 +52,24 @@ class Zoom extends Model
         return $this->belongsTo(Grade::class, 'grade_id');
     }
 
-    public function group()
+    public function assignmentSubmissions()
     {
-        return $this->belongsTo(Group::class, 'group_id');
+        return $this->hasMany(AssignmentSubmission::class, 'assignment_id');
+    }
+
+    public function assignmentFiles()
+    {
+        return $this->hasMany(AssignmentFile::class, 'assignment_id');
+    }
+
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class, 'assignment_group');
     }
 
     # Scopes
     public function scopeUuid($query, $uuid)
     {
         return $query->where('uuid', $uuid);
-    }
-    
-    # Accessors
-    public function getCreatedAtAttribute($value)
-    {
-        return isoFormat($value);
-    }
-    public function getUpdatedAtAttribute($value)
-    {
-        return isoFormat($value);
     }
 }

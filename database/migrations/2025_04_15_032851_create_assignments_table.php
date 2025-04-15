@@ -11,16 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('groups', function (Blueprint $table) {
-            $table->increments('id');
+        Schema::create('assignments', function (Blueprint $table) {
+			$table->increments('id');
             $table->uuid('uuid')->unique();
-            $table->string('name');
             $table->integer('teacher_id')->unsigned();
             $table->integer('grade_id')->unsigned();
-            $table->string('day_1')->nullable();
-            $table->string('day_2')->nullable();
-            $table->time('time');
-            $table->boolean('is_active')->default(true);
+            $table->string('title');
+            $table->text('description')->nullable();
+            $table->timestamp('deadline');
+            $table->integer('max_scores')->default(100);
             $table->timestamps();
         });
     }
@@ -30,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('groups');
+        Schema::dropIfExists('assignments');
     }
 };
