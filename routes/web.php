@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\PlansController;
 use App\Http\Controllers\Admin\GradesController;
@@ -23,6 +22,7 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Http\Controllers\Admin\Activities\QuestionsController;
 use App\Http\Controllers\Admin\Activities\AttendanceController;
 use App\Http\Controllers\Admin\Assistants\AssistantsController;
+use App\Http\Controllers\Admin\Activities\AssignmentsController;
 use App\Http\Controllers\Admin\Parents\ParentsDetailsController;
 use App\Http\Controllers\Admin\Students\StudentsDetailsController;
 use App\Http\Controllers\Admin\Teachers\TeachersDetailsController;
@@ -48,19 +48,6 @@ Route::group(
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('web.dashboard');
-
-    Route::get('/test', function () {
-        try {
-            $files = Storage::disk('s3')->allFiles(); // Get all file paths
-
-            foreach ($files as $file) {
-                Storage::disk('s3')->delete($file);
-            }
-            return "Total size used in S3";
-        } catch (\Exception $e) {
-            return 'Failed to calculate S3 size: ' . $e->getMessage();
-        }
-    });
 
     Route::name('admin.')->group(function() {
 
@@ -333,6 +320,21 @@ Route::group(
             Route::prefix('answers')->controller(AnswersController::class)->name('answers.')->middleware('throttle:10,1')->group(function() {
                 Route::post('update', 'update')->name('update');
                 Route::post('delete', 'delete')->name('delete');
+            });
+
+            # Assignments
+            Route::prefix('assignments')->controller(AssignmentsController::class)->name('assignments.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::get('{id}', 'details')->name('details');
+                Route::post('{id}/upload', 'uploadFile')->name('files.upload');
+                Route::get('files/{fileId}/download', 'downloadFile')->name('files.download');
+                Route::post('files/delete', 'deleteFile')->name('files.delete');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
             });
         # End Activities
     });

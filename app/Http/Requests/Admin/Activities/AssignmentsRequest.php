@@ -4,7 +4,7 @@ namespace App\Http\Requests\Admin\Activities;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class QuizzesRequest extends FormRequest
+class AssignmentsRequest extends FormRequest
 {
     public function authorize()
     {
@@ -14,13 +14,14 @@ class QuizzesRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'name_ar' => 'required|min:3|max:100',
-            'name_en' => 'required|min:3|max:100',
+            'title_ar' => 'required|min:3|max:100',
+            'title_en' => 'required|min:3|max:100',
             'grade_id' => 'required|integer|exists:grades,id',
             'groups' => 'required|array|min:1',
             'groups.*' => 'required|integer|exists:groups,id',
-            'duration' => 'required|integer|min:1|max:180',
-            'start_time' => 'required|date|after_or_equal:now|date_format:Y-m-d H:i',
+            'deadline' => 'required|date|after_or_equal:now|date_format:Y-m-d H:i',
+            'score' => 'required|numeric|min:0|max:100',
+            'description' => 'nullable|max:500',
         ];
 
         if (isAdmin()) {

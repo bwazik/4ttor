@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin\assistants;
 use App\Models\Assistant;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
-use App\Services\Admin\ProfilePicService;
+use App\Services\Admin\FileUploadService;
 use App\Http\Requests\Admin\ProfilePicRequest;
 
 class AssistantsDetailsController extends Controller
@@ -14,7 +14,7 @@ class AssistantsDetailsController extends Controller
 
     protected $profilePicService;
 
-    public function __construct(ProfilePicService $profilePicService)
+    public function __construct(FileUploadService $profilePicService)
     {
         $this->profilePicService = $profilePicService;
     }

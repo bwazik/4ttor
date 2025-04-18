@@ -44,10 +44,29 @@
   const dropzoneMulti = document.querySelector('#dropzone-multi');
   if (dropzoneMulti) {
     const myDropzoneMulti = new Dropzone(dropzoneMulti, {
-      previewTemplate: previewTemplate,
-      parallelUploads: 1,
-      maxFilesize: 5,
-      addRemoveLinks: true
+        url: dropzoneMulti.action, // Use the form's action URL
+        paramName: "file", // Matches the name attribute in the form
+        previewTemplate: previewTemplate,
+        parallelUploads: 1,
+        maxFilesize: 5, // Max file size in MB
+        addRemoveLinks: true,
+        autoProcessQueue: true, // Automatically upload files
+    });
+
+    // Add CSRF token to the request
+    myDropzoneMulti.on("sending", function (file, xhr, formData) {
+        formData.append("_token", document.querySelector('input[name="_token"]').value);
+    });
+
+    // Update hidden input on successful upload
+    myDropzoneMulti.on("success", function (file, response) {
+        console.log("File uploaded successfully:", response);
+        // Assuming the server returns the file path in `response.path`
+        document.querySelector('#filew').value = response.path;
+    });
+
+    myDropzoneMulti.on("error", function (file, errorMessage) {
+        console.error("Error uploading file:", errorMessage);
     });
   }
 })();

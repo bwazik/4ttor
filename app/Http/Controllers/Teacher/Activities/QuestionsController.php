@@ -25,21 +25,26 @@ class QuestionsController extends Controller
 
     public function index($quizId)
     {
-        $quiz = Quiz::where('id', $quizId)
-            ->where('teacher_id', $this->teacherId)->first();
+        $quiz = Quiz::uuid($quizId)
+            ->where('teacher_id', $this->teacherId)
+            ->first();
 
         if (!$quiz) {
             abort(404);
         }
 
-        $questions = Question::query()->select('id', 'quiz_id', 'question_text')->where('quiz_id', $quizId)->get();
+        $questions = Question::query()->select('id', 'quiz_id', 'question_text')->where('quiz_id', $quiz->id)->get();
 
         return view('teacher.activities.questions.index', compact('questions', 'quizId'));
     }
 
     public function insert(QuestionsRequest $request, $quizId)
     {
-        $result = $this->questionService->insertQuestion($request->validated(), $quizId);
+        $realQuizId = Quiz::uuid($quizId)
+            ->where('teacher_id', $this->teacherId)
+            ->value('id');
+
+        $result = $this->questionService->insertQuestion($request->validated(), $realQuizId);
 
         if ($result['status'] === 'success') {
             return response()->json(['success' => $result['message']], 200);

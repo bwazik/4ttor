@@ -42,4 +42,5 @@ return [
     'attendance' => 'Attendance',
     'zooms' => 'Zooms',
     'quizzes' => 'Quizzes',
+    'assignments' => 'Assignments',
 ];

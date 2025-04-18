@@ -74,4 +74,10 @@ class Quiz extends Model
     {
         return $this->belongsToMany(Group::class, 'quiz_group');
     }
+
+    # Scopes
+    public function scopeUuid($query, $uuid)
+    {
+        return $query->where('uuid', $uuid);
+    }
 }

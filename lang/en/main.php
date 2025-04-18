@@ -73,9 +73,12 @@ return [
     'topic' => 'Topic',
     'topic_ar' => 'Topic (AR)',
     'topic_en' => 'Topic (EN)',
+    'title_ar' => 'Title (AR)',
+    'title_en' => 'Title (EN)',
     'duration' => 'Duration (Minutes)',
     'start_time' => 'Start Time',
     'end_time' => 'End Time',
+    'deadline' => 'Deadline',
     'join_url' => 'Join URL',
     'realName_ar' => 'Full Name (AR)',
     'realName_en' => 'Full Name (EN)',
@@ -96,6 +99,7 @@ return [
     'correct' => 'Correct',
     'wrong' => 'Incorrect',
     'score' => 'Score',
+    'files' => 'Files',
     'allowed' => 'Allowed',
     'notallowed' => 'Not Allowed',
     'select_option' => 'Select an option from the list',
@@ -129,6 +133,7 @@ return [
     'yes_delete' => 'Yes, Delete',
     'yes_archive' => 'Yes, Archive',
     'yes_restore' => 'Yes, Restore',
+    'processing' => 'Processing',
 
     # Toasts
     'errorMessage' => 'An unexpected error occurred. Please try again later!',
@@ -148,4 +153,8 @@ return [
     'validateTeacherGrades' => 'The teacher must be assigned to the specified grade.',
     'validateTeacherGradesGroups' => 'The teacher must be assigned to the specified grade and group.',
     'validateTeacherZoomAccount' => 'The teacher must have a Zoom account to be able to add zooms.',
+
+    # Other
+    'mr' => 'Mr',
+    'mrs' => 'Mrs',
 ];

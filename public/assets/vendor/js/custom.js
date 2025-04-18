@@ -612,10 +612,16 @@ function setupModal({ buttonId, modalId, fields = {}, onShow = null }) {
 }
 
 function handleFormSubmit(formId, fields, modalId, modalType, getDatatableId) {
+    const $form = $(formId);
+    const $submitButton = $form.find('button[type="submit"]');
+    const originalButtonContent = $submitButton.html();
+
     $(formId).on('submit', function(e) {
         e.preventDefault();
-        submitButton = $(this).find('button[type="submit"]');
-        submitButton.prop('disabled', true);
+
+        $submitButton.find('.waves-ripple').remove();
+        $submitButton.prop('disabled', true);
+        $submitButton.html(`<i class="ri-loader-4-line ri-spin ri-20px me-1"></i> ${window.translations.processing}...`);
 
         // Clear previous error states
         $.each(fields, function(_, field) {
@@ -644,9 +650,7 @@ function handleFormSubmit(formId, fields, modalId, modalType, getDatatableId) {
                         }
                     });
                     toastr.success(response.success)
-                    setTimeout(function() {
-                        submitButton.prop('disabled', false);
-                    }, 1500);
+                    resetButtonState($submitButton, originalButtonContent);
                     if (modalType === 'offcanvas') {
                         $(modalId).offcanvas('hide');
                     } else if (modalType === 'modal') {
@@ -659,9 +663,7 @@ function handleFormSubmit(formId, fields, modalId, modalType, getDatatableId) {
                     }
                 } else {
                     toastr.error(response.error || errorMessage);
-                    setTimeout(function() {
-                        submitButton.prop('disabled', false);
-                    }, 1500);
+                    resetButtonState($submitButton, originalButtonContent);
                 }
             },
             error: function(xhr, status, error) {
@@ -670,8 +672,9 @@ function handleFormSubmit(formId, fields, modalId, modalType, getDatatableId) {
                 } else if (xhr.responseJSON) {
                     if (xhr.responseJSON.errors) {
                         $.each(xhr.responseJSON.errors, function(key, val) {
-                            const inputElement = $(formId + ' #' + key);
-                            const errorElement = $(formId + ' #' + key + '_error');
+                            const normalizedKey = key.replace(/\.\d+$/, '');
+                            const inputElement = $(formId + ' #' + normalizedKey);
+                            const errorElement = $(formId + ' #' + normalizedKey + '_error');
                             inputElement.addClass('is-invalid');
                             errorElement.text(val[0]).addClass('d-block').removeClass('d-none');
                         });
@@ -684,19 +687,26 @@ function handleFormSubmit(formId, fields, modalId, modalType, getDatatableId) {
                     toastr.error(errorMessage);
                 }
 
-                setTimeout(function() {
-                    submitButton.prop('disabled', false);
-                }, 1500);
+                resetButtonState($submitButton, originalButtonContent);
             },
+            complete: function() {
+                resetButtonState($submitButton, originalButtonContent);
+            }
         });
     });
 }
 
 function handleDeletionFormSubmit(formId, modalId, getDatatableId) {
+    const $form = $(formId);
+    const $submitButton = $form.find('button[type="submit"]');
+    const originalButtonContent = $submitButton.html();
+
     $(formId).on('submit', function(e) {
         e.preventDefault();
-        submitButton = $(this).find('button[type="submit"]');
-        submitButton.prop('disabled', true);
+
+        $submitButton.find('.waves-ripple').remove();
+        $submitButton.prop('disabled', true);
+        $submitButton.html(`<i class="ri-loader-4-line ri-spin ri-20px me-1"></i> ${window.translations.processing}...`);
 
         const formData = new FormData(this);
         let datatableId = typeof getDatatableId === 'function' ? getDatatableId() : getDatatableId;
@@ -711,9 +721,7 @@ function handleDeletionFormSubmit(formId, modalId, getDatatableId) {
             success: function(response) {
                 if (response.success) {
                     toastr.success(response.success)
-                    setTimeout(function() {
-                        submitButton.prop('disabled', false);
-                    }, 1500);
+                    resetButtonState($submitButton, originalButtonContent);
                     $(modalId).modal('hide')
                     if ($(datatableId).length) {
                         refreshDataTable(datatableId);
@@ -722,9 +730,7 @@ function handleDeletionFormSubmit(formId, modalId, getDatatableId) {
                     }
                 } else {
                     toastr.error(response.error || errorMessage);
-                    setTimeout(function() {
-                        submitButton.prop('disabled', false);
-                    }, 1500);
+                    resetButtonState($submitButton, originalButtonContent);
                 }
             },
             error: function(xhr, status, error) {
@@ -735,10 +741,11 @@ function handleDeletionFormSubmit(formId, modalId, getDatatableId) {
                 } else {
                     toastr.error(errorMessage);
                 }
-                setTimeout(function() {
-                    submitButton.prop('disabled', false);
-                }, 1500);
+                resetButtonState($submitButton, originalButtonContent);
             },
+            complete: function() {
+                resetButtonState($submitButton, originalButtonContent);
+            }
         });
     });
 }
@@ -877,23 +884,60 @@ function updateGroupNames() {
     $('#name_en').val(groupNameEn);
 }
 
-function handleProfilePicSubmit(formId) {
+function resetButtonState(submitButton, originalButtonContent) {
+    setTimeout(function() {
+        submitButton.prop('disabled', false);
+        submitButton.html(originalButtonContent);
+        submitButton.blur();
+        submitButton.find('.waves-ripple').remove();
+        if (typeof Waves !== 'undefined') {
+            Waves.init();
+            Waves.attach(submitButton[0]);
+        }
+    }, 1500);
+}
+
+function validateFile(file, fileSize, allowedExtensions) {
+    if (!file) {
+        toastr.error(window.translations.noFileUploaded);
+        return false;
+    }
+
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+    if (!allowedExtensions.includes(fileExtension)) {
+        toastr.error(window.translations.invalidFileType.replace(':values', allowedExtensions.join(', ')));
+        return false;
+    }
+
+    if (file.size > fileSize * 1024 * 1024) {
+        toastr.error(window.translations.maxFileSize.replace(':max', fileSize * 1024));
+        return false;
+    }
+
+    return true;
+}
+
+function handleProfilePicSubmit(formId, fileSize, allowedExtensions) {
+    const $form = $(formId);
+    const $submitButton = $form.find('button[type="submit"]');
+    const $fileInput = $form.find('input[type="file"]');
+    const originalButtonContent = $submitButton.html();
+
     $(formId).on('submit', function(e) {
         e.preventDefault();
-        submitButton = $(this).find('button[type="submit"]');
-        submitButton.prop('disabled', true);
 
-        const formData = new FormData(this);
+        $submitButton.find('.waves-ripple').remove();
+        $submitButton.prop('disabled', true);
+        $submitButton.html(`<i class="ri-loader-4-line ri-spin ri-20px me-1"></i> ${window.translations.processing}...`);
 
-        const file = $(formId).find('input[type="file"]')[0].files[0];
+        const file = $fileInput[0].files[0];
 
-        if (file && file.size > 1024 * 1024) {
-            toastr.error("The file is too large. Please select a file smaller than 1MB.");
-            setTimeout(function() {
-                submitButton.prop('disabled', false);
-            }, 1500);
+        if (!validateFile(file, fileSize, allowedExtensions)) {
+            resetButtonState($submitButton, originalButtonContent);
             return;
         }
+
+        const formData = new FormData(this);
 
         $.ajax({
             url: $(this).attr('action'),
@@ -910,9 +954,7 @@ function handleProfilePicSubmit(formId) {
                     }, 2000);
                 } else {
                     toastr.error(response.error || errorMessage);
-                    setTimeout(function() {
-                        submitButton.prop('disabled', false);
-                    }, 1500);
+                    resetButtonState($submitButton, originalButtonContent);
                 }
             },
             error: function(xhr, status, error) {
@@ -934,9 +976,7 @@ function handleProfilePicSubmit(formId) {
                     toastr.error(errorMessage);
                 }
 
-                setTimeout(function() {
-                    submitButton.prop('disabled', false);
-                }, 1500);
+                resetButtonState($submitButton, originalButtonContent);
             },
         });
     });

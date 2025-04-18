@@ -43,4 +43,5 @@ return [
     'attendance' => 'الحضور والغياب',
     'zooms' => 'حصص الزوم',
     'quizzes' => 'الكويزات',
+    'assignments' => 'الواجبات',
 ];

@@ -13,6 +13,7 @@
     'divClasses' => null,
     'price' => false,
     'value' => null,
+    'multiple' => false,
 ])
 
 @php
@@ -86,6 +87,14 @@
                 <label for="{{ $id ?? $name }}">{{ $label }}</label>
             </div>
         </div>
+        <span class="invalid-feedback" id="{{ $id ?? $name }}_error" role="alert"></span>
+    </div>
+@elseif($type === 'file')
+    <div class="{{ $divClasses }}">
+        <label for="{{ $id ?? $name }}">{{ $label }}</label>
+        <input type="{{ $type }}" id="{{ $id ?? $name }}" class="form-control{{ $classes ? ' ' . $classes : '' }}"
+            name="{{ $name }}{{ $multiple ? '[]' : '' }}" {{ $required ? "required" : '' }} {{ $disabled ? "disabled" : '' }} {{ $multiple ? 'multiple' : '' }}
+            accept=".pdf, .doc, .docx, .xls, .xlsx, .txt, .jpg, .jpeg, .png"/>
         <span class="invalid-feedback" id="{{ $id ?? $name }}_error" role="alert"></span>
     </div>
 @else

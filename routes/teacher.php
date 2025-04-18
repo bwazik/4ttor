@@ -12,6 +12,7 @@ use App\Http\Controllers\Teacher\Activities\ZoomsController;
 use App\Http\Controllers\Teacher\Activities\QuizzesController;
 use App\Http\Controllers\Teacher\Activities\QuestionsController;
 use App\Http\Controllers\Teacher\Activities\AnswersController;
+use App\Http\Controllers\Teacher\Activities\AssignmentsController;
 
 Route::group(
     [
@@ -136,6 +137,21 @@ Route::group(
             Route::prefix('answers')->controller(AnswersController::class)->name('answers.')->middleware('throttle:10,1')->group(function() {
                 Route::post('update', 'update')->name('update');
                 Route::post('delete', 'delete')->name('delete');
+            });
+
+            # Assignments
+            Route::prefix('assignments')->controller(AssignmentsController::class)->name('assignments.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::get('{id}', 'details')->name('details');
+                Route::post('{id}/upload', 'uploadFile')->name('files.upload');
+                Route::get('files/{fileId}/download', 'downloadFile')->name('files.download');
+                Route::post('files/delete', 'deleteFile')->name('files.delete');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
             });
         # End Activities
     });

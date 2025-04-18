@@ -12,6 +12,7 @@ class AssignmentFile extends Model
         'assignment_id',
         'file_path',
         'file_name',
+        'file_size',
     ];
 
     protected $hidden = [
