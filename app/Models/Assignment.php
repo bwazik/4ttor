@@ -72,4 +72,9 @@ class Assignment extends Model
     {
         return $query->where('uuid', $uuid);
     }
+
+    public function scopeUuids($query, $uuids)
+    {
+        return $query->whereIn('uuid', $uuids);
+    }
 }

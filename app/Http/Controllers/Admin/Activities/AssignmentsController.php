@@ -128,7 +128,7 @@ class AssignmentsController extends Controller
             return $result;
         }
 
-        abort(500);
+        abort(404);
     }
 
     public function deleteFile(Request $request)

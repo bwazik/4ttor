@@ -12,5 +12,5 @@ return [
     'fileUploadedSuccessfully' => 'File uploaded successfully, you can now download or delete it.',
     'fileDeletedSuccessfully' => 'The file has been deleted successfully.',
     'fileNotFound' => 'File not found, please try again.',
-
+    'unauthorizedAssignment' => 'You are not authorized to perform any action on this assignment.',
 ];

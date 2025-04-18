@@ -186,5 +186,11 @@
                 <div>{{ trans('layouts/sidebar.quizzes') }}</div>
             </a>
         </li>
+        <li class="menu-item {{ isActiveRoute('teacher.assignments.index') ? 'active' : '' }}">
+            <a href="{{ route('teacher.assignments.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons ri-file-copy-2-line"></i>
+                <div>{{ trans('layouts/sidebar.assignments') }}</div>
+            </a>
+        </li>
     </ul>
 </aside>

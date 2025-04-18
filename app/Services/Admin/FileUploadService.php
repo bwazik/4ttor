@@ -6,6 +6,7 @@ use App\Models\Assignment;
 use Illuminate\Http\Request;
 use App\Models\AssignmentFile;
 use App\Models\SubmissionFile;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Traits\PublicValidatesTrait;
@@ -69,9 +70,15 @@ class FileUploadService
 
             if ($entityType === 'assignment') {
                 $guard = getActiveGuard();
+                $user = Auth::guard($guard)->user();
                 $assignment = Assignment::findOrFail($entityId);
 
                 if ($guard === 'teacher') {
+                    if(!$this->isTeacherAuthorizedForAssignment($user, $assignment))
+                    {
+                        return $this->errorResponse(trans('toasts.unauthorizedAssignment'));
+                    }
+
                     $existingFiles = AssignmentFile::where('assignment_id', $entityId)->get();
                     $fileCount = $existingFiles->count();
                     $totalSize = $existingFiles->sum('file_size');
@@ -193,36 +200,41 @@ class FileUploadService
 
             $guard = getActiveGuard();
             $user = Auth::guard($guard)->user();
+            $assignment = Assignment::findOrFail($file->assignment_id);
 
             if (!$user) {
                 return $this->errorResponse("Unauthenticated");
             }
 
-            // if ($guard === 'web') {
-            //     if ($entityType === 'assignment') {
-            //         $assignment = Assignment::find($file->assignment_id);
-            //         if (!$assignment || !$this->isStudentAuthorizedForAssignment($user, $assignment)) {
-            //             return response()->json(['error' => 'Unauthorized to download this assignment file.'], 403);
-            //         }
-            //     } elseif ($entityType === 'submission') {
-            //         // Restrict to files uploaded by the student (check uuid in path)
-            //         if ($file->submission_id && strpos($file->file_path, $user->uuid) === false) {
-            //             return response()->json(['error' => 'Unauthorized to download this submission file.'], 403);
-            //         }
-            //     } elseif ($entityType === 'teacher_library') {
-            //         return response()->json(['error' => 'Students cannot download teacher library files.'], 403);
-            //     }
-            // } elseif ($guard === 'teacher') {
-            //     if ($entityType === 'submission') {
-            //         $assignment = Assignment::find($file->submission_id);
-            //         if (!$assignment || $assignment->teacher_id != $user->id) {
-            //             return response()->json(['error' => 'Unauthorized to download this submission file.'], 403);
-            //         }
-            //     }
-            //     if ($entityType === 'teacher_library' && $file->teacher_id != $user->id) {
-            //         return response()->json(['error' => 'Unauthorized to download this library file.'], 403);
-            //     }
-            // }
+            if ($guard === 'web') {
+                // if ($entityType === 'assignment') {
+                //     $assignment = Assignment::find($file->assignment_id);
+                //     if (!$assignment || !$this->isStudentAuthorizedForAssignment($user, $assignment)) {
+                //         return response()->json(['error' => 'Unauthorized to download this assignment file.'], 403);
+                //     }
+                // } elseif ($entityType === 'submission') {
+                //     // Restrict to files uploaded by the student (check uuid in path)
+                //     if ($file->submission_id && strpos($file->file_path, $user->uuid) === false) {
+                //         return response()->json(['error' => 'Unauthorized to download this submission file.'], 403);
+                //     }
+                // } elseif ($entityType === 'teacher_library') {
+                //     return response()->json(['error' => 'Students cannot download teacher library files.'], 403);
+                // }
+            } elseif ($guard === 'teacher') {
+                if ($entityType === 'assignment') {
+                    if(!$this->isTeacherAuthorizedForAssignment($user, $assignment))
+                    {
+                        return $this->errorResponse(trans('toasts.unauthorizedAssignment'));
+                    }
+                } elseif ($entityType === 'submission') {
+                    $assignment = Assignment::find($file->submission_id);
+                    if (!$assignment || $assignment->teacher_id != $user->id) {
+                        return response()->json(['error' => 'Unauthorized to download this submission file.'], 403);
+                    }
+                } elseif ($entityType === 'teacher_library' && $file->teacher_id != $user->id) {
+                    return response()->json(['error' => 'Unauthorized to download this library file.'], 403);
+                }
+            }
 
             $filePath = $file->file_path;
             if (!Storage::disk('s3')->exists($filePath)) {
@@ -250,30 +262,35 @@ class FileUploadService
 
             $guard = getActiveGuard();
             $user = Auth::guard($guard)->user();
+            $assignment = Assignment::findOrFail($file->assignment_id);
 
             if (!$user) {
                 return $this->errorResponse("Unauthenticated");
             }
 
-            // if ($guard === 'web') {
-            //     if ($entityType === 'submission') {
-            //         if ($file->submission_id && strpos($file->file_path, $user->uuid) === false) {
-            //             return response()->json(['error' => 'Unauthorized to delete this submission file.'], 403);
-            //         }
-            //     } else {
-            //         return response()->json(['error' => 'Students can only delete their own submission files.'], 403);
-            //     }
-            // } elseif ($guard === 'teacher') {
-            //     if ($entityType === 'submission') {
-            //         $assignment = Assignment::find($file->submission_id);
-            //         if (!$assignment || $assignment->teacher_id != $user->id) {
-            //             return response()->json(['error' => 'Unauthorized to delete this submission file.'], 403);
-            //         }
-            //     }
-            //     if ($entityType === 'teacher_library' && $file->teacher_id != $user->id) {
-            //         return response()->json(['error' => 'Unauthorized to delete this library file.'], 403);
-            //     }
-            // }
+            if ($guard === 'web') {
+                // if ($entityType === 'submission') {
+                //     if ($file->submission_id && strpos($file->file_path, $user->uuid) === false) {
+                //         return response()->json(['error' => 'Unauthorized to delete this submission file.'], 403);
+                //     }
+                // } else {
+                //     return response()->json(['error' => 'Students can only delete their own submission files.'], 403);
+                // }
+            } elseif ($guard === 'teacher') {
+                if ($entityType === 'assignment') {
+                    if(!$this->isTeacherAuthorizedForAssignment($user, $assignment))
+                    {
+                        return $this->errorResponse(trans('toasts.unauthorizedAssignment'));
+                    }
+                } elseif ($entityType === 'submission') {
+                    $assignment = Assignment::find($file->submission_id);
+                    if (!$assignment || $assignment->teacher_id != $user->id) {
+                        return response()->json(['error' => 'Unauthorized to delete this submission file.'], 403);
+                    }
+                } elseif ($entityType === 'teacher_library' && $file->teacher_id != $user->id) {
+                    return response()->json(['error' => 'Unauthorized to delete this library file.'], 403);
+                }
+            }
 
             $filePath = $file->file_path;
             if (Storage::disk('s3')->exists($filePath)) {
@@ -286,9 +303,36 @@ class FileUploadService
         });
     }
 
-    protected function isStudentAuthorizedForAssignment($user, $assignment)
+    public function deleteRelatedFiles($models, string $relation, string $pathColumn = 'file_path')
     {
-        // Assuming the student is linked to a grade or group
-        return $user->grade_id == $assignment->grade_id || $user->groups()->whereIn('group_id', $assignment->groups->pluck('id'))->exists();
+        $models = $models instanceof Collection ? $models : collect([$models]);
+
+        $models->each(function ($model) use ($relation, $pathColumn) {
+            $model->$relation()->each(function ($related) use ($pathColumn) {
+                if (Storage::disk('s3')->exists($related->$pathColumn)) {
+                    Storage::disk('s3')->delete($related->$pathColumn);
+                }
+                $related->delete();
+            });
+        });
+    }
+
+    protected function isTeacherAuthorizedForAssignment($teacher, $assignment)
+    {
+        $isOwner = $teacher->id === $assignment->teacher_id;
+
+        if ($isOwner) {
+            return true;
+        }
+
+        if ($teacher->grades()->where('grades.id', $assignment->grade_id)->exists()) {
+            return true;
+        }
+
+        if ($teacher->groups()->whereIn('groups.id', $assignment->groups()->select('groups.id')->pluck('id'))->exists()) {
+            return true;
+        }
+
+        return false;
     }
 }

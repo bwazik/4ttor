@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Admin\Activities;
+namespace App\Services\Teacher\Activities;
 
 use App\Models\Assignment;
 use App\Traits\PublicValidatesTrait;
@@ -12,29 +12,27 @@ class AssignmentService
 {
     use PreventDeletionIfRelated, PublicValidatesTrait, DatabaseTransactionTrait;
 
-    protected $relationships = [];
-    protected $transModelKey = 'admin/assignments.assignments';
+    protected $teacherId;
     protected $fileUploadService;
 
     public function __construct(FileUploadService $fileUploadService)
     {
         $this->fileUploadService = $fileUploadService;
+        $this->teacherId = auth()->guard('teacher')->user()->id;
     }
 
     public function getAssignmentsForDatatable($assignmentsQuery)
     {
         return datatables()->eloquent($assignmentsQuery)
             ->addIndexColumn()
-            ->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
+            ->addColumn('selectbox', fn($row) => generateSelectbox($row->uuid))
             ->editColumn('title', fn($row) => $row->title)
-            ->editColumn('teacher_id', fn($row) => formatRelation($row->teacher_id, $row->teacher, 'name', 'admin.teachers.details'))
             ->editColumn('grade_id', fn($row) => formatRelation($row->grade_id, $row->grade, 'name'))
             ->editColumn('deadline', fn($row) => isoFormat($row->deadline))
             ->editColumn('description', fn($row) => $row->description ?: '-')
             ->addColumn('actions', fn($row) => $this->generateActionButtons($row))
-            ->filterColumn('teacher_id', fn($query, $keyword) => filterByRelation($query, 'teacher', 'name', $keyword))
             ->filterColumn('grade_id', fn($query, $keyword) => filterByRelation($query, 'grade', 'name', $keyword))
-            ->rawColumns(['selectbox', 'teacher_id', 'actions'])
+            ->rawColumns(['selectbox', 'actions'])
             ->make(true);
     }
 
@@ -50,13 +48,13 @@ class AssignmentService
                 '</a>' .
                 '<ul class="dropdown-menu dropdown-menu-end m-0">' .
                     '<li>
-                        <a target="_blank" href="' . route('admin.assignments.details', $row->id) . '" class="dropdown-item">'.trans('main.details').'</a>
+                        <a target="_blank" href="' . route('teacher.assignments.details', $row->uuid) . '" class="dropdown-item">'.trans('main.details').'</a>
                     </li>' .
                     '<div class="dropdown-divider"></div>' .
                     '<li>' .
                         '<a href="javascript:;" class="dropdown-item text-danger" ' .
                             'id="delete-button" ' .
-                            'data-id="' . $row->id . '" ' .
+                            'data-id="' . $row->uuid . '" ' .
                             'data-title_ar="' . $row->getTranslation('title', 'ar') . '" ' .
                             'data-title_en="' . $row->getTranslation('title', 'en') . '" ' .
                             'data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
@@ -68,10 +66,9 @@ class AssignmentService
             '<button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light" ' .
                 'tabindex="0" type="button" data-bs-toggle="modal" data-bs-target="#edit-modal" ' .
                 'id="edit-button" ' .
-                'data-id="' . $row->id . '" ' .
+                'data-id="' . $row->uuid . '" ' .
                 'data-title_ar="' . $row->getTranslation('title', 'ar') . '" ' .
                 'data-title_en="' . $row->getTranslation('title', 'en') . '" ' .
-                'data-teacher_id="' . $row->teacher_id . '" ' .
                 'data-grade_id="' . $row->grade_id . '" ' .
                 'data-groups="' . $groups . '" ' .
                 'data-deadline="' . humanFormat($row->deadline) . '" ' .
@@ -85,11 +82,11 @@ class AssignmentService
     {
         return $this->executeTransaction(function () use ($request)
         {
-            if ($validationResult = $this->validateTeacherGradeAndGroups($request['teacher_id'], $request['groups'], $request['grade_id'], true))
+            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $request['groups'], $request['grade_id'], true))
                 return $validationResult;
 
             $assignment = Assignment::create([
-                'teacher_id' => $request['teacher_id'],
+                'teacher_id' => $this->teacherId,
                 'grade_id' => $request['grade_id'],
                 'title' => ['en' => $request['title_en'], 'ar' => $request['title_ar']],
                 'deadline' => $request['deadline'],
@@ -107,12 +104,11 @@ class AssignmentService
     {
         return $this->executeTransaction(function () use ($id, $request)
         {
-            if ($validationResult = $this->validateTeacherGradeAndGroups($request['teacher_id'], $request['groups'], $request['grade_id'], true))
+            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $request['groups'], $request['grade_id'], true))
                 return $validationResult;
 
             $assignment = Assignment::findOrFail($id);
             $assignment->update([
-                'teacher_id' => $request['teacher_id'],
                 'grade_id' => $request['grade_id'],
                 'title' => ['en' => $request['title_en'], 'ar' => $request['title_ar']],
                 'deadline' => $request['deadline'],
@@ -130,10 +126,7 @@ class AssignmentService
     {
         return $this->executeTransaction(function () use ($id)
         {
-            $assignment = Assignment::select('id', 'title')->findOrFail($id);
-
-            if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($assignment))
-                return $dependencyCheck;
+            $assignment = Assignment::findOrFail($id);
 
             $this->fileUploadService->deleteRelatedFiles($assignment, 'assignmentFiles');
             $this->fileUploadService->deleteRelatedFiles($assignment, 'assignmentSubmissions');
@@ -151,13 +144,7 @@ class AssignmentService
 
         return $this->executeTransaction(function () use ($ids)
         {
-            $assignments = Assignment::whereIn('id', $ids)
-                ->select('id', 'title')
-                ->orderBy('id')
-                ->get();
-
-            if ($dependencyCheck = $this->checkDependenciesForMultipleDeletion($assignments))
-                return $dependencyCheck;
+            $assignments = Assignment::whereIn('id', $ids)->get();
 
             foreach ($assignments as $assignment) {
                 $this->fileUploadService->deleteRelatedFiles($assignment, 'assignmentFiles');
@@ -165,18 +152,8 @@ class AssignmentService
 
                 $assignment->delete();
             }
-            
+
             return $this->successResponse(trans('main.deletedSelected', ['item' => trans('admin/assignments.assignments')]));
         });
-    }
-
-    public function checkDependenciesForSingleDeletion($assignment)
-    {
-        return $this->checkForSingleDependencies($assignment, $this->relationships, $this->transModelKey);
-    }
-
-    public function checkDependenciesForMultipleDeletion($assignments)
-    {
-        return $this->checkForMultipleDependencies($assignments, $this->relationships, $this->transModelKey);
     }
 }

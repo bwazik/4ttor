@@ -12,5 +12,5 @@ return [
     'fileUploadedSuccessfully' => 'تم رفع الملف بنجاح، ممكن دلوقتي تحمله أو تمسحه.',
     'fileDeletedSuccessfully' => 'تم حذف الملف بنجاح.',
     'fileNotFound' => 'الملف غير موجود، حاول مرة تانية.',
-
+    'unauthorizedAssignment' => 'مش مسموح لك بتنفيذ اي إجراء على الواجب دا.',
 ];
