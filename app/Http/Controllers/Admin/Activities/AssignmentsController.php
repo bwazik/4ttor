@@ -124,13 +124,13 @@ class AssignmentsController extends Controller
     {
         $result = $this->fileUploadService->downloadFile('assignment', $fileId);
 
-        if ($result['status'] === 'error') {
-            abort(500);
+        if ($result instanceof \Symfony\Component\HttpFoundation\StreamedResponse) {
+            return $result;
         }
 
-        return $result;
+        abort(500);
     }
-    
+
     public function deleteFile(Request $request)
     {
         $this->validateExistence($request, 'assignment_files');
