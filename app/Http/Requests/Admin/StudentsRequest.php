@@ -30,8 +30,8 @@ class StudentsRequest extends FormRequest
             'grade_id' => 'required|integer|exists:grades,id',
             'parent_id' => 'nullable|integer|exists:parents,id',
             'is_active' => 'nullable|boolean',
-            'groups' => 'array|min:1',
-            'groups.*' => 'integer|exists:groups,id',
+            'groups' => 'required|array|min:1',
+            'groups.*' => 'required|integer|exists:groups,id',
         ];
 
         if (isAdmin()) {

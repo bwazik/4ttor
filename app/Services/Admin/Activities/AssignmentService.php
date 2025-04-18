@@ -1,0 +1,168 @@
+<?php
+
+namespace App\Services\Admin\Activities;
+
+use App\Models\Assignment;
+use App\Traits\PublicValidatesTrait;
+use App\Traits\DatabaseTransactionTrait;
+use App\Traits\PreventDeletionIfRelated;
+
+class AssignmentService
+{
+    use PreventDeletionIfRelated, PublicValidatesTrait, DatabaseTransactionTrait;
+
+    protected $relationships = [];
+
+    protected $transModelKey = 'admin/assignments.assignments';
+
+    public function getAssignmentsForDatatable($assignmentsQuery)
+    {
+        return datatables()->eloquent($assignmentsQuery)
+            ->addIndexColumn()
+            ->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
+            ->editColumn('title', fn($row) => $row->title)
+            ->editColumn('teacher_id', fn($row) => formatRelation($row->teacher_id, $row->teacher, 'name', 'admin.teachers.details'))
+            ->editColumn('grade_id', fn($row) => formatRelation($row->grade_id, $row->grade, 'name'))
+            ->editColumn('deadline', fn($row) => isoFormat($row->deadline))
+            ->editColumn('description', fn($row) => $row->description ?: '-')
+            ->addColumn('actions', fn($row) => $this->generateActionButtons($row))
+            ->filterColumn('teacher_id', fn($query, $keyword) => filterByRelation($query, 'teacher', 'name', $keyword))
+            ->filterColumn('grade_id', fn($query, $keyword) => filterByRelation($query, 'grade', 'name', $keyword))
+            ->rawColumns(['selectbox', 'teacher_id', 'actions'])
+            ->make(true);
+    }
+
+    private function generateActionButtons($row)
+    {
+        $groupIds = $row->groups->pluck('id')->toArray();
+        $groups = implode(',', $groupIds);
+
+        return
+            '<div class="d-inline-block">' .
+                '<a href="javascript:;" class="btn btn-sm btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">' .
+                    '<i class="ri-more-2-line"></i>' .
+                '</a>' .
+                '<ul class="dropdown-menu dropdown-menu-end m-0">' .
+                    '<li>
+                        <a target="_blank" href="' . route('admin.assignments.details', $row->id) . '" class="dropdown-item">'.trans('main.details').'</a>
+                    </li>' .
+                    '<div class="dropdown-divider"></div>' .
+                    '<li>' .
+                        '<a href="javascript:;" class="dropdown-item text-danger" ' .
+                            'id="delete-button" ' .
+                            'data-id="' . $row->id . '" ' .
+                            'data-title_ar="' . $row->getTranslation('title', 'ar') . '" ' .
+                            'data-title_en="' . $row->getTranslation('title', 'en') . '" ' .
+                            'data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
+                            trans('main.delete') .
+                        '</a>' .
+                    '</li>' .
+                '</ul>' .
+            '</div>' .
+            '<button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light" ' .
+                'tabindex="0" type="button" data-bs-toggle="modal" data-bs-target="#edit-modal" ' .
+                'id="edit-button" ' .
+                'data-id="' . $row->id . '" ' .
+                'data-title_ar="' . $row->getTranslation('title', 'ar') . '" ' .
+                'data-title_en="' . $row->getTranslation('title', 'en') . '" ' .
+                'data-teacher_id="' . $row->teacher_id . '" ' .
+                'data-grade_id="' . $row->grade_id . '" ' .
+                'data-groups="' . $groups . '" ' .
+                'data-deadline="' . humanFormat($row->deadline) . '" ' .
+                'data-score="' . $row->score . '" ' .
+                'data-description="' . $row->description . '">' .
+                '<i class="ri-edit-box-line ri-20px"></i>' .
+            '</button>';
+    }
+
+    public function insertAssignment(array $request)
+    {
+        return $this->executeTransaction(function () use ($request)
+        {
+            if ($validationResult = $this->validateTeacherGradeAndGroups($request['teacher_id'], $request['groups'], $request['grade_id'], true))
+                return $validationResult;
+
+            $assignment = Assignment::create([
+                'teacher_id' => $request['teacher_id'],
+                'grade_id' => $request['grade_id'],
+                'title' => ['en' => $request['title_en'], 'ar' => $request['title_ar']],
+                'deadline' => $request['deadline'],
+                'score' => $request['score'],
+                'description' => $request['description'],
+            ]);
+
+            $assignment->groups()->attach($request['groups']);
+
+            return $this->successResponse(trans('main.added', ['item' => trans('admin/assignments.assignment')]));
+        });
+    }
+
+    public function updateAssignment($id, array $request): array
+    {
+        return $this->executeTransaction(function () use ($id, $request)
+        {
+            if ($validationResult = $this->validateTeacherGradeAndGroups($request['teacher_id'], $request['groups'], $request['grade_id'], true))
+                return $validationResult;
+
+            $assignment = Assignment::findOrFail($id);
+            $assignment->update([
+                'teacher_id' => $request['teacher_id'],
+                'grade_id' => $request['grade_id'],
+                'title' => ['en' => $request['title_en'], 'ar' => $request['title_ar']],
+                'deadline' => $request['deadline'],
+                'score' => $request['score'],
+                'description' => $request['description'],
+            ]);
+
+            $assignment->groups()->sync($request['groups'] ?? []);
+
+            return $this->successResponse(trans('main.edited', ['item' => trans('admin/assignments.assignment')]));
+        });
+    }
+
+    public function deleteAssignment($id): array
+    {
+        return $this->executeTransaction(function () use ($id)
+        {
+            $assignment = Assignment::select('id', 'title')->findOrFail($id);
+
+            if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($assignment))
+                return $dependencyCheck;
+
+            $assignment->delete();
+
+            return $this->successResponse(trans('main.deleted', ['item' => trans('admin/assignments.assignment')]));
+        });
+    }
+
+    public function deleteSelectedAssignments($ids)
+    {
+        if ($validationResult = $this->validateSelectedItems((array) $ids))
+            return $validationResult;
+
+        return $this->executeTransaction(function () use ($ids)
+        {
+            $assignments = Assignment::whereIn('id', $ids)
+                ->select('id', 'title')
+                ->orderBy('id')
+                ->get();
+
+            if ($dependencyCheck = $this->checkDependenciesForMultipleDeletion($assignments))
+                return $dependencyCheck;
+
+            Assignment::whereIn('id', $ids)->delete();
+
+            return $this->successResponse(trans('main.deletedSelected', ['item' => trans('admin/assignments.assignments')]));
+        });
+    }
+
+    public function checkDependenciesForSingleDeletion($assignment)
+    {
+        return $this->checkForSingleDependencies($assignment, $this->relationships, $this->transModelKey);
+    }
+
+    public function checkDependenciesForMultipleDeletion($assignments)
+    {
+        return $this->checkForMultipleDependencies($assignments, $this->relationships, $this->transModelKey);
+    }
+}

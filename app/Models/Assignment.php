@@ -32,7 +32,7 @@ class Assignment extends Model
         'title',
         'description',
         'deadline',
-        'max_scores',
+        'score',
     ];
 
     protected $hidden = [

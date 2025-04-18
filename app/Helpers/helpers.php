@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 
@@ -221,5 +222,17 @@ if (!function_exists('formatJoinUrl')) {
             'class="btn btn-sm btn-label-success waves-effect">' .
                 trans('main.join_url') .
             '</a>';
+    }
+}
+
+if (!function_exists('getActiveGuard')) {
+    function getActiveGuard()
+    {
+        foreach (array_keys(config('auth.guards')) as $guard) {
+            if (Auth::guard($guard)->check()) {
+                return $guard;
+            }
+        }
+        return null;
     }
 }

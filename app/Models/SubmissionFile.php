@@ -12,6 +12,7 @@ class SubmissionFile extends Model
         'submission_id',
         'file_path',
         'file_name',
+        'file_size',
     ];
 
     protected $hidden = [

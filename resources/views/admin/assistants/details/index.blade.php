@@ -174,6 +174,7 @@
             })();
         });
 
-        handleProfilePicSubmit('#update-profile-form');
+        const allowedExtensions = ['jpg', 'jpeg', 'png'];
+        handleProfilePicSubmit('#update-profile-form', 1.5, allowedExtensions);
     </script>
 @endsection

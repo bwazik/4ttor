@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin\teachers;
 use App\Models\Teacher;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
-use App\Services\Admin\ProfilePicService;
+use App\Services\Admin\FileUploadService;
 use App\Http\Requests\Admin\ProfilePicRequest;
 
 class TeachersDetailsController extends Controller
@@ -14,7 +14,7 @@ class TeachersDetailsController extends Controller
 
     protected $profilePicService;
 
-    public function __construct(ProfilePicService $profilePicService)
+    public function __construct(FileUploadService $profilePicService)
     {
         $this->profilePicService = $profilePicService;
     }

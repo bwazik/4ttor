@@ -73,9 +73,12 @@ return [
     'topic' => 'عنوان الحصة',
     'topic_ar' => 'عنوان الحصة بالعربي',
     'topic_en' => 'عنوان الحصة بالإنجليزي',
+    'title_ar' => 'العنوان بالعربي',
+    'title_en' => 'العنوان بالإنجليزي',
     'duration' => 'المدة (بالدقائق)',
     'start_time' => 'وقت البداية',
     'end_time' => 'وقت النهاية',
+    'deadline' => 'الموعد النهائي',
     'join_url' => 'لينك الحصة',
     'realName_ar' => 'الإسم  الثلاثي بالعربي',
     'realName_en' => 'الإسم الثلاثي بالإنجليزي',
@@ -96,6 +99,7 @@ return [
     'correct' => 'صحيحة',
     'wrong' => 'خاطئة',
     'score' => 'الدرجة',
+    'files' => 'الملفات',
     'allowed' => 'مسموح',
     'notallowed' => 'مش مسموح',
     'select_option' => 'اختار حاجة من الاختيارات',
@@ -129,6 +133,7 @@ return [
     'yes_delete' => 'آه, إمسح',
     'yes_archive' => 'آه, أرشف',
     'yes_restore' => 'آه, رجعهم',
+    'processing' => 'اصبر',
 
     # Toasts
     'errorMessage' => 'فيه مشكلة حصلت، جرب تاني بعد شوية!',
@@ -148,4 +153,8 @@ return [
     'validateTeacherGrades' => 'لازم يكون المدرس مع الصف المحدد.',
     'validateTeacherGradesGroups' => 'لازم يكون المدرس مع الصف والمجموعة المحددين.',
     'validateTeacherZoomAccount' => 'لازم يكون المدرس عنده حساب زوم عشان يقدر يضيف حصص.',
+
+    # Other
+    'mr' => 'مستر',
+    'mrs' => 'مس',
 ];

@@ -47,7 +47,7 @@ class QuizService
                 '</a>' .
                 '<ul class="dropdown-menu dropdown-menu-end m-0">' .
                     '<li>
-                        <a target="_blank" href="' . route('teacher.questions.index', $row->id) . '" class="dropdown-item">'.trans('admin/questions.questions').'</a>
+                        <a target="_blank" href="' . route('teacher.questions.index', $row->uuid) . '" class="dropdown-item">'.trans('admin/questions.questions').'</a>
                     </li>' .
                     '<div class="dropdown-divider"></div>' .
                     '<li>' .
