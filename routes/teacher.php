@@ -142,8 +142,8 @@ Route::group(
             # Assignments
             Route::prefix('assignments')->controller(AssignmentsController::class)->name('assignments.')->group(function() {
                 Route::get('/', 'index')->name('index');
-                Route::get('{id}', 'details')->name('details');
-                Route::post('{id}/upload', 'uploadFile')->name('files.upload');
+                Route::get('{uuid}', 'details')->name('details');
+                Route::post('{uuid}/upload', 'uploadFile')->name('files.upload');
                 Route::get('files/{fileId}/download', 'downloadFile')->name('files.download');
                 Route::post('files/delete', 'deleteFile')->name('files.delete');
                 Route::middleware('throttle:10,1')->group(function() {

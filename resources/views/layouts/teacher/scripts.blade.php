@@ -31,6 +31,10 @@
             en: @json(trans('main.weekdays', [], 'en')),
         },
         currentLocale: "{{ app()->getLocale() }}",
+        processing: @json(trans('main.processing')),
+        noFileUploaded: @json(trans('toasts.noFileUploaded')),
+        invalidFileType: @json(trans('validation.mimes')),
+        maxFileSize: @json(trans('validation.max.file')),
     };
 </script>
 
