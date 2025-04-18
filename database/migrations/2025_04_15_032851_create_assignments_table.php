@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->timestamp('deadline');
-            $table->integer('max_scores')->default(100);
+            $table->integer('score')->default(100);
             $table->timestamps();
         });
     }
