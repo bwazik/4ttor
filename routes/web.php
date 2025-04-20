@@ -1,32 +1,38 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\PlansController;
-use App\Http\Controllers\Admin\GradesController;
-use App\Http\Controllers\Admin\StagesController;
+
 use App\Http\Controllers\Api\DataFetchController;
-use App\Http\Controllers\Admin\SubjectsController;
+
+use App\Http\Controllers\Admin\Platform\StagesController;
+use App\Http\Controllers\Admin\Platform\GradesController;
+use App\Http\Controllers\Admin\Platform\SubjectsController;
+use App\Http\Controllers\Admin\Platform\PlansController;
+
+use App\Http\Controllers\Admin\Users\Teachers\TeachersController;
+use App\Http\Controllers\Admin\Users\Teachers\TeachersDetailsController;
+use App\Http\Controllers\Admin\Users\Assistants\AssistantsController;
+use App\Http\Controllers\Admin\Users\Assistants\AssistantsDetailsController;
+use App\Http\Controllers\Admin\Users\Parents\ParentsController;
+use App\Http\Controllers\Admin\Users\Parents\ParentsDetailsController;
+use App\Http\Controllers\Admin\Users\Students\StudentsController;
+use App\Http\Controllers\Admin\Users\Students\StudentsDetailsController;
+
 use App\Http\Controllers\Admin\Finance\FeesController;
 use App\Http\Controllers\Admin\Finance\RefundsController;
-use App\Http\Controllers\Admin\Parents\ParentsController;
-use App\Http\Controllers\Admin\Teachers\GroupsController;
-use App\Http\Controllers\Admin\Activities\ZoomsController;
 use App\Http\Controllers\Admin\Finance\InvoicesController;
 use App\Http\Controllers\Admin\Finance\ReceiptsController;
-use App\Http\Controllers\Admin\Students\StudentsController;
-use App\Http\Controllers\Admin\Teachers\TeachersController;
-use App\Http\Controllers\Admin\Activities\AnswersController;
-use App\Http\Controllers\Admin\Activities\QuizzesController;
-use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
-use App\Http\Controllers\Admin\Activities\QuestionsController;
+
+use App\Http\Controllers\Admin\Tools\GroupsController;
+
 use App\Http\Controllers\Admin\Activities\AttendanceController;
-use App\Http\Controllers\Admin\Assistants\AssistantsController;
+use App\Http\Controllers\Admin\Activities\ZoomsController;
+use App\Http\Controllers\Admin\Activities\QuizzesController;
+use App\Http\Controllers\Admin\Activities\QuestionsController;
+use App\Http\Controllers\Admin\Activities\AnswersController;
 use App\Http\Controllers\Admin\Activities\AssignmentsController;
-use App\Http\Controllers\Admin\Parents\ParentsDetailsController;
-use App\Http\Controllers\Admin\Students\StudentsDetailsController;
-use App\Http\Controllers\Admin\Teachers\TeachersDetailsController;
-use App\Http\Controllers\Admin\Assistants\AssistantsDetailsController;
 
 Route::group(
     [
@@ -45,9 +51,7 @@ Route::group(
         'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath', 'auth:web']
     ], function(){
 
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('web.dashboard');
+    Route::get('/dashboard', fn() => view('admin.dashboard'))->name('admin.dashboard');
 
     Route::name('admin.')->group(function() {
 
@@ -125,18 +129,6 @@ Route::group(
                 Route::controller(TeachersDetailsController::class)->group(function() {
                     Route::get('/details/{id}', 'index')->name('details');
                     Route::post('/update-profile-pic/{id}', 'updateProfilePic')->name('updateProfilePic');
-                });
-            });
-
-            # Groups
-            Route::prefix('groups')->controller(GroupsController::class)->name('groups.')->group(function() {
-                Route::get('/', 'index')->name('index');
-                Route::get('{id}/students', 'getGroupStudents')->name('students');
-                Route::middleware('throttle:10,1')->group(function() {
-                    Route::post('insert', 'insert')->name('insert');
-                    Route::post('update', 'update')->name('update');
-                    Route::post('delete', 'delete')->name('delete');
-                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
                 });
             });
 
@@ -264,6 +256,20 @@ Route::group(
                 }
             });
         # End Finance Managment
+
+        # Start Teacher Tools
+            # Groups
+            Route::prefix('groups')->controller(GroupsController::class)->name('groups.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::get('{id}/students', 'getGroupStudents')->name('students');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
+            });
+        # End Teacher Tools
 
         # Start Activities
             # Attendance

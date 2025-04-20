@@ -6,7 +6,7 @@ use App\Models\MyParent;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\ParentsRequest;
+use App\Http\Requests\Admin\Users\ParentsRequest;
 use App\Models\Student;
 use App\Services\Teacher\Users\ParentService;
 

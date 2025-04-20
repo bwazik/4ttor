@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\StudentsRequest;
+use App\Http\Requests\Admin\Users\StudentsRequest;
 use App\Services\Teacher\Users\StudentService;
 
 class StudentsController extends Controller
