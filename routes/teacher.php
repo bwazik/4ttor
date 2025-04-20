@@ -2,11 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
+
 use App\Http\Controllers\Api\DataFetchController;
-use App\Http\Controllers\Teacher\Platform\GroupsController;
+
+use App\Http\Controllers\Teacher\Tools\GroupsController;
+
 use App\Http\Controllers\Teacher\Users\AssistantsController;
 use App\Http\Controllers\Teacher\Users\StudentsController;
 use App\Http\Controllers\Teacher\Users\ParentsController;
+
 use App\Http\Controllers\Teacher\Activities\AttendanceController;
 use App\Http\Controllers\Teacher\Activities\ZoomsController;
 use App\Http\Controllers\Teacher\Activities\QuizzesController;
@@ -28,7 +32,7 @@ Route::group(
             Route::get('grades/{grade}/groups', 'getTeacherGroupsByGrade')->name('grade.groups');
         });
 
-        # Start Platform Managment
+        # Start Tools
             # Groups
             Route::prefix('groups')->controller(GroupsController::class)->name('groups.')->group(function() {
                 Route::get('/', 'index')->name('index');
@@ -39,7 +43,7 @@ Route::group(
                     Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
                 });
             });
-        # End Platform Managment
+        # End Tools
 
         # Start Users Managment
             # Assistants

@@ -59,7 +59,7 @@
     <ul class="menu-inner py-1">
         <!-- Dashboard -->
         <li class="menu-item {{ isActiveRoute('admin.dashboard') ? 'active' : '' }}">
-            <a href="{{ route('web.dashboard') }}" class="menu-link">
+            <a href="{{ route('admin.dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons ri-home-smile-line"></i>
                 <div>{{ trans('layouts/sidebar.dashboard') }}</div>
             </a>
@@ -108,11 +108,6 @@
                 <li class="menu-item {{ isActiveRoute('admin.teachers.index') ? 'active' : '' }}">
                     <a href="{{ route('admin.teachers.index') }}" class="menu-link">
                         <div>{{ trans('layouts/sidebar.teachersManagment') }}</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ isActiveRoute('admin.groups.index') ? 'active' : '' }}">
-                    <a href="{{ route('admin.groups.index') }}" class="menu-link">
-                        <div>{{ trans('layouts/sidebar.groupsManagment') }}</div>
                     </a>
                 </li>
                 <li class="menu-item {{ isActiveRoute('admin.teachers.archived') ? 'active' : '' }}">
@@ -243,6 +238,17 @@
                     </a>
                 </li>
             </ul>
+        </li>
+
+        <!-- Tools -->
+        <li class="menu-header mt-5">
+            <span class="menu-header-text">{{ trans('layouts/sidebar.tools') }}</span>
+        </li>
+        <li class="menu-item {{ isActiveRoute('admin.groups.index') ? 'active' : '' }}">
+            <a href="{{ route('admin.groups.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons ri-group-2-line"></i>
+                <div>{{ trans('layouts/sidebar.groups') }}</div>
+            </a>
         </li>
 
         <!-- Activities -->

@@ -6,7 +6,7 @@ use App\Models\Assistant;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\AssistantsRequest;
+use App\Http\Requests\Admin\Users\AssistantsRequest;
 use App\Services\Teacher\Users\AssistantService;
 
 class AssistantsController extends Controller

@@ -7,7 +7,7 @@
 @section('title', pageTitle('admin/parents.parents'))
 
 @section('content')
-    @include('admin.parents.manage.statistics')
+    @include('admin.users.parents.manage.statistics')
     <!-- DataTable with Buttons -->
     <x-datatable datatableTitle="{{ trans('main.datatableTitle', ['item' => trans('admin/parents.parents')]) }}"
         dataToggle="modal" deleteButton addButton="{{ trans('main.addItem', ['item' => trans('admin/parents.parent')]) }}">

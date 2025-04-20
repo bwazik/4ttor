@@ -7,7 +7,7 @@
 @section('title', pageTitle('admin/assistants.assistants'))
 
 @section('content')
-    @include('admin.assistants.manage.statistics')
+    @include('admin.users.assistants.manage.statistics')
     <!-- DataTable with Buttons -->
     <x-datatable datatableTitle="{{ trans('main.datatableTitle', ['item' => trans('admin/assistants.assistants')]) }}"
         dataToggle="offcanvas" deleteButton addButton="{{ trans('main.addItem', ['item' => trans('admin/assistants.assistant')]) }}">

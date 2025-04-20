@@ -96,12 +96,12 @@ class AssignmentsController extends Controller
 
     public function deleteSelected(Request $request)
     {
-        $ids = Assignment::uuids($request->ids)->pluck('id')->toArray();
-        $request->merge(['ids' => $ids]);
+        $ids = Assignment::whereIn('uuid', $request->ids ?? [])->pluck('id')->toArray();
+        !empty($ids) ? $request->merge(['ids' => $ids]) : null;
 
         $this->validateExistence($request, 'assignments');
 
-        $result = $this->assignmentService->deleteSelectedAssignments($ids);
+        $result = $this->assignmentService->deleteSelectedAssignments($request->ids);
 
         if ($result['status'] === 'success') {
             return response()->json(['success' => $result['message']], 200);

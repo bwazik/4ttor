@@ -17,7 +17,6 @@ return [
     'archived' => 'الأرشيف',
     'teachers' => 'المدرسين',
     'teachersManagment' => 'إدارة المدرسين',
-    'groupsManagment' => 'إدارة المجاميع',
     'students' => 'الطلاب',
     'studentsManagment' => 'إدارة الطلاب',
     'parents' => 'أولياء الأمور',
@@ -37,6 +36,10 @@ return [
     'refunds' => 'الإستردادات',
     'teachersRefunds' => 'إستردادات المدرسين',
     'studentsRefunds' => 'إستردادات الطلاب',
+
+    # Tools
+    'tools' => 'أنشطة المعلم',
+    'groups' => 'المجاميع',
 
     # Activities
     'activities' => 'الأنشطة الطلابية',

@@ -165,7 +165,7 @@ class AssignmentService
 
                 $assignment->delete();
             }
-            
+
             return $this->successResponse(trans('main.deletedSelected', ['item' => trans('admin/assignments.assignments')]));
         });
     }

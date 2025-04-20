@@ -65,14 +65,14 @@
             </a>
         </li>
 
-        <!-- Platform Managment -->
+        <!-- Tools -->
         <li class="menu-header mt-5">
-            <span class="menu-header-text">{{ trans('layouts/sidebar.platformManagment') }}</span>
+            <span class="menu-header-text">{{ trans('layouts/sidebar.tools') }}</span>
         </li>
         <li class="menu-item {{ isActiveRoute('teacher.groups.index') ? 'active' : '' }}">
             <a href="{{ route('teacher.groups.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons ri-group-2-line"></i>
-                <div>{{ trans('layouts/sidebar.groupsManagment') }}</div>
+                <div>{{ trans('layouts/sidebar.groups') }}</div>
             </a>
         </li>
 

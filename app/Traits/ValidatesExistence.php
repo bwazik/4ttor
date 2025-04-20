@@ -22,7 +22,7 @@ trait ValidatesExistence
         elseif($request->has('ids'))
         {
             return $request->validate([
-                'ids' => 'required|array',
+                'ids' => 'array',
                 'ids.*' => 'integer|exists:' . $table . ',id',
             ]);
         }
