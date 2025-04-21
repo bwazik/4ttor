@@ -7,7 +7,7 @@
 @section('title', pageTitle('admin/groups.groups'))
 
 @section('content')
-    @include('admin.groups.statistics')
+    @include('admin.tools.groups.statistics')
     <!-- DataTable with Buttons -->
     <x-datatable datatableTitle="{{ trans('main.datatableTitle', ['item' => trans('admin/groups.groups')]) }}"
         dataToggle="offcanvas" deleteButton addButton="{{ trans('main.addItem', ['item' => trans('admin/groups.group')]) }}">

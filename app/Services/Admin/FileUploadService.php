@@ -5,6 +5,7 @@ namespace App\Services\Admin;
 use App\Models\Assignment;
 use Illuminate\Http\Request;
 use App\Models\AssignmentFile;
+use App\Models\Resource;
 use App\Models\SubmissionFile;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -65,11 +66,11 @@ class FileUploadService
             $timestamp = now()->format('YmdHis');
             $fileName = str_replace(['/', '-', '–', ' ', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $file->getClientOriginalName()); // Sanitize file name
             $path = '';
+            $guard = getActiveGuard();
             $fileModelClass = null;
             $fileModelData = [];
 
             if ($entityType === 'assignment') {
-                $guard = getActiveGuard();
                 $user = Auth::guard($guard)->user();
                 $assignment = Assignment::findOrFail($entityId);
 
@@ -138,30 +139,43 @@ class FileUploadService
                 if ($existingFile) {
                     return $this->errorResponse(trans('toasts.fileAlreadyExists', ['filename' => $fileName]));
                 }
-            // } elseif ($entityType === 'teacher_library') {
-            //     $teacher = Auth::user();
-            //     if (!$teacher || !isset($teacher->uuid)) {
-            //         return $this->errorResponse('Teacher authentication failed or UUID missing.');
-            //     }
-            //     $customFileName = "{$fileName}_{$timestamp}";
-            //     $path = "teacher_library/{$teacher->uuid}/{$fileType}/{$customFileName}";
-            //     $fileModelClass = TeacherLibraryFile::class;
-            //     $fileModelData = [
-            //         'teacher_id' => $entityId,
-            //         'file_type' => $fileType,
-            //         'file_path' => $path,
-            //         'file_name' => $file->getClientOriginalName(),
-            //         'size' => $file->getSize(),
-            //     ];
+            } elseif ($entityType === 'resource') {
+                $user = Auth::guard($guard)->user();
+                $resource = Resource::findOrFail($entityId);
 
-            //     // Check for duplicate file name
-            //     $existingFile = $fileModelClass::where('teacher_id', $entityId)
-            //         ->where('file_type', $fileType)
-            //         ->where('file_name', $fileName)
-            //         ->first();
-            //     if ($existingFile) {
-            //         return $this->errorResponse("A file named '{$fileName}' already exists in this library section.");
-            //     }
+                $existingResource = Resource::where('id', $entityId)
+                    ->whereNotNull('file_path')
+                    ->whereNotNull('file_name')
+                    ->first();
+
+                if ($existingResource) {
+                    return $this->errorResponse(trans('toasts.maxFilesLimitReached', ['max' => 1]));
+                }
+
+                if ($guard === 'teacher') {
+                    if(!$this->isTeacherAuthorizedForAssignment($user, $resource))
+                    {
+                        return $this->errorResponse(trans('toasts.unauthorizedAssignment'));
+                    }
+                }
+
+                $customFileName = "{$resource->id}_{$fileName}_{$timestamp}";
+                $path = "resources/{$resource->uuid}/{$customFileName}";
+                $fileModelClass = Resource::class;
+                $fileModelData = [
+                    'file_path' => $path,
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_size' => $file->getSize(),
+                ];
+
+                // Check for duplicate file name
+                $existingFile = $fileModelClass::where('id', $entityId)
+                    ->where('file_name', $file->getClientOriginalName())
+                    ->first();
+
+                if ($existingFile) {
+                    return $this->errorResponse(trans('toasts.fileAlreadyExists', ['filename' => $fileName]));
+                }
             } else {
                 return $this->errorResponse(trans('main.errorMessage'));
             }
@@ -181,7 +195,12 @@ class FileUploadService
             }
 
             // Save to database
-            $fileModel = $fileModelClass::create($fileModelData);
+            if ($entityType === 'resource') {
+                $fileModel = $fileModelClass::findOrFail($entityId);
+                $fileModel->update($fileModelData);
+            } else {
+                $fileModel = $fileModelClass::create($fileModelData);
+            }
 
             return $this->successResponse(trans('toasts.fileUploadedSuccessfully'));
         });
@@ -193,6 +212,7 @@ class FileUploadService
             $fileModelClass = match ($entityType) {
                 'assignment' => AssignmentFile::class,
                 'submission' => SubmissionFile::class,
+                'resource' => Resource::class,
                 default => $this->errorResponse(trans('main.errorMessage')),
             };
 
@@ -200,7 +220,10 @@ class FileUploadService
 
             $guard = getActiveGuard();
             $user = Auth::guard($guard)->user();
-            $assignment = Assignment::findOrFail($file->assignment_id);
+
+            if ($entityType === 'assignment') {
+                $assignment = Assignment::findOrFail($file->assignment_id);
+            }
 
             if (!$user) {
                 return $this->errorResponse("Unauthenticated");
@@ -255,6 +278,7 @@ class FileUploadService
             $fileModelClass = match ($entityType) {
                 'assignment' => AssignmentFile::class,
                 'submission' => SubmissionFile::class,
+                'resource' => Resource::class,
                 default => $this->errorResponse(trans('main.errorMessage')),
             };
 
@@ -262,7 +286,10 @@ class FileUploadService
 
             $guard = getActiveGuard();
             $user = Auth::guard($guard)->user();
-            $assignment = Assignment::findOrFail($file->assignment_id);
+
+            if ($entityType === 'assignment') {
+                $assignment = Assignment::findOrFail($file->assignment_id);
+            }
 
             if (!$user) {
                 return $this->errorResponse("Unauthenticated");
@@ -297,25 +324,50 @@ class FileUploadService
                 Storage::disk('s3')->delete($filePath);
             }
 
-            $file->delete();
+            if ($entityType === 'submission' || $entityType === 'assignment') {
+                $file->delete();
+            }elseif ($entityType === 'resource') {
+                $file->update([
+                    'file_path' => null,
+                    'file_name' => null,
+                    'file_size' => 0,
+                ]);
+            }
 
             return $this->successResponse(trans('toasts.fileDeletedSuccessfully'));
         });
     }
 
-    public function deleteRelatedFiles($models, string $relation, string $pathColumn = 'file_path')
+    public function deleteRelatedFiles($models, ?string $relation = null, string $pathColumn = 'file_path', bool $deleteModelFile = false)
     {
         $models = $models instanceof Collection ? $models : collect([$models]);
 
-        $models->each(function ($model) use ($relation, $pathColumn) {
-            $model->$relation()->each(function ($related) use ($pathColumn) {
-                if (Storage::disk('s3')->exists($related->$pathColumn)) {
-                    Storage::disk('s3')->delete($related->$pathColumn);
+        $models->each(function ($model) use ($relation, $pathColumn, $deleteModelFile) {
+            if ($deleteModelFile && !empty($model->$pathColumn)) {
+                if (Storage::disk('s3')->exists($model->$pathColumn)) {
+                    try {
+                        Storage::disk('s3')->delete($model->$pathColumn);
+                    } catch (\Exception $e) {
+                        Log::error("Failed to delete file from S3: {$model->$pathColumn}", ['exception' => $e->getMessage()]);
+                    }
                 }
-                $related->delete();
-            });
+            }
+
+            if ($relation) {
+                $model->$relation()->each(function ($related) use ($pathColumn) {
+                    if (!empty($related->$pathColumn) && Storage::disk('s3')->exists($related->$pathColumn)) {
+                        try {
+                            Storage::disk('s3')->delete($related->$pathColumn);
+                        } catch (\Exception $e) {
+                            Log::error("Failed to delete file from S3: {$related->$pathColumn}", ['exception' => $e->getMessage()]);
+                        }
+                    }
+                    $related->delete();
+                });
+            }
         });
     }
+
 
     protected function isTeacherAuthorizedForAssignment($teacher, $assignment)
     {

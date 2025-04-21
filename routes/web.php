@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\Finance\InvoicesController;
 use App\Http\Controllers\Admin\Finance\ReceiptsController;
 
 use App\Http\Controllers\Admin\Tools\GroupsController;
+use App\Http\Controllers\Admin\Tools\ResourcesController;
 
 use App\Http\Controllers\Admin\Activities\AttendanceController;
 use App\Http\Controllers\Admin\Activities\ZoomsController;
@@ -51,9 +52,9 @@ Route::group(
         'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath', 'auth:web']
     ], function(){
 
-    Route::get('/dashboard', fn() => view('admin.dashboard'))->name('admin.dashboard');
 
     Route::name('admin.')->group(function() {
+        Route::get('/dashboard', fn() => view('admin.dashboard'))->name('dashboard');
 
         # Api Responses
         Route::prefix('fetch')->controller(DataFetchController::class)->name('fetch.')->group(function () {
@@ -267,6 +268,20 @@ Route::group(
                     Route::post('update', 'update')->name('update');
                     Route::post('delete', 'delete')->name('delete');
                     Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
+            });
+
+            # Resources
+            Route::prefix('resources')->controller(ResourcesController::class)->name('resources.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::get('{id}', 'details')->name('details');
+                Route::post('{id}/upload', 'uploadFile')->name('upload');
+                Route::get('{id}/download', 'downloadFile')->name('download');
+                Route::post('files/delete', 'deleteFile')->name('files.delete');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
                 });
             });
         # End Teacher Tools

@@ -100,6 +100,7 @@ return [
     'wrong' => 'Incorrect',
     'score' => 'Score',
     'files' => 'Files',
+    'video_url' => 'Video URL',
     'allowed' => 'Allowed',
     'notallowed' => 'Not Allowed',
     'select_option' => 'Select an option from the list',
@@ -109,6 +110,8 @@ return [
     'attendances' => 'Attendances',
     'zoomAccount' => 'Zoom Account',
     'dependencyDept' => ':dependency Dept',
+    'downloads' => 'Downloads',
+    'views' => 'Views',
 
     # Modals
     'items' => 'Items Count',
@@ -130,6 +133,7 @@ return [
     'submit' => 'Submit',
     'cancel' => 'Cancel',
     'search' => 'Search',
+    'share' => 'Share',
     'yes_delete' => 'Yes, Delete',
     'yes_archive' => 'Yes, Archive',
     'yes_restore' => 'Yes, Restore',

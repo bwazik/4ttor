@@ -35,6 +35,9 @@
         noFileUploaded: @json(trans('toasts.noFileUploaded')),
         invalidFileType: @json(trans('validation.mimes')),
         maxFileSize: @json(trans('validation.max.file')),
+        linkCopiedSuccess: @json(trans('toasts.linkCopiedSuccess')),
+        linkCopiedError: @json(trans('toasts.linkCopiedError')),
+        share: @json(trans('main.share')),
     };
 </script>
 

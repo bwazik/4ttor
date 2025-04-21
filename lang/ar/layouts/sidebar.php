@@ -2,7 +2,7 @@
 
 return [
 
-    'platformName' => 'منصة شطور',
+    'platformName' => 'منصة شَطُّور',
     'dashboard' => 'الرئيسية',
 
     # Platform Managment
@@ -40,6 +40,7 @@ return [
     # Tools
     'tools' => 'أنشطة المعلم',
     'groups' => 'المجاميع',
+    'resources' => 'المستندات',
 
     # Activities
     'activities' => 'الأنشطة الطلابية',

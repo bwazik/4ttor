@@ -13,7 +13,7 @@ return [
     'restoreSelected' => 'إسترجاع المحددين',
     'addItem' => 'إضافة :item',
     'datatable' => [
-        'search' => 'ابحث هنا:',
+        'search' => 'بتدَوَّر علي حاجة؟',
         'empty_table' => 'مفيش بيانات عشان تعرضها',
         'zero_records' => 'مفيش نتائج مطابقة',
         'length_menu' => 'اعرض _MENU_ من العناصر',
@@ -100,6 +100,7 @@ return [
     'wrong' => 'خاطئة',
     'score' => 'الدرجة',
     'files' => 'الملفات',
+    'video_url' => 'رمز الفيديو',
     'allowed' => 'مسموح',
     'notallowed' => 'مش مسموح',
     'select_option' => 'اختار حاجة من الاختيارات',
@@ -109,6 +110,8 @@ return [
     'attendances' => 'الحضور والغياب',
     'zoomAccount' => 'أكونت الزوم',
     'dependencyDept' => 'مديونية ال:dependency',
+    'downloads' => 'التحميلات',
+    'views' => 'المشاهدات',
 
     # Modals
     'items' => 'عدد العناصر',
@@ -130,6 +133,7 @@ return [
     'submit' => 'تمام',
     'cancel' => 'إلغاء',
     'search' => 'بحث',
+    'share' => 'مشاركة',
     'yes_delete' => 'آه, إمسح',
     'yes_archive' => 'آه, أرشف',
     'yes_restore' => 'آه, رجعهم',

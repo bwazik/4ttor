@@ -16,7 +16,7 @@ class SubjectsRequest extends FormRequest
         return [
             'name_ar' => 'required|min:3|max:100|unique:subjects,name->ar,'.$this -> id,
             'name_en' => 'required|min:3|max:100|unique:subjects,name->en,'.$this -> id,
-            'is_active' => 'required|boolean',
+            'is_active' => 'nullable|boolean',
         ];
     }
 

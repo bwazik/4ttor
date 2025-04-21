@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'platformName' => '4ttor',
+    'platformName' => 'Shattor',
     'dashboard' => 'Dashboard',
 
     # Platform Managment
@@ -16,7 +16,6 @@ return [
     'archived' => 'Archive',
     'teachers' => 'Teachers',
     'teachersManagment' => 'Teachers Managment',
-    'groupsManagment' => 'Groups Managment',
     'students' => 'Students',
     'studentsManagment' => 'Students Managment',
     'parents' => 'Parents',
@@ -36,6 +35,11 @@ return [
     'refunds' => 'Refunds',
     'teachersRefunds' => 'Teachers Refunds',
     'studentsRefunds' => 'Students Refunds',
+
+    # Tools
+    'tools' => 'Teacher Activities',
+    'groups' => 'Groups',
+    'resources' => 'Resources',
 
     # Activities
     'activities' => 'Student Activities',
