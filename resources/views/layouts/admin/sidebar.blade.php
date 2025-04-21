@@ -250,6 +250,12 @@
                 <div>{{ trans('layouts/sidebar.groups') }}</div>
             </a>
         </li>
+        <li class="menu-item {{ isActiveRoute('admin.resources.index') ? 'active' : '' }}">
+            <a href="{{ route('admin.resources.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons ri-folders-line"></i>
+                <div>{{ trans('layouts/sidebar.resources') }}</div>
+            </a>
+        </li>
 
         <!-- Activities -->
         <li class="menu-header mt-5">

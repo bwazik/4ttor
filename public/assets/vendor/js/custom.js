@@ -155,7 +155,7 @@ function generateRandomString(length = 8) {
 
 function generateRandomUsername(suffix) {
     $('#add-form #name_en').on('input', function() {
-        const username = '4ttor' + generateRandomString() + suffix;
+        const username = 'Shattor' + generateRandomString() + suffix;
         $('#add-form #username').val(username);
     });
 }
@@ -978,6 +978,101 @@ function handleProfilePicSubmit(formId, fileSize, allowedExtensions) {
 
                 resetButtonState($submitButton, originalButtonContent);
             },
+        });
+    });
+}
+
+function strLimit(str, limit = 50, ending = '...') {
+    if (typeof str !== 'string') {
+        str = String(str);
+    }
+    if (str.length <= limit) {
+        return str;
+    }
+
+    let truncated = str.substr(0, limit);
+    let lastSpace = truncated.lastIndexOf(' ');
+
+    if (lastSpace !== -1) {
+        truncated = truncated.substr(0, lastSpace);
+    } else {
+        truncated = str.substr(0, limit);
+    }
+
+    return truncated + ending;
+}
+
+
+function toggleShareButton()
+{
+    document.querySelector('.ri-share-forward-line').addEventListener('click', async () => {
+        // Get current URL
+        const url = encodeURIComponent(window.location.href);
+        const title = encodeURIComponent(document.title);
+
+        // Create sharing options
+        const shareOptions = [
+            {
+                name: 'WhatsApp',
+                url: `https://wa.me/?text=${title}%20${url}`,
+                icon: 'ri-whatsapp-line'
+            },
+            {
+                name: 'Copy Link',
+                url: 'copy',
+                icon: 'ri-file-copy-line'
+            }
+        ];
+
+        // Create share modal HTML
+        const modalHtml = `
+            <div class="modal fade" id="shareModal" tabindex="-1">
+                <div class="modal-dialog modal-sm modal-dialog-centered">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">${window.translations?.share || 'Share'}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="d-flex justify-content-around">
+                        ${shareOptions.map(option => `
+                            <button class="btn btn-icon ${option.url === 'copy' ? 'btn-label-primary' : 'btn-label-success'} share-btn" data-url="${option.url}">
+                            <i class="${option.icon}"></i>
+                            </button>
+                        `).join('')}
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Add modal to body if not exists
+        if (!document.getElementById('shareModal')) {
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        // Show modal
+        const shareModal = new bootstrap.Modal(document.getElementById('shareModal'));
+        shareModal.show();
+
+        // Handle share button clicks
+        document.querySelectorAll('.share-btn').forEach(btn => {
+            btn.onclick = async () => {
+                const shareUrl = btn.dataset.url;
+
+                if (shareUrl === 'copy') {
+                    try {
+                        await navigator.clipboard.writeText(window.location.href);
+                        toastr.success(window.translations?.linkCopiedSuccess || 'Link copied successfully!');
+                    } catch (err) {
+                        toastr.error(window.translations?.linkCopiedError || 'Failed to copy link');
+                    }
+                    shareModal.hide();
+                } else {
+                    window.open(shareUrl, '_blank', 'width=600,height=400');
+                }
+            };
         });
     });
 }

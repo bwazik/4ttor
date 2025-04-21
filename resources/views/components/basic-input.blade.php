@@ -106,5 +106,8 @@
             <label for="{{ $id ?? $name }}">{{ $label }}</label>
         </div>
         <span class="invalid-feedback" id="{{ $id ?? $name }}_error" role="alert"></span>
+        @if($name === 'video_url')
+            <div class="form-text">https://www.youtube.com/watch?v=V6e6j2RwXiQ هتنسخ اخر جزء من الفيديو (V6e6j2RwXiQ)</div>
+        @endif
     </div>
 @endif

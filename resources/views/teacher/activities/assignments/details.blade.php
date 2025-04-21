@@ -14,11 +14,11 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap mb-6 gap-1">
                         <div class="me-1">
                             <h5 class="mb-0">{{ $assignment->title }}</h5>
-                            <p class="mb-0">{{ trans('main.mr') }}: <span class="fw-medium text-heading"> {{ Auth::user()->name }} </span></p>
+                            <p class="mb-0">{{ trans('main.mr') }}: <span class="fw-medium text-heading"> {{ Auth::user()->name ?? 'N/A' }} </span></p>
                         </div>
                         <div class="d-flex align-items-center">
-                            <span class="badge bg-label-success rounded-pill">{{ $assignment->grade->name }}</span>
-                            <i class="ri-share-forward-line ri-24px mx-4 cursor-pointer"></i>
+                            <span class="badge bg-label-success rounded-pill">{{ $assignment->grade->name ?? 'N/A' }}</span>
+                            <i class="ri-share-forward-line ri-24px mx-4 cursor-pointer" data-bs-toggle="tooltip" title="{{ trans('main.share') }}"></i>
                         </div>
                     </div>
                     <div class="card academy-content shadow-none border">
@@ -33,7 +33,7 @@
                                         <i class="ri-star-smile-line ri-20px me-2"></i>{{ trans('main.score') }}: {{ $assignment->score }}
                                     </p>
                                     <p class="text-nowrap mb-3">
-                                        <i class="ri-survey-line ri-20px me-2"></i>{{ trans('main.grade') }}: {{ $assignment->grade->name }}
+                                        <i class="ri-survey-line ri-20px me-2"></i>{{ trans('main.grade') }}: {{ $assignment->grade->name ?? 'N/A' }}
                                     </p>
                                 </div>
                                 <div>
@@ -61,8 +61,8 @@
                                     </div>
                                 </div>
                                 <div class="d-flex flex-column">
-                                    <h6 class="mb-1">{{ Auth::user()->name }}</h6>
-                                    <small>{{ trans('admin/teachers.teacher') }} {{ Auth::user()->subject->name }}</small>
+                                    <h6 class="mb-1">{{ Auth::user()->name ?? 'N/A' }}</h6>
+                                    <small>{{ trans('admin/teachers.teacher') }} {{ Auth::user()->subject->name ?? 'N/A' }}</small>
                                 </div>
                             </div>
                         </div>
@@ -98,12 +98,12 @@
                                         @php
                                             $extension = strtolower(pathinfo($file->file_name, PATHINFO_EXTENSION));
                                             $imageSrc = match ($extension) {
-                                                'pdf' => asset('assets/img/icons/misc/pdf.png'),
-                                                'jpg', 'jpeg' => asset('assets/img/icons/misc/jpg.png'),
-                                                'png' => asset('assets/img/icons/misc/png.png'),
-                                                'doc', 'docx' => asset('assets/img/icons/misc/doc.png'),
-                                                'xls', 'xlsx' => asset('assets/img/icons/misc/excel.png'),
-                                                'txt' => asset('assets/img/icons/misc/txt.png'),
+                                                'pdf' => asset('assets/img/icons/misc/pdf.svg'),
+                                                'jpg', 'jpeg' => asset('assets/img/icons/misc/jpg.svg'),
+                                                'png' => asset('assets/img/icons/misc/png.svg'),
+                                                'doc', 'docx' => asset('assets/img/icons/misc/docx.svg'),
+                                                'xls', 'xlsx' => asset('assets/img/icons/misc/xlsx.svg'),
+                                                'txt' => asset('assets/img/icons/misc/txt.svg'),
                                                 default => asset('assets/img/icons/misc/file.png'),
                                             };
                                         @endphp
@@ -114,11 +114,7 @@
                                             {{ $file->file_name }}
                                         </a>
                                         <small class="text-body d-block">
-                                            @if($file->file_size / (1024 * 1024) >= 1)
-                                                {{ number_format($file->file_size / (1024 * 1024), 2) }} MB
-                                            @else
-                                                {{ number_format($file->file_size / 1024, 2) }} KB
-                                            @endif
+                                            {{ $file->file_size >= 1024 * 1024 ? number_format($file->file_size / (1024 * 1024), 2) . ' MB' : number_format($file->file_size / 1024, 2) . ' KB' }}
                                         </small>
                                     </span>
                                     <div class="ms-auto">
@@ -130,7 +126,7 @@
                                     </div>
                                 </div>
                             @empty
-                                <p>No files uploaded for this assignment.</p>
+                                <p class="text-muted">{{ trans('admin/resources.no_files_uploaded') }}</p>
                             @endforelse
                         </div>
                     </div>
@@ -162,5 +158,7 @@
         });
 
         handleDeletionFormSubmit('#delete-form', '#delete-modal')
+
+        toggleShareButton();
     </script>
 @endsection

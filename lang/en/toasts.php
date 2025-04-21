@@ -13,4 +13,6 @@ return [
     'fileDeletedSuccessfully' => 'The file has been deleted successfully.',
     'fileNotFound' => 'File not found, please try again.',
     'unauthorizedAssignment' => 'You are not authorized to perform any action on this assignment.',
+    'linkCopiedSuccess' => 'Link copied to clipboard successfully.',
+    'linkCopiedError' => 'Error copying the link, please try again.',
 ];

@@ -13,4 +13,6 @@ return [
     'fileDeletedSuccessfully' => 'تم حذف الملف بنجاح.',
     'fileNotFound' => 'الملف غير موجود، حاول مرة تانية.',
     'unauthorizedAssignment' => 'مش مسموح لك بتنفيذ اي إجراء على الواجب دا.',
+    'linkCopiedSuccess' => 'تم نسخ الرابط للحافظة بنجاح.',
+    'linkCopiedError' => 'في مشكلة في نسخ الرابط، حاول مرة تانية.',
 ];

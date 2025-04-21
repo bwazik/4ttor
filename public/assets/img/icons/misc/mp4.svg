@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="72" height="72" viewBox="0 0 72 72">
+  <defs>
+    <clipPath id="clip-Artboard_181">
+      <rect width="72" height="72"/>
+    </clipPath>
+  </defs>
+  <g id="Artboard_181" data-name="Artboard – 181" clip-path="url(#clip-Artboard_181)">
+    <rect width="72" height="72" fill="rgba(255,255,255,0)"/>
+    <path id="Path_636" data-name="Path 636" d="M7.2,0H40.425L55.2,15.623V64.918A7.142,7.142,0,0,1,48,72H7.2A7.142,7.142,0,0,1,0,64.918V7.082A7.142,7.142,0,0,1,7.2,0Z" transform="translate(8 0)" fill="#081bdd"/>
+    <path id="Path_638" data-name="Path 638" d="M48.463,15.635H40.887a7.142,7.142,0,0,1-7.2-7.082l0-8.539Z" transform="translate(14.737 -0.012)" fill="#8c96f8"/>
+    <g id="play-button-arrowhead" transform="translate(21.893 27.665)">
+      <path id="Path_758" data-name="Path 758" d="M10.828.368C9.325-.495,8.107.212,8.107,1.944V14.725c0,1.734,1.218,2.439,2.721,1.578L22,9.9c1.5-.862,1.5-2.26,0-3.122Z" transform="translate(0 0)" fill="#fff"/>
+    </g>
+    <path id="Path_865" data-name="Path 865" d="M5.905,5.047l2.557,7.219L11,5.047H13.7V15H11.641V12.279l.205-4.7L9.159,15H7.751L5.071,7.59l.205,4.689V15H3.226V5.047ZM17.54,11.493V15H15.489V5.047h3.883a4.492,4.492,0,0,1,1.972.41,3.022,3.022,0,0,1,1.309,1.166,3.25,3.25,0,0,1,.458,1.719,2.858,2.858,0,0,1-1,2.307,4.171,4.171,0,0,1-2.772.844Zm0-1.661h1.832a1.8,1.8,0,0,0,1.241-.383,1.392,1.392,0,0,0,.427-1.094,1.642,1.642,0,0,0-.431-1.183,1.609,1.609,0,0,0-1.189-.465H17.54Zm12.612,1.422H31.28v1.593H30.152V15H28.177V12.847H24.1L24.007,11.6l4.149-6.556h2Zm-4.177,0h2.2V7.74l-.13.226Z" transform="translate(19 47)" fill="#fff"/>
+  </g>
+</svg>

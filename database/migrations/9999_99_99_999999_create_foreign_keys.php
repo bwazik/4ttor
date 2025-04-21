@@ -57,22 +57,6 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });
-        Schema::table('groups', function (Blueprint $table) {
-            $table->foreign('teacher_id')->references('id')->on('teachers')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-            $table->foreign('grade_id')->references('id')->on('grades')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-        });
-        Schema::table('student_group', function (Blueprint $table) {
-            $table->foreign('student_id')->references('id')->on('students')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-            $table->foreign('group_id')->references('id')->on('groups')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-        });
         # End Users Management Tables
 
         # Start Finance Tables
@@ -154,6 +138,33 @@ return new class extends Migration
                 ->onUpdate('cascade');
         });
         # End Finance Tables
+
+        # Start Tools Tables
+        Schema::table('groups', function (Blueprint $table) {
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('grade_id')->references('id')->on('grades')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('student_group', function (Blueprint $table) {
+            $table->foreign('student_id')->references('id')->on('students')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('group_id')->references('id')->on('groups')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('teacher_resources', function (Blueprint $table) {
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('grade_id')->references('id')->on('grades')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        # End Tools Tables
 
         # Start Activities Tables
         Schema::table('attendances', function (Blueprint $table) {
@@ -311,14 +322,6 @@ return new class extends Migration
         Schema::table('assistants', function (Blueprint $table) {
             $table->dropForeign('assistants_teacher_id_foreign');
         });
-        Schema::table('groups', function (Blueprint $table) {
-            $table->dropForeign('groups_teacher_id_foreign');
-            $table->dropForeign('groups_grade_id_foreign');
-        });
-        Schema::table('student_group', function (Blueprint $table) {
-            $table->dropForeign('student_group_student_id_foreign');
-            $table->dropForeign('student_group_group_id_foreign');
-        });
         # End Users Management Tables
 
         # Start Finance Tables
@@ -358,6 +361,21 @@ return new class extends Migration
             $table->dropForeign('funds_refund_id_foreign');
         });
         # End Finance Tables
+
+        # Start Tools Tables
+        Schema::table('groups', function (Blueprint $table) {
+            $table->dropForeign('groups_teacher_id_foreign');
+            $table->dropForeign('groups_grade_id_foreign');
+        });
+        Schema::table('student_group', function (Blueprint $table) {
+            $table->dropForeign('student_group_student_id_foreign');
+            $table->dropForeign('student_group_group_id_foreign');
+        });
+        Schema::table('teacher_resources', function (Blueprint $table) {
+            $table->dropForeign('teacher_resources_teacher_id_foreign');
+            $table->dropForeign('teacher_resources_grade_id_foreign');
+        });
+        # End Tools Tables
 
         # Start Activities Tables
         Schema::table('attendances', function (Blueprint $table) {

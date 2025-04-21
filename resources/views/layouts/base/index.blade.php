@@ -11,9 +11,9 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
     <meta name="description"
-        content="4ttor Platform - Empowering teachers with tools to manage students and create engaging educational experiences." />
-    <meta name="author" content="Abdullah Mohamed (Bazoka), Developer and Founder of 4ttor Platform" />
-    <meta name="keywords" content="4ttor, education platform, teacher tools, student management, online learning" />
+        content="Shattor Platform - Empowering teachers with tools to manage students and create engaging educational experiences." />
+    <meta name="author" content="Abdullah Mohamed (Bazoka), Developer and Founder of Shattor Platform" />
+    <meta name="keywords" content="Shattor, education platform, teacher tools, student management, online learning" />
     <!-- Title -->
     <title>@yield("title")</title>
     <!-- Favicon -->

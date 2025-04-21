@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="72" height="72" viewBox="0 0 72 72">
+  <defs>
+    <linearGradient id="linear-gradient" x1="1.073" y1="-0.46" x2="0.625" y2="0.911" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#9f9d9d"/>
+      <stop offset="1" stop-color="#d8d8d8"/>
+    </linearGradient>
+    <clipPath id="clip-Artboard_24">
+      <rect width="72" height="72"/>
+    </clipPath>
+  </defs>
+  <g id="Artboard_24" data-name="Artboard – 24" clip-path="url(#clip-Artboard_24)">
+    <rect width="72" height="72" fill="rgba(255,255,255,0)"/>
+    <g id="Group_484" data-name="Group 484">
+      <path id="Path_636" data-name="Path 636" d="M7.2,0H40.425L55.2,15.623V64.918A7.142,7.142,0,0,1,48,72H7.2A7.142,7.142,0,0,1,0,64.918V7.082A7.142,7.142,0,0,1,7.2,0Z" transform="translate(8 0)" fill="url(#linear-gradient)"/>
+      <path id="Path_638" data-name="Path 638" d="M48.463,15.635H40.887a7.142,7.142,0,0,1-7.2-7.082l0-8.539Z" transform="translate(14.737 -0.012)" fill="#e6e6e6"/>
+    </g>
+  </g>
+</svg>
