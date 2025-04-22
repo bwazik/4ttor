@@ -1,4 +1,4 @@
-@extends('layouts.admin.master')
+@extends('layouts.teacher.master')
 
 @section('page-css')
 
@@ -18,15 +18,15 @@
                 </div>
                 <div class="app-academy-md-50 card-body d-flex align-items-md-center flex-column text-md-center mb-6 py-6">
                     <span class="card-title mb-4 lh-lg px-md-12 h4 text-heading">
-                        {{ trans('admin/resources.resources_header') }}<br />
-                        {{ trans('admin/resources.resources_header2') }} <span class="text-primary text-nowrap">{{ trans('admin/resources.resources_highlight') }}</span>.
+                        {{ trans('admin/resources.teacher.resources_header') }}<br />
+                        {{ trans('admin/resources.teacher.resources_header2') }} <span class="text-primary text-nowrap">{{ trans('admin/resources.teacher.resources_highlight') }}</span>.
                     </span>
                     <p class="mb-4 px-0 px-md-2">
-                        {{ trans('admin/resources.resources_description') }}<br />
-                        {{ trans('admin/resources.resources_description2') }}
+                        {{ trans('admin/resources.teacher.resources_description') }}<br />
+                        {{ trans('admin/resources.teacher.resources_description2') }}
                     </p>
                     <div class="d-flex align-items-center justify-content-between app-academy-md-80">
-                        <form id="search-form" method="GET" action="{{ route('admin.resources.index') }}"
+                        <form id="search-form" method="GET" action="{{ route('teacher.resources.index') }}"
                             class="d-flex align-items-center justify-content-between app-academy-md-80">
                             <input type="search" name="search" placeholder="{{ trans('admin/resources.search_resources') }}"
                                 class="form-control form-control-sm me-4" value="{{ request('search') }}" />
@@ -53,20 +53,12 @@
                     <h5 class="mb-0">{{ trans('main.datatableTitle', ['item' => trans('admin/resources.resources')]) }}</h5>
                     <p class="mb-0 text-body">{{ trans('admin/resources.total_resources', ['count' => $resources->total()]) }}</p>
                 </div>
-                <form id="filter-form" method="GET" action="{{ route('admin.resources.index') }}"
+                <form id="filter-form" method="GET" action="{{ route('teacher.resources.index') }}"
                     class="d-flex justify-content-md-end align-items-center gap-6 flex-wrap">
                     <select id="grade_id" class="form-select form-select-sm w-px-250" name="grade_id">
                         <option value="">{{ trans('admin/grades.grades') }}</option>
                         @foreach ($grades as $id => $name)
                             <option value="{{ $id }}" {{ request('grade_id') == $id ? 'selected' : '' }}>
-                                {{ $name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <select id="teacher_id" class="form-select form-select-sm w-px-250" name="teacher_id">
-                        <option value="">{{ trans('admin/teachers.teachers') }}</option>
-                        @foreach ($teachers as $id => $name)
-                            <option value="{{ $id }}" {{ request('teacher_id') == $id ? 'selected' : '' }}>
                                 {{ $name }}
                             </option>
                         @endforeach
@@ -125,29 +117,28 @@
                                         <div class="dropdown">
                                             <button
                                                 class="btn btn-text-secondary rounded-pill text-muted border-0 p-1 waves-effect waves-light"
-                                                type="button" id="financeApp_{{ $resource->id }}" data-bs-toggle="dropdown"
+                                                type="button" id="financeApp_{{ $resource->uuid }}" data-bs-toggle="dropdown"
                                                 aria-haspopup="true" aria-expanded="false">
                                                 <i class="ri-more-2-line ri-20px"></i>
                                             </button>
-                                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="financeApp_{{ $resource->id }}">
-                                                <a target="_blank" href="{{ route('admin.resources.details', $resource->id) }}" class="dropdown-item waves-effect">{{ trans('main.details') }}</a>
+                                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="financeApp_{{ $resource->uuid }}">
+                                                <a target="_blank" href="{{ route('teacher.resources.details', $resource->uuid) }}" class="dropdown-item waves-effect">{{ trans('main.details') }}</a>
                                                 <a href="javascript:;" class="dropdown-item waves-effect" tabindex="0" type="button" data-bs-toggle="offcanvas" data-bs-target="#edit-modal"
                                                     id="edit-button"
-                                                    data-id="{{ $resource->id }}"
+                                                    data-id="{{ $resource->uuid }}"
                                                     data-title_ar="{{ $resource->getTranslation('title', 'ar') }}"
                                                     data-title_en="{{ $resource->getTranslation('title', 'en') }}"
-                                                    data-teacher_id="{{ $resource->teacher_id }}"
                                                     data-grade_id="{{ $resource->grade_id }}"
                                                     data-video_url="{{ $resource->video_url }}"
                                                     data-description="{{ $resource->description }}"
                                                     data-is_active="{{ $resource->is_active ? 1 : 0 }}">
                                                     {{ trans('main.edit') }}
                                                 </a>
-                                                <a href="{{ route('admin.resources.download', $resource->id) }}" class="dropdown-item waves-effect">{{ trans('main.download') }}</a>
+                                                <a href="{{ route('teacher.resources.download', $resource->uuid) }}" class="dropdown-item waves-effect">{{ trans('main.download') }}</a>
                                                 <div class="dropdown-divider"></div>
                                                 <a href="javascript:;" class="dropdown-item waves-effect text-danger"
                                                     id="delete-button"
-                                                    data-id="{{ $resource->id }}"
+                                                    data-id="{{ $resource->uuid }}"
                                                     data-title_ar="{{ $resource->getTranslation('title', 'ar') }}"
                                                     data-title_en="{{ $resource->getTranslation('title', 'en') }}"
                                                     data-bs-target="#delete-modal"
@@ -158,7 +149,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <a target="_blank" href="{{ route('admin.resources.details', $resource->id) }}" class="h5 mb-1">{{ Str::limit($resource->title, 50) }}</a>
+                                    <a target="_blank" href="{{ route('teacher.resources.details', $resource->uuid) }}" class="h5 mb-1">{{ Str::limit($resource->title, 50) }}</a>
                                     <p class="fw-medium small">{{ isoFormat($resource->created_at ?? now()) }}</p>
                                     <p class="my-4 small">{{ Str::limit($resource->description ?? '-', 50) }}</p>
                                     @php
@@ -187,10 +178,10 @@
                                         <ul class="list-unstyled m-0 d-flex align-items-center avatar-group">
                                             <li data-bs-toggle="tooltip" data-popup="tooltip-custom"
                                                 data-bs-placement="top" class="avatar avatar-sm pull-up"
-                                                aria-label="{{ $resource->teacher->name ?? 'N/A' }}"
-                                                data-bs-original-title="{{ $resource->teacher->name ?? 'N/A' }}">
+                                                aria-label="{{ Auth::user()->name ?? 'N/A' }}"
+                                                data-bs-original-title="{{ Auth::user()->name ?? 'N/A' }}">
                                                 <img class="rounded-circle"
-                                                    src="{{ $resource->teacher->profile_pic ? asset('storage/profiles/teachers/' . $resource->teacher->profile_pic) : asset('assets/img/avatars/default.jpg') }}"
+                                                    src="{{ Auth::user()->profile_pic ? asset('storage/profiles/teachers/' . Auth::user()->profile_pic) : asset('assets/img/avatars/default.jpg') }}"
                                                     alt="Avatar">
                                             </li>
                                         </ul>
@@ -220,7 +211,7 @@
             </div>
         </div>
     </div>
-    @include('admin.tools.resources.modals')
+    @include('teacher.tools.resources.modals')
 @endsection
 
 @section('page-js')
@@ -230,7 +221,6 @@
             buttonId: '#add-button',
             modalId: '#add-modal',
             fields: {
-                teacher_id: () => '',
                 grade_id: () => '',
             }
         });
@@ -242,7 +232,6 @@
                 id: button => button.data('id'),
                 title_ar: button => button.data('title_ar'),
                 title_en: button => button.data('title_en'),
-                teacher_id: button => button.data('teacher_id'),
                 grade_id: button => button.data('grade_id'),
                 video_url: button => button.data('video_url'),
                 description: button => button.data('description'),
@@ -259,12 +248,10 @@
             }
         });
 
-        let fields = ['title_ar', 'title_en', 'teacher_id', 'grade_id', 'video_url', 'description', 'is_active'];
+        let fields = ['title_ar', 'title_en', 'grade_id', 'video_url', 'description', 'is_active'];
         handleFormSubmit('#add-form', fields, '#add-modal', 'offcanvas');
         handleFormSubmit('#edit-form', fields, '#edit-modal', 'offcanvas');
         handleDeletionFormSubmit('#delete-form', '#delete-modal');
-        fetchMultipleDataByAjax('#add-form #teacher_id', "{{ route('admin.teachers.grades', '__ID__') }}",
-            '#add-form #grade_id', 'teacher_id', 'GET');
 
         function updateResources(page = 1) {
             const searchForm = $('#search-form');
@@ -298,11 +285,11 @@
             let formData = searchForm.serializeArray().concat(filterForm.serializeArray());
             formData.push({name: 'page', value: page});
 
-            const detailsRouteBase = "{{ route('admin.resources.details', ':id') }}";
-            const downloadRouteBase = "{{ route('admin.resources.download', ':id') }}";
+            const detailsRouteBase = "{{ route('teacher.resources.details', ':id') }}";
+            const downloadRouteBase = "{{ route('teacher.resources.download', ':id') }}";
 
             $.ajax({
-                url: "{{ route('admin.resources.index') }}",
+                url: "{{ route('teacher.resources.index') }}",
                 type: 'GET',
                 data: formData,
                 headers: {
@@ -352,8 +339,8 @@
                             '{{ asset('storage/profiles/teachers') }}' + '/' + resource.teacher.profile_pic :
                             '{{ asset('assets/img/avatars/default.jpg') }}';
 
-                        const detailsUrl = detailsRouteBase.replace(':id', resource.id);
-                        const downloadUrl = downloadRouteBase.replace(':id', resource.id);
+                        const detailsUrl = detailsRouteBase.replace(':id', resource.uuid);
+                        const downloadUrl = downloadRouteBase.replace(':id', resource.uuid);
 
                         const newCard = $('<div>').addClass('col-sm-6 col-lg-4').html(`
                             <div class="card">
@@ -371,17 +358,16 @@
                                             </div>
                                         </div>
                                         <div class="dropdown">
-                                            <button class="btn btn-text-secondary rounded-pill text-muted border-0 p-1 waves-effect waves-light" type="button" id="financeApp_${resource.id}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <button class="btn btn-text-secondary rounded-pill text-muted border-0 p-1 waves-effect waves-light" type="button" id="financeApp_${resource.uuid}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <i class="ri-more-2-line ri-20px"></i>
                                             </button>
-                                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="financeApp_${resource.id}">
+                                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="financeApp_${resource.uuid}">
                                                 <a target="_blank" href="${detailsUrl}" class="dropdown-item waves-effect">{{ trans('main.details') }}</a>
                                                 <a href="javascript:;" class="dropdown-item waves-effect" tabindex="0" type="button" data-bs-toggle="offcanvas" data-bs-target="#edit-modal"
                                                     id="edit-button"
-                                                    data-id="${resource.id}"
+                                                    data-id="${resource.uuid}"
                                                     data-title_ar="${resource.title_ar || ''}"
                                                     data-title_en="${resource.title_en || ''}"
-                                                    data-teacher_id="${resource.teacher_id}"
                                                     data-grade_id="${resource.grade_id}"
                                                     data-video_url="${resource.video_url || ''}"
                                                     data-description="${resource.description || ''}"
@@ -392,7 +378,7 @@
                                                 <div class="dropdown-divider"></div>
                                                 <a href="javascript:;" class="dropdown-item waves-effect text-danger"
                                                     id="delete-button"
-                                                    data-id="${resource.id}"
+                                                    data-id="${resource.uuid}"
                                                     data-title_ar="${resource.title_ar || ''}"
                                                     data-title_en="${resource.title_en || ''}"
                                                     data-bs-target="#delete-modal"
@@ -503,7 +489,7 @@
             updateResources();
         });
 
-        $('#grade_id, #teacher_id, #sort, #resource-switch').on('change', updateResources);
+        $('#grade_id, #sort, #resource-switch').on('change', updateResources);
 
         attachPaginationListeners();
     </script>

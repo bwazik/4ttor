@@ -111,6 +111,7 @@ return [
     'zoomAccount' => 'Zoom Account',
     'dependencyDept' => ':dependency Dept',
     'downloads' => 'Downloads',
+    'download' => 'Download',
     'views' => 'Views',
 
     # Modals

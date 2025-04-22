@@ -58,7 +58,6 @@ class FileUploadService
                 return $this->errorResponse(trans('toasts.noFileUploaded'));
             }
 
-            // Validate file integrity
             if (!$file->isValid()) {
                 return $this->errorResponse(trans('toasts.invalidUploadedFile'));
             }
@@ -67,17 +66,21 @@ class FileUploadService
             $fileName = str_replace(['/', '-', '–', ' ', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $file->getClientOriginalName()); // Sanitize file name
             $path = '';
             $guard = getActiveGuard();
+            $user = Auth::guard($guard)->user();
             $fileModelClass = null;
             $fileModelData = [];
 
             if ($entityType === 'assignment') {
-                $user = Auth::guard($guard)->user();
                 $assignment = Assignment::findOrFail($entityId);
+                $groupIds = $assignment->groups->pluck('id')->toArray();
 
                 if ($guard === 'teacher') {
-                    if(!$this->isTeacherAuthorizedForAssignment($user, $assignment))
-                    {
-                        return $this->errorResponse(trans('toasts.unauthorizedAssignment'));
+                    if ($OwnershipValidationResult = $this->checkOwnership($user, $assignment)){
+                        return $OwnershipValidationResult;
+                    }
+
+                    if ($validationResult = $this->validateTeacherGradeAndGroups($user->id, $groupIds, $assignment->grade_id, true)){
+                        return $validationResult;
                     }
 
                     $existingFiles = AssignmentFile::where('assignment_id', $entityId)->get();
@@ -108,7 +111,6 @@ class FileUploadService
                     'file_size' => $file->getSize(),
                 ];
 
-                // Check for duplicate file name
                 $existingFile = $fileModelClass::where('assignment_id', $entityId)
                     ->where('file_name', $file->getClientOriginalName())
                     ->first();
@@ -140,8 +142,17 @@ class FileUploadService
                     return $this->errorResponse(trans('toasts.fileAlreadyExists', ['filename' => $fileName]));
                 }
             } elseif ($entityType === 'resource') {
-                $user = Auth::guard($guard)->user();
                 $resource = Resource::findOrFail($entityId);
+
+                if ($guard === 'teacher') {
+                    if ($OwnershipValidationResult = $this->checkOwnership($user, $resource)){
+                        return $OwnershipValidationResult;
+                    }
+
+                    if ($validationResult = $this->validateTeacherGrade($resource->grade_id, $user->id)){
+                        return $validationResult;
+                    }
+                }
 
                 $existingResource = Resource::where('id', $entityId)
                     ->whereNotNull('file_path')
@@ -150,13 +161,6 @@ class FileUploadService
 
                 if ($existingResource) {
                     return $this->errorResponse(trans('toasts.maxFilesLimitReached', ['max' => 1]));
-                }
-
-                if ($guard === 'teacher') {
-                    if(!$this->isTeacherAuthorizedForAssignment($user, $resource))
-                    {
-                        return $this->errorResponse(trans('toasts.unauthorizedAssignment'));
-                    }
                 }
 
                 $customFileName = "{$resource->id}_{$fileName}_{$timestamp}";
@@ -168,7 +172,6 @@ class FileUploadService
                     'file_size' => $file->getSize(),
                 ];
 
-                // Check for duplicate file name
                 $existingFile = $fileModelClass::where('id', $entityId)
                     ->where('file_name', $file->getClientOriginalName())
                     ->first();
@@ -180,21 +183,18 @@ class FileUploadService
                 return $this->errorResponse(trans('main.errorMessage'));
             }
 
-            // Upload to S3
             $success = Storage::disk('s3')->put($path, file_get_contents($file));
 
             if (!$success) {
                 return $this->errorResponse(trans('main.errorMessage'));
             }
 
-            // Verify file size on S3
             $s3FileSize = Storage::disk('s3')->size($path);
             if ($s3FileSize !== $file->getSize()) {
                 Storage::disk('s3')->delete($path); // Clean up
                 return $this->errorResponse(trans('main.errorMessage'));
             }
 
-            // Save to database
             if ($entityType === 'resource') {
                 $fileModel = $fileModelClass::findOrFail($entityId);
                 $fileModel->update($fileModelData);
@@ -223,43 +223,30 @@ class FileUploadService
 
             if ($entityType === 'assignment') {
                 $assignment = Assignment::findOrFail($file->assignment_id);
+                $groupIds = $assignment->groups->pluck('id')->toArray();
             }
 
-            if (!$user) {
-                return $this->errorResponse("Unauthenticated");
-            }
-
-            if ($guard === 'web') {
-                // if ($entityType === 'assignment') {
-                //     $assignment = Assignment::find($file->assignment_id);
-                //     if (!$assignment || !$this->isStudentAuthorizedForAssignment($user, $assignment)) {
-                //         return response()->json(['error' => 'Unauthorized to download this assignment file.'], 403);
-                //     }
-                // } elseif ($entityType === 'submission') {
-                //     // Restrict to files uploaded by the student (check uuid in path)
-                //     if ($file->submission_id && strpos($file->file_path, $user->uuid) === false) {
-                //         return response()->json(['error' => 'Unauthorized to download this submission file.'], 403);
-                //     }
-                // } elseif ($entityType === 'teacher_library') {
-                //     return response()->json(['error' => 'Students cannot download teacher library files.'], 403);
-                // }
-            } elseif ($guard === 'teacher') {
+            if ($guard === 'teacher') {
                 if ($entityType === 'assignment') {
-                    if(!$this->isTeacherAuthorizedForAssignment($user, $assignment))
-                    {
-                        return $this->errorResponse(trans('toasts.unauthorizedAssignment'));
+                    if ($OwnershipValidationResult = $this->checkOwnership($user, $file->assignment)){
+                        return $OwnershipValidationResult;
                     }
-                } elseif ($entityType === 'submission') {
-                    $assignment = Assignment::find($file->submission_id);
-                    if (!$assignment || $assignment->teacher_id != $user->id) {
-                        return response()->json(['error' => 'Unauthorized to download this submission file.'], 403);
+                    if ($validationResult = $this->validateTeacherGradeAndGroups($user->id, $groupIds, $assignment->grade_id, true)){
+                        return $validationResult;
                     }
-                } elseif ($entityType === 'teacher_library' && $file->teacher_id != $user->id) {
-                    return response()->json(['error' => 'Unauthorized to download this library file.'], 403);
+                } elseif ($entityType === 'resource') {
+                    if ($OwnershipValidationResult = $this->checkOwnership($user, $file)){
+                        return $OwnershipValidationResult;
+                    }
                 }
             }
 
             $filePath = $file->file_path;
+
+            if (!$filePath) {
+                return;
+            }
+
             if (!Storage::disk('s3')->exists($filePath)) {
                 $this->errorResponse(trans('toasts.fileNotFound'));
             }
@@ -289,33 +276,26 @@ class FileUploadService
 
             if ($entityType === 'assignment') {
                 $assignment = Assignment::findOrFail($file->assignment_id);
+                $groupIds = $assignment->groups->pluck('id')->toArray();
             }
 
             if (!$user) {
                 return $this->errorResponse("Unauthenticated");
             }
 
-            if ($guard === 'web') {
-                // if ($entityType === 'submission') {
-                //     if ($file->submission_id && strpos($file->file_path, $user->uuid) === false) {
-                //         return response()->json(['error' => 'Unauthorized to delete this submission file.'], 403);
-                //     }
-                // } else {
-                //     return response()->json(['error' => 'Students can only delete their own submission files.'], 403);
-                // }
-            } elseif ($guard === 'teacher') {
+            if ($guard === 'teacher') {
                 if ($entityType === 'assignment') {
-                    if(!$this->isTeacherAuthorizedForAssignment($user, $assignment))
-                    {
-                        return $this->errorResponse(trans('toasts.unauthorizedAssignment'));
+                    if ($OwnershipValidationResult = $this->checkOwnership($user, $file->assignment)){
+                        return $OwnershipValidationResult;
                     }
-                } elseif ($entityType === 'submission') {
-                    $assignment = Assignment::find($file->submission_id);
-                    if (!$assignment || $assignment->teacher_id != $user->id) {
-                        return response()->json(['error' => 'Unauthorized to delete this submission file.'], 403);
+                    
+                    if ($validationResult = $this->validateTeacherGradeAndGroups($user->id, $groupIds, $assignment->grade_id, true)){
+                        return $validationResult;
                     }
-                } elseif ($entityType === 'teacher_library' && $file->teacher_id != $user->id) {
-                    return response()->json(['error' => 'Unauthorized to delete this library file.'], 403);
+                } elseif ($entityType === 'resource') {
+                    if ($OwnershipValidationResult = $this->checkOwnership($user, $file)){
+                        return $OwnershipValidationResult;
+                    }
                 }
             }
 
@@ -366,25 +346,5 @@ class FileUploadService
                 });
             }
         });
-    }
-
-
-    protected function isTeacherAuthorizedForAssignment($teacher, $assignment)
-    {
-        $isOwner = $teacher->id === $assignment->teacher_id;
-
-        if ($isOwner) {
-            return true;
-        }
-
-        if ($teacher->grades()->where('grades.id', $assignment->grade_id)->exists()) {
-            return true;
-        }
-
-        if ($teacher->groups()->whereIn('groups.id', $assignment->groups()->select('groups.id')->pluck('id'))->exists()) {
-            return true;
-        }
-
-        return false;
     }
 }

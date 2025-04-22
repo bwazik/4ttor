@@ -159,8 +159,6 @@
 
         handleDeletionFormSubmit('#delete-form', '#delete-modal')
 
-        document.addEventListener('DOMContentLoaded', () => {
-            toggleShareButton();
-        });
+        toggleShareButton();
     </script>
 @endsection

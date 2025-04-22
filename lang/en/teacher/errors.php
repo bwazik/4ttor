@@ -1,7 +1,6 @@
 <?php
 
 return [
-    'validateTeacherGrade' => 'You must be teaching this grade to add it.',
     'validateTeacherGroups' => 'You must be responsible for the selected groups and ensure they match the grade.',
     'noGroupsForGrade' => 'You are not currently assigned to any groups for the selected grade.',
     'validateTeacherZoomAccount' => 'You must have a Zoom account to be able to add zooms.',

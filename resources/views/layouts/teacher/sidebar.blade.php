@@ -75,6 +75,12 @@
                 <div>{{ trans('layouts/sidebar.groups') }}</div>
             </a>
         </li>
+        <li class="menu-item {{ isActiveRoute('teacher.resources.index') ? 'active' : '' }}">
+            <a href="{{ route('teacher.resources.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons ri-folders-line"></i>
+                <div>{{ trans('layouts/sidebar.resources') }}</div>
+            </a>
+        </li>
 
         <!-- Users Managment -->
         <li class="menu-header mt-5">
