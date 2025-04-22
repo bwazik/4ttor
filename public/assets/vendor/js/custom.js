@@ -1002,7 +1002,6 @@ function strLimit(str, limit = 50, ending = '...') {
     return truncated + ending;
 }
 
-
 function toggleShareButton()
 {
     document.querySelector('.ri-share-forward-line').addEventListener('click', async () => {
