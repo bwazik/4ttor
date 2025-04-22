@@ -46,6 +46,10 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        if ($guard == 'web') {
+            $guard = 'admin';
+        }
+        
         return redirect()->intended(route($guard.'.dashboard', absolute: false));
     }
 
