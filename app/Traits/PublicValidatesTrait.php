@@ -10,7 +10,9 @@ use App\Models\Teacher;
 use App\Models\Question;
 use App\Models\ZoomAccount;
 use App\Traits\ServiceResponseTrait;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Eloquent\Model;
 
 trait PublicValidatesTrait
 {
@@ -26,7 +28,7 @@ trait PublicValidatesTrait
             ->exists();
 
         if (!$teacherHasGrade) {
-            return $this->errorResponse(trans('teacher/errors.validateTeacherGrade'));
+            return $this->errorResponse(trans('toasts.validateTeacherGrade'));
         }
 
         return null;
@@ -61,7 +63,7 @@ trait PublicValidatesTrait
                 ->count();
 
             if ($teachersCount !== $teachersWithGradeCount) {
-                return $this->errorResponse(trans('teacher/errors.validateTeacherGrade'));
+                return $this->errorResponse(trans('toasts.validateTeacherGrade'));
             }
         }
 
@@ -206,6 +208,27 @@ trait PublicValidatesTrait
 
         if ($answerCount >= $this->answersLimit) {
             return $this->errorResponse(trans('teacher/errors.questionHasMaxAnswers'));
+        }
+
+        return null;
+    }
+
+    public function checkOwnership($user = null, Model $model, string $ownershipColumn = 'teacher_id')
+    {
+        $user = $user ?? Auth::user();
+
+        if (!$user) {
+            return false;
+        }
+
+        if (!$model->hasAttribute($ownershipColumn) || is_null($model->$ownershipColumn)) {
+            return false;
+        }
+
+        $isOwner = $user->id === $model->$ownershipColumn;
+
+        if ($isOwner == false) {
+            return $this->errorResponse(trans('toasts.ownershipError'));
         }
 
         return null;

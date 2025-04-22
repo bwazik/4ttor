@@ -1,4 +1,4 @@
-@extends('layouts.admin.master')
+@extends('layouts.teacher.master')
 
 @section('page-css')
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/plyr/plyr.css') }}" />
@@ -14,7 +14,7 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap mb-6 gap-1">
                         <div class="me-1">
                             <h5 class="mb-0">{{ $resource->title }}</h5>
-                            <p class="mb-0">{{ trans('main.mr') }}: <span class="fw-medium text-heading"> {{ $resource->teacher->name ?? 'N/A' }} </span></p>
+                            <p class="mb-0">{{ trans('main.mr') }}: <span class="fw-medium text-heading"> {{ Auth::user()->name ?? 'N/A' }} </span></p>
                         </div>
                         <div class="d-flex align-items-center">
                             <span class="badge bg-label-success rounded-pill">{{ $resource->grade->name ?? 'N/A' }}</span>
@@ -68,14 +68,14 @@
                             <div class="d-flex justify-content-start align-items-center user-name">
                                 <div class="avatar-wrapper">
                                     <div class="avatar me-4">
-                                        <img src="{{ $resource->teacher->profile_pic ? asset('storage/profiles/teachers/' . $resource->teacher->profile_pic) : asset('assets/img/avatars/default.jpg') }}"
+                                        <img src="{{ Auth::user()->profile_pic ? asset('storage/profiles/teachers/' . Auth::user()->profile_pic) : asset('assets/img/avatars/default.jpg') }}"
                                             alt="Avatar" class="rounded-circle" />
                                     </div>
                                 </div>
                                 <div class="d-flex flex-column">
-                                    <h6 class="mb-1">{{ $resource->teacher->name ?? 'N/A' }}</h6>
+                                    <h6 class="mb-1">{{ Auth::user()->name ?? 'N/A' }}</h6>
                                     <small>{{ trans('admin/teachers.teacher') }}
-                                        {{ $resource->teacher->subject->name ?? 'N/A' }}</small>
+                                        {{ Auth::user()->subject->name ?? 'N/A' }}</small>
                                 </div>
                             </div>
                         </div>
@@ -84,7 +84,7 @@
             </div>
         </div>
         <div class="col-lg-4">
-            <form id="add-form" action="{{ route('admin.resources.upload', $resource->id) }}" method="POST"
+            <form id="add-form" action="{{ route('teacher.resources.upload', $resource->uuid) }}" method="POST"
                 enctype="multipart/form-data">
                 @csrf
                 <x-basic-input divClasses="mb-3" type="file" name="file" label="{{ trans('admin/resources.file') }}"
@@ -126,7 +126,7 @@
                                     </div>
                                     <span class="text-nowrap overflow-hidden text-truncate" style="max-width: 200px;"
                                         title="{{ $resource->file_name }}">
-                                        <a href="{{ route('admin.resources.download', $resource->id) }}"
+                                        <a href="{{ route('teacher.resources.download', $resource->uuid) }}"
                                             class="text-decoration-none">
                                             {{ $resource->file_name }}
                                         </a>
@@ -137,7 +137,7 @@
                                     <div class="ms-auto">
                                         <button
                                             class="btn btn-sm btn-icon btn-text-danger rounded-pill text-body waves-effect waves-light"
-                                            id="delete-button" data-id="{{ $resource->id }}"
+                                            id="delete-button" data-id="{{ $resource->uuid }}"
                                             data-file_name="{{ $resource->file_name }}" data-bs-target="#delete-modal"
                                             data-bs-toggle="modal" data-bs-dismiss="modal">
                                             <i class="ri-delete-bin-7-line ri-20px text-danger"></i>
@@ -156,7 +156,7 @@
 
     <!-- Delete Modal -->
     <x-modal modalType="delete" modalTitle="{{ trans('main.deleteItem', ['item' => trans('admin/resources.resource')]) }}"
-        action="{{ route('admin.resources.files.delete') }}" id submitColor="danger"
+        action="{{ route('teacher.resources.files.delete') }}" id submitColor="danger"
         submitButton="{{ trans('main.yes_delete') }}">
         @include('partials.delete-modal-body')
     </x-modal>

@@ -6,6 +6,7 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Http\Controllers\Api\DataFetchController;
 
 use App\Http\Controllers\Teacher\Tools\GroupsController;
+use App\Http\Controllers\Teacher\Tools\ResourcesController;
 
 use App\Http\Controllers\Teacher\Users\AssistantsController;
 use App\Http\Controllers\Teacher\Users\StudentsController;
@@ -41,6 +42,20 @@ Route::group(
                     Route::post('update', 'update')->name('update');
                     Route::post('delete', 'delete')->name('delete');
                     Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
+            });
+
+            # Resources
+            Route::prefix('resources')->controller(ResourcesController::class)->name('resources.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::get('{uuid}', 'details')->name('details');
+                Route::post('{uuid}/upload', 'uploadFile')->name('upload');
+                Route::get('{uuid}/download', 'downloadFile')->name('download');
+                Route::post('files/delete', 'deleteFile')->name('files.delete');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
                 });
             });
         # End Tools

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Admin\Tools;
+namespace App\Services\Teacher\Tools;
 
 use App\Models\Resource;
 use App\Traits\PublicValidatesTrait;
@@ -15,22 +15,24 @@ class ResourceService
     protected $relationships = [];
     protected $transModelKey = 'admin/resources.resources';
     protected $fileUploadService;
+    protected $teacherId;
 
     public function __construct(FileUploadService $fileUploadService)
     {
         $this->fileUploadService = $fileUploadService;
+        $this->teacherId = auth()->guard('teacher')->user()->id;
     }
 
     public function insertResource(array $request)
     {
         return $this->executeTransaction(function () use ($request)
         {
-            if ($validationResult = $this->validateTeacherGrade($request['grade_id'], $request['teacher_id']))
+            if ($validationResult = $this->validateTeacherGrade($request['grade_id'], $this->teacherId))
                 return $validationResult;
 
             Resource::create([
                 'title' => ['ar' => $request['title_ar'], 'en' => $request['title_en']],
-                'teacher_id' => $request['teacher_id'],
+                'teacher_id' => $this->teacherId,
                 'grade_id' => $request['grade_id'],
                 'video_url' => $request['video_url'] ?? null,
                 'description' => $request['description'] ?? null,
@@ -44,13 +46,12 @@ class ResourceService
     {
         return $this->executeTransaction(function () use ($id, $request)
         {
-            if ($validationResult = $this->validateTeacherGrade($request['grade_id'], $request['teacher_id']))
+            if ($validationResult = $this->validateTeacherGrade($request['grade_id'], $this->teacherId))
                 return $validationResult;
 
             $resource = Resource::findOrFail($id);
             $resource->update([
                 'title' => ['ar' => $request['title_ar'], 'en' => $request['title_en']],
-                'teacher_id' => $request['teacher_id'],
                 'grade_id' => $request['grade_id'],
                 'video_url' => $request['video_url'] ?? null,
                 'description' => $request['description'] ?? null,

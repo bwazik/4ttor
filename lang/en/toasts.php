@@ -15,4 +15,6 @@ return [
     'unauthorizedAssignment' => 'You are not authorized to perform any action on this assignment.',
     'linkCopiedSuccess' => 'Link copied to clipboard successfully.',
     'linkCopiedError' => 'Error copying the link, please try again.',
+    'ownershipError' => 'Sorry! But you do not have permission to perform this action.',
+    'validateTeacherGrade' => 'You must be teaching the required grade to perform the action.',
 ];

@@ -111,6 +111,7 @@ return [
     'zoomAccount' => 'أكونت الزوم',
     'dependencyDept' => 'مديونية ال:dependency',
     'downloads' => 'التحميلات',
+    'download' => 'تحميل',
     'views' => 'المشاهدات',
 
     # Modals

@@ -115,6 +115,7 @@ class AssignmentsController extends Controller
         $assignment = Assignment::with(['grade', 'assignmentFiles', 'groups'])
             ->select('id', 'uuid', 'grade_id', 'title', 'description', 'deadline', 'score')
             ->uuid($uuid)
+            ->where('teacher_id', $this->teacherId)
             ->firstOrFail();
 
         return view('teacher.activities.assignments.details', compact('assignment'));
