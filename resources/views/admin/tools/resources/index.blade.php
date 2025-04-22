@@ -109,8 +109,8 @@
                                         default => asset('assets/img/icons/misc/mp4.svg'),
                                     }
                                 @endphp
-                                <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 241px; width: 435px; background-color: #f8f9fa;">
-                                    <img src="{{ $imageSrc }}" style="height: 120px; width: auto;" alt="resource image">
+                                <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 241px; width: 100%; background-color: #f8f9fa;">
+                                    <img src="{{ $imageSrc }}" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;" alt="resource image">
                                 </div>
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center mb-4">
