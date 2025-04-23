@@ -99,7 +99,7 @@
             <span class="menu-header-text">{{ trans('layouts/sidebar.usersManagment') }}</span>
         </li>
         <li
-            class="menu-item {{ isActiveRoute(['admin.teachers.index', 'admin.teachers.archived', 'admin.groups.index']) ? 'active open' : '' }}">
+            class="menu-item {{ isActiveRoute(['admin.teachers.index', 'admin.teachers.archived']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
                 <i class="menu-icon tf-icons ri-presentation-line"></i>
                 <div>{{ trans('layouts/sidebar.teachers') }}</div>

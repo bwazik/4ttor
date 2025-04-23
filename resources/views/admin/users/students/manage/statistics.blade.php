@@ -88,7 +88,7 @@
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-xl-4">
+    {{-- <div class="col-sm-6 col-xl-4">
         <div class="card card-border-shadow-info">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
@@ -133,8 +133,8 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="col-sm-6 col-xl-4">
+    </div> --}}
+    <div class="col-12">
         <div class="card card-border-shadow-primary">
             <div class="card-body">
                 <div class="d-flex justify-content-between">

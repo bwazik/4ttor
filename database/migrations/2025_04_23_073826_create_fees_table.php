@@ -12,11 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('fees', function (Blueprint $table) {
-            $table->increments('id');
+			$table->increments('id');
+            $table->uuid('uuid')->unique();
             $table->string('name');
-            $table->decimal('amount', 8, 2)->default(0.00);
-            $table->unsignedInteger('teacher_id');
-            $table->unsignedInteger('grade_id');
+            $table->decimal('amount')->default(0.00);
+            $table->integer('teacher_id')->unsigned();
+            $table->integer('grade_id')->unsigned();
+            $table->tinyInteger('frequency')->default(1)->comment('1 => one-time, 2 => monthly, 3 => custom');
             $table->timestamps();
         });
     }

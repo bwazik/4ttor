@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('funds', function (Blueprint $table) {
+        Schema::create('teacher_subscriptions', function (Blueprint $table) {
 			$table->increments('id');
-			$table->tinyInteger('type')->default(1)->comment('1 - Receipt, 2 - Refund');
             $table->integer('teacher_id')->unsigned();
-            $table->integer('receipt_id')->unsigned()->nullable();
-            $table->integer('refund_id')->unsigned()->nullable();
-            $table->decimal('debit')->default(0.00)->nullable();
-            $table->decimal('credit')->default(0.00)->nullable();
+            $table->integer('plan_id')->unsigned();
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->decimal('amount')->default(0.00);
+            $table->tinyInteger('status')->default(1)->comment('1 => active, 2 => canceled, 3 => expired');
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('funds');
+        Schema::dropIfExists('teacher_subscriptions');
     }
 };

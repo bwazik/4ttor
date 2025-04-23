@@ -11,15 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('receipts', function (Blueprint $table) {
+        Schema::create('transactions', function (Blueprint $table) {
 			$table->increments('id');
-            $table->date('date');
+            $table->tinyInteger('type')->default(1)->comment('1 => invoice, 2 => payment, 3 => refund, 4 => coupon');
             $table->integer('teacher_id')->unsigned()->nullable();
             $table->integer('student_id')->unsigned()->nullable();
-            $table->decimal('debit')->default(0.00)->nullable();
+            $table->integer('invoice_id')->unsigned()->nullable();
+            $table->decimal('amount')->default(0.00);
+            $table->decimal('balance_after')->comment('User balance after transaction');
             $table->text('description')->nullable();
+            $table->tinyInteger('payment_method')->nullable()->comment('1 => cash, 2 => vodafone_cash, 3 => balance');
+            $table->date('date');
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -28,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('receipts');
+        Schema::dropIfExists('transactions');
     }
 };

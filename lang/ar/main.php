@@ -105,8 +105,6 @@ return [
     'notallowed' => 'مش مسموح',
     'select_option' => 'اختار حاجة من الاختيارات',
     'selectAll' => 'تحديد الكل',
-    'studentAccount' => 'حساب الطالب',
-    'teacherAccount' => 'حساب المدرس',
     'attendances' => 'الحضور والغياب',
     'zoomAccount' => 'أكونت الزوم',
     'dependencyDept' => 'مديونية ال:dependency',

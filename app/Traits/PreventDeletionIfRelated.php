@@ -51,8 +51,6 @@ trait PreventDeletionIfRelated
     public function checkForSingleDependencies($models, array $relationships, string $transModelKey): ?array
     {
         $accountTranslations = [
-            'admin/studentAccount.studentAccount' => trans('main.studentAccount'),
-            'admin/teacherAccount.teacherAccount' => trans('main.teacherAccount'),
             'admin/attendances.attendances' => trans('main.attendances'),
             'admin/zoomAccount.zoomAccount' => trans('main.zoomAccount'),
         ];

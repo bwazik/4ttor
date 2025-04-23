@@ -3,7 +3,6 @@
 namespace App\Services\Admin\Users;
 
 use App\Models\Teacher;
-use App\Models\TeacherAccount;
 use Illuminate\Support\Facades\Hash;
 use App\Traits\PreventDeletionIfRelated;
 use App\Traits\DatabaseTransactionTrait;
@@ -13,7 +12,7 @@ class TeacherService
 {
     use PreventDeletionIfRelated, PublicValidatesTrait, DatabaseTransactionTrait;
 
-    protected $relationships = ['students', 'assistants', 'groups', 'fees', 'invoices', 'teacherAccount', 'receipts', 'refunds', 'attendances', 'zoomAccount', 'zooms', 'assignments'];
+    protected $relationships = ['students', 'assistants', 'groups', 'attendances', 'zoomAccount', 'zooms', 'assignments'];
     protected $transModelKey = 'admin/teachers.teachers';
 
     public function getTeachersForDatatable($teachersQuery)
@@ -271,19 +270,5 @@ class TeacherService
     public function checkDependenciesForMultipleDeletion($teachers)
     {
         return $this->checkForMultipleDependencies($teachers, $this->relationships, $this->transModelKey);
-    }
-
-    public function getTeacherAccountBalance($id): float
-    {
-        $teacherAccount = TeacherAccount::where('teacher_id', $id)->select('debit', 'credit')->get();
-
-        if ($teacherAccount->isEmpty()) {
-            return 0.00;
-        }
-
-        $debit = $teacherAccount->sum('debit');
-        $credit = $teacherAccount->sum('credit');
-
-        return round($debit - $credit, 2);
     }
 }

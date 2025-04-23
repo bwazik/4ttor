@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('refunds', function (Blueprint $table) {
+        Schema::create('student_fees', function (Blueprint $table) {
 			$table->increments('id');
-            $table->date('date');
-            $table->integer('teacher_id')->unsigned()->nullable();
-            $table->integer('student_id')->unsigned()->nullable();
-            $table->decimal('credit')->default(0.00)->nullable();
-            $table->text('description')->nullable();
+            $table->integer('student_id')->unsigned();
+            $table->integer('fee_id')->unsigned();
+            $table->decimal('discount', 5, 2)->default(0.00)->comment('Percentage discount, e.g., 10.00 for 10%');
+            $table->boolean('is_exempted')->default(false);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('refunds');
+        Schema::dropIfExists('student_fees');
     }
 };

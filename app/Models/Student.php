@@ -72,26 +72,6 @@ class Student extends Authenticatable
         return $this->belongsToMany(Group::class, 'student_group');
     }
 
-    public function invoices()
-    {
-        return $this->hasMany(Invoice::class, 'student_id');
-    }
-
-    public function studentAccount()
-    {
-        return $this->hasMany(StudentAccount::class, 'student_id');
-    }
-
-    public function receipts()
-    {
-        return $this->hasMany(Receipt::class, 'student_id');
-    }
-
-    public function refunds()
-    {
-        return $this->hasMany(Refund::class, 'student_id');
-    }
-
     public function attendances()
     {
         return $this->hasMany(Attendance::class, 'student_id');
@@ -116,7 +96,7 @@ class Student extends Authenticatable
     {
         return $this->hasMany(AssignmentSubmission::class, 'student_id');
     }
-    
+
     # Scopes
     public function scopeUuid($query, $uuid)
     {

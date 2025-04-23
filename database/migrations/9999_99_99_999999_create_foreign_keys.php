@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         # Start Platform Managment Tables
@@ -58,86 +55,6 @@ return new class extends Migration
                 ->onUpdate('cascade');
         });
         # End Users Management Tables
-
-        # Start Finance Tables
-        Schema::table('fees', function (Blueprint $table) {
-            $table->foreign('teacher_id')->references('id')->on('teachers')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-            $table->foreign('grade_id')->references('id')->on('grades')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-        });
-        Schema::table('invoices', function (Blueprint $table) {
-            $table->foreign('fee_id')->references('id')->on('fees')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-            $table->foreign('plan_id')->references('id')->on('plans')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-            $table->foreign('teacher_id')->references('id')->on('teachers')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-            $table->foreign('student_id')->references('id')->on('students')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-        });
-        Schema::table('student_accounts', function (Blueprint $table) {
-            $table->foreign('student_id')->references('id')->on('students')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-            $table->foreign('invoice_id')->references('id')->on('invoices')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-            $table->foreign('receipt_id')->references('id')->on('receipts')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-            $table->foreign('refund_id')->references('id')->on('refunds')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-        });
-        Schema::table('teacher_accounts', function (Blueprint $table) {
-            $table->foreign('teacher_id')->references('id')->on('teachers')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-            $table->foreign('invoice_id')->references('id')->on('invoices')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-            $table->foreign('receipt_id')->references('id')->on('receipts')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-            $table->foreign('refund_id')->references('id')->on('refunds')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-        });
-        Schema::table('receipts', function (Blueprint $table) {
-            $table->foreign('teacher_id')->references('id')->on('teachers')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-            $table->foreign('student_id')->references('id')->on('students')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-        });
-        Schema::table('refunds', function (Blueprint $table) {
-            $table->foreign('teacher_id')->references('id')->on('teachers')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-            $table->foreign('student_id')->references('id')->on('students')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-        });
-        Schema::table('funds', function (Blueprint $table) {
-            $table->foreign('teacher_id')->references('id')->on('teachers')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-            $table->foreign('receipt_id')->references('id')->on('receipts')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-            $table->foreign('refund_id')->references('id')->on('refunds')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-        });
-        # End Finance Tables
 
         # Start Tools Tables
         Schema::table('groups', function (Blueprint $table) {
@@ -289,6 +206,84 @@ return new class extends Migration
         });
         # End Activities Tables
 
+        # Start Finance Tables
+        Schema::table('teacher_subscriptions', function (Blueprint $table) {
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('plan_id')->references('id')->on('plans')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('fees', function (Blueprint $table) {
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('grade_id')->references('id')->on('grades')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('student_fees', function (Blueprint $table) {
+            $table->foreign('student_id')->references('id')->on('students')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('fee_id')->references('id')->on('fees')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('invoices', function (Blueprint $table) {
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('student_id')->references('id')->on('students')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('fee_id')->references('id')->on('fees')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('subscription_id')->references('id')->on('teacher_subscriptions')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('transactions', function (Blueprint $table) {
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('student_id')->references('id')->on('students')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('invoice_id')->references('id')->on('invoices')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('coupons', function (Blueprint $table) {
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('student_id')->references('id')->on('students')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('wallets', function (Blueprint $table) {
+            $table->foreign('user_id')->references('id')->on('users')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        Schema::table('audit_logs', function (Blueprint $table) {
+            $table->foreign('teacher_id')->references('id')->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('assistant_id')->references('id')->on('assistants')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('student_id')->references('id')->on('students')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
+        # End Finance Tables
     }
 
     /**
@@ -323,44 +318,6 @@ return new class extends Migration
             $table->dropForeign('assistants_teacher_id_foreign');
         });
         # End Users Management Tables
-
-        # Start Finance Tables
-        Schema::table('fees', function (Blueprint $table) {
-            $table->dropForeign('fees_teacher_id_foreign');
-            $table->dropForeign('fees_grade_id_foreign');
-        });
-        Schema::table('invoices', function (Blueprint $table) {
-            $table->dropForeign('invoices_fee_id_foreign');
-            $table->dropForeign('invoices_plan_id_foreign');
-            $table->dropForeign('invoices_teacher_id_foreign');
-            $table->dropForeign('invoices_student_id_foreign');
-        });
-        Schema::table('student_accounts', function (Blueprint $table) {
-            $table->dropForeign('student_accounts_student_id_foreign');
-            $table->dropForeign('student_accounts_invoice_id_foreign');
-            $table->dropForeign('student_accounts_receipt_id_foreign');
-            $table->dropForeign('student_accounts_refund_id_foreign');
-        });
-        Schema::table('teacher_accounts', function (Blueprint $table) {
-            $table->dropForeign('teacher_accounts_teacher_id_foreign');
-            $table->dropForeign('teacher_accounts_invoice_id_foreign');
-            $table->dropForeign('teacher_accounts_receipt_id_foreign');
-            $table->dropForeign('teacher_accounts_refund_id_foreign');
-        });
-        Schema::table('receipts', function (Blueprint $table) {
-            $table->dropForeign('receipts_teacher_id_foreign');
-            $table->dropForeign('receipts_student_id_foreign');
-        });
-        Schema::table('refunds', function (Blueprint $table) {
-            $table->dropForeign('refunds_teacher_id_foreign');
-            $table->dropForeign('refunds_student_id_foreign');
-        });
-        Schema::table('funds', function (Blueprint $table) {
-            $table->dropForeign('funds_teacher_id_foreign');
-            $table->dropForeign('funds_receipt_id_foreign');
-            $table->dropForeign('funds_refund_id_foreign');
-        });
-        # End Finance Tables
 
         # Start Tools Tables
         Schema::table('groups', function (Blueprint $table) {
@@ -439,5 +396,44 @@ return new class extends Migration
             $table->dropForeign('assignment_group_group_id_foreign');
         });
         # End Activities Tables
+
+        # Start Finance Tables
+        Schema::table('teacher_subscriptions', function (Blueprint $table) {
+            $table->dropForeign('teacher_subscriptions_teacher_id_foreign');
+            $table->dropForeign('teacher_subscriptions_plan_id_foreign');
+        });
+        Schema::table('fees', function (Blueprint $table) {
+            $table->dropForeign('fees_teacher_id_foreign');
+            $table->dropForeign('fees_grade_id_foreign');
+        });
+        Schema::table('student_fees', function (Blueprint $table) {
+            $table->dropForeign('student_fees_student_id_foreign');
+            $table->dropForeign('student_fees_fee_id_foreign');
+        });
+        Schema::table('invoices', function (Blueprint $table) {
+            $table->dropForeign('invoices_teacher_id_foreign');
+            $table->dropForeign('invoices_student_id_foreign');
+            $table->dropForeign('invoices_fee_id_foreign');
+            $table->dropForeign('invoices_subscription_id_foreign');
+        });
+        Schema::table('transactions', function (Blueprint $table) {
+            $table->dropForeign('transactions_teacher_id_foreign');
+            $table->dropForeign('transactions_student_id_foreign');
+            $table->dropForeign('transactions_invoice_id_foreign');
+        });
+        Schema::table('coupons', function (Blueprint $table) {
+            $table->dropForeign('coupons_teacher_id_foreign');
+            $table->dropForeign('coupons_student_id_foreign');
+        });
+        Schema::table('wallets', function (Blueprint $table) {
+            $table->dropForeign('wallets_user_id_foreign');
+            $table->dropForeign('wallets_teacher_id_foreign');
+        });
+        Schema::table('audit_logs', function (Blueprint $table) {
+            $table->dropForeign('audit_logs_teacher_id_foreign');
+            $table->dropForeign('audit_logs_assistant_id_foreign');
+            $table->dropForeign('audit_logs_student_id_foreign');
+        });
+        # End Finance Tables
     }
 };
