@@ -15,9 +15,9 @@ return new class extends Migration
             $table->increments('id');
             $table->string('name')->unique();
             $table->text('description')->nullable();
-            $table->decimal('monthly_price', 8, 2);
-            $table->decimal('term_price', 8, 2)->nullable();
-            $table->decimal('year_price', 8, 2)->nullable();
+            $table->decimal('monthly_price');
+            $table->decimal('term_price')->nullable();
+            $table->decimal('year_price')->nullable();
 
             // Limits
             $table->integer('student_limit');

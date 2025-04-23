@@ -43,8 +43,8 @@ class StudentsController extends Controller
             'activeStudents' => (clone $baseStatsQuery)->active()->count(),
             'inactiveStudents' => (clone $baseStatsQuery)->inactive()->count(),
             'archivedStudents' => (clone $baseStatsQuery)->onlyTrashed()->count(),
-            'exemptedStudents' => (clone $baseStatsQuery)->exempted()->count(),
-            'discountedStudents' => (clone $baseStatsQuery)->where('fees_discount', '>', 0)->count(),
+            // 'exemptedStudents' => (clone $baseStatsQuery)->exempted()->count(),
+            // 'discountedStudents' => (clone $baseStatsQuery)->where('fees_discount', '>', 0)->count(),
             'topGrade' => (clone $baseStatsQuery)->select('grade_id', DB::raw('COUNT(*) as student_count'))
                 ->groupBy('grade_id')
                 ->orderByDesc('student_count')

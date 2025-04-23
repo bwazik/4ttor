@@ -23,7 +23,7 @@ return new class extends Migration
             $table->integer('plan_id')->unsigned()->nullable();
             $table->boolean('is_active')->default(true);
             $table->decimal('average_rating', 3, 2)->default(0.00);
-            $table->decimal('balance', 8, 2)->default(0.00);
+            $table->decimal('balance')->default(0.00);
             $table->string('profile_pic')->nullable();
             $table->rememberToken();
             $table->softDeletes();

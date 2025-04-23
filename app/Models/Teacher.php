@@ -84,26 +84,6 @@ class Teacher extends Authenticatable
         return $this->hasMany(Fee::class, 'teacher_id');
     }
 
-    public function invoices()
-    {
-        return $this->hasMany(Invoice::class, 'teacher_id');
-    }
-
-    public function teacherAccount()
-    {
-        return $this->hasMany(TeacherAccount::class, 'teacher_id');
-    }
-
-    public function receipts()
-    {
-        return $this->hasMany(Receipt::class, 'teacher_id');
-    }
-
-    public function refunds()
-    {
-        return $this->hasMany(Refund::class, 'teacher_id');
-    }
-
     public function attendances()
     {
         return $this->hasMany(Attendance::class, 'teacher_id');

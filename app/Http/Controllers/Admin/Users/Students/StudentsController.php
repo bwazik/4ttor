@@ -38,8 +38,8 @@ class StudentsController extends Controller
             'activeStudents' => Student::active()->count(),
             'inactiveStudents' => Student::inactive()->count(),
             'archivedStudents' => Student::onlyTrashed()->count(),
-            'exemptedStudents' => Student::exempted()->count(),
-            'discountedStudents' => Student::where('fees_discount', '>', 0)->count(),
+            // 'exemptedStudents' => Student::exempted()->count(),
+            // 'discountedStudents' => Student::where('fees_discount', '>', 0)->count(),
             'topGrade' => Student::select('grade_id', DB::raw('COUNT(*) as student_count'))
             ->groupBy('grade_id')
             ->orderByDesc('student_count')
@@ -217,25 +217,6 @@ class StudentsController extends Controller
             }
 
             return response()->json(['status' => 'success', 'data' => $teachers]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    public function getStudentAccountBalance($id)
-    {
-        try {
-            $balance = $this->studentService->getStudentAccountBalance($id);
-
-            return response()->json([
-                'status' => 'success',
-                'data' => number_format($balance, 2),
-            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',

@@ -4,13 +4,10 @@ namespace App\Models;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Invoice extends Model
+class Coupon extends Model
 {
-    use SoftDeletes;
-
-    protected $table = 'invoices';
+    protected $table = 'coupons';
 
     protected static function boot()
     {
@@ -25,21 +22,16 @@ class Invoice extends Model
 
     protected $fillable = [
         'uuid',
-        'type', // 1 => subscription, 2 => fee
+        'code',
+        'amount',
+        'is_used',
         'teacher_id',
         'student_id',
-        'fee_id',
-        'subscription_id',
-        'amount',
-        'date',
-        'due_date',
-        'status', // 1 => pending, 2 => paid, 3 => overdue, 4 => canceled
     ];
 
     protected $hidden = [
         'created_at',
         'updated_at',
-        'deleted_at',
     ];
 
 
@@ -54,16 +46,6 @@ class Invoice extends Model
         return $this->belongsTo(Student::class, 'student_id');
     }
 
-    public function fee()
-    {
-        return $this->belongsTo(Fee::class, 'fee_id');
-    }
-
-    public function subscription()
-    {
-        return $this->belongsTo(TeacherSubscription::class, 'subscription_id');
-    }
-
     # Scopes
     public function scopeUuid($query, $uuid)
     {
@@ -73,5 +55,10 @@ class Invoice extends Model
     public function scopeUuids($query, $uuids)
     {
         return $query->whereIn('uuid', $uuids);
+    }
+
+    public function scopeUsed($query)
+    {
+        return $query->where('is_used', true);
     }
 }

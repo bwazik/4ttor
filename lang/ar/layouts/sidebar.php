@@ -24,19 +24,6 @@ return [
     'assistants' => 'الأسيستانتس',
     'assistantsManagment' => 'إدارة الأسيستانتس',
 
-    # Finance Managment
-    'financeManagment' => 'إدارة المالية',
-    'fees' => 'المصاريف',
-    'invoices' => 'الفواتير',
-    'teachersInvoices' => 'فواتير المدرسين',
-    'studentsInvoices' => 'فواتير الطلاب',
-    'receipts' => 'سندات القبض',
-    'teachersReceipts' => 'سندات قبض المدرسين',
-    'studentsReceipts' => 'سندات قبض الطلاب',
-    'refunds' => 'الإستردادات',
-    'teachersRefunds' => 'إستردادات المدرسين',
-    'studentsRefunds' => 'إستردادات الطلاب',
-
     # Tools
     'tools' => 'أنشطة المعلم',
     'groups' => 'المجاميع',
@@ -48,4 +35,12 @@ return [
     'zooms' => 'حصص الزوم',
     'quizzes' => 'الكويزات',
     'assignments' => 'الواجبات',
+
+    # Finance Managment
+    'financeManagment' => 'إدارة المالية',
+    'fees' => 'المصاريف',
+    'invoices' => 'الفواتير',
+    'teachersInvoices' => 'فواتير المدرسين',
+    'studentsInvoices' => 'فواتير الطلاب',
+
 ];

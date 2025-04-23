@@ -23,19 +23,6 @@ return [
     'assistants' => 'Assistants',
     'assistantsManagment' => 'Assistants Managment',
 
-    # Finance Managment
-    'financeManagment' => 'Finance Managment',
-    'fees' => 'Fees',
-    'invoices' => 'Invoices',
-    'teachersInvoices' => 'Teachers Invoices',
-    'studentsInvoices' => 'Students Invoices',
-    'receipts' => 'Receipts',
-    'teachersReceipts' => 'Teachers Receipts',
-    'studentsReceipts' => 'Students Receipts',
-    'refunds' => 'Refunds',
-    'teachersRefunds' => 'Teachers Refunds',
-    'studentsRefunds' => 'Students Refunds',
-
     # Tools
     'tools' => 'Teacher Activities',
     'groups' => 'Groups',
@@ -47,4 +34,12 @@ return [
     'zooms' => 'Zooms',
     'quizzes' => 'Quizzes',
     'assignments' => 'Assignments',
+
+    # Finance Managment
+    'financeManagment' => 'Finance Managment',
+    'fees' => 'Fees',
+    'invoices' => 'Invoices',
+    'teachersInvoices' => 'Teachers Invoices',
+    'studentsInvoices' => 'Students Invoices',
+
 ];

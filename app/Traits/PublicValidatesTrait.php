@@ -218,11 +218,11 @@ trait PublicValidatesTrait
         $user = $user ?? Auth::user();
 
         if (!$user) {
-            return false;
+            return $this->errorResponse(trans('toasts.ownershipError'));
         }
 
         if (!$model->hasAttribute($ownershipColumn) || is_null($model->$ownershipColumn)) {
-            return false;
+            return $this->errorResponse(trans('toasts.ownershipError'));
         }
 
         $isOwner = $user->id === $model->$ownershipColumn;

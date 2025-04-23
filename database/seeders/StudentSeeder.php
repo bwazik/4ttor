@@ -34,8 +34,6 @@ class StudentSeeder extends Seeder
                 'parent_id' => $fakerEn->randomElement($parentsIds),
                 'balance' => $fakerEn->randomFloat(2, 0, 1000),
                 'is_active' => $fakerEn->boolean(75),
-                'is_exempted' => $fakerEn->boolean(10),
-                'fees_discount' => $fakerEn->boolean(15) ? $fakerEn->randomFloat(2, 1, 100) : 0.00,
             ]);
         }
     }

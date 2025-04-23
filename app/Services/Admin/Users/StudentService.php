@@ -12,7 +12,7 @@ class StudentService
 {
     use PreventDeletionIfRelated, PublicValidatesTrait, DatabaseTransactionTrait;
 
-    protected $relationships = ['invoices', 'studentAccount', 'receipts', 'refunds', 'attendances', 'assignmentSubmissions'];
+    protected $relationships = ['attendances', 'assignmentSubmissions'];
     protected $transModelKey = 'admin/students.students';
 
     public function getStudentsForDatatable($studentsQuery)
@@ -288,18 +288,4 @@ class StudentService
     {
         return $this->checkForMultipleDependencies($teachers, $this->relationships, $this->transModelKey);
     }
-
-    // public function getStudentAccountBalance($id): float
-    // {
-    //     $studentAccount = StudentAccount::where('student_id', $id)->select('debit', 'credit')->get();
-
-    //     if ($studentAccount->isEmpty()) {
-    //         return 0.00;
-    //     }
-
-    //     $debit = $studentAccount->sum('debit');
-    //     $credit = $studentAccount->sum('credit');
-
-    //     return round($debit - $credit, 2);
-    // }
 }

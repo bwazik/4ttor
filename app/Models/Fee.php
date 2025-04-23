@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Translatable\HasTranslations;
 
@@ -11,19 +12,33 @@ class Fee extends Model
 
     protected $table = 'fees';
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
+    }
+
     public $translatable = ['name'];
 
     protected $fillable = [
+        'uuid',
         'name',
         'amount',
         'teacher_id',
         'grade_id',
-        'created_at',
+        'frequency',
     ];
 
     protected $hidden = [
+        'created_at',
         'updated_at',
     ];
+
 
     # Relationships
     public function teacher()
@@ -36,18 +51,14 @@ class Fee extends Model
         return $this->belongsTo(Grade::class, 'grade_id');
     }
 
-    public function invoices()
+    # Scopes
+    public function scopeUuid($query, $uuid)
     {
-        return $this->hasMany(Invoice::class, 'fee_id');
+        return $query->where('uuid', $uuid);
     }
 
-    # Accessors
-    public function getCreatedAtAttribute($value)
+    public function scopeUuids($query, $uuids)
     {
-        return isoFormat($value);
-    }
-    public function getUpdatedAtAttribute($value)
-    {
-        return isoFormat($value);
+        return $query->whereIn('uuid', $uuids);
     }
 }
