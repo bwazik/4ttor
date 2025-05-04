@@ -12,6 +12,8 @@ return [
     'archiveSelected' => 'أرشفة المحددين',
     'restoreSelected' => 'إسترجاع المحددين',
     'addItem' => 'إضافة :item',
+    'previewItem' => 'عرض :item',
+    'printItem' => 'طباعة :item',
     'datatable' => [
         'search' => 'بتدَوَّر علي حاجة؟',
         'empty_table' => 'مفيش بيانات عشان تعرضها',
@@ -31,6 +33,7 @@ return [
     'plan' => 'الخطة',
     'stage' => 'المرحلة الدراسية',
     'grade' => 'الصف الدراسي',
+    'founder' => 'المؤسس',
     'parent' => 'ولي الأمر',
     'teacher' => 'المدرس',
     'group' => 'المجموعة',
@@ -49,6 +52,11 @@ return [
     'delete' => 'حذف',
     'archive' => 'أرشفة',
     'restore' => 'إسترجاع',
+    'print' => 'طباعة',
+    'payment' => 'مدفوعات',
+    'refund' => 'إستردادات',
+    'invoice' => 'الفاتورة',
+    'balance_after' => 'الأرباح بعد',
 
     # Weekdays
     'weekdays' => [
@@ -63,8 +71,10 @@ return [
 
     # Placeholders
     'placeholders' => [
+        'description' => 'اكتب ملاحظات مختصرة هنا...',
         'description_ar' => 'اكتب وصف مختصر للعنصر دا.',
         'description_en' => 'Enter a brief description of the item.',
+        'realName' => 'الإسم الثلاثي',
     ],
 
     # Main inputs
@@ -98,6 +108,11 @@ return [
     'is_correct' => 'صحيحة ولا خاطئة',
     'correct' => 'صحيحة',
     'wrong' => 'خاطئة',
+    'is_exempted' => 'معفي ولا غير معفي',
+    'exempted' => 'معفي',
+    'notexempted' => 'غير معفي',
+    'used' => 'مستخدم',
+    'unused' => 'متاح',
     'score' => 'الدرجة',
     'files' => 'الملفات',
     'video_url' => 'رمز الفيديو',
@@ -111,11 +126,36 @@ return [
     'downloads' => 'التحميلات',
     'download' => 'تحميل',
     'views' => 'المشاهدات',
+    'frequency' => 'التكرار',
+    'one_time' => 'مرة واحدة',
+    'monthly' => 'شهرياً',
+    'custom' => 'مخصص',
+    'discount' => 'الخصم',
+    'due_amount' => 'المبلغ المستحق',
+    'due_date' => 'تاريخ الاستحقاق',
+    'pending' => 'قيد الإنتظار',
+    'paid' => 'مدفوعة',
+    'overdue' => 'متأخرة',
+    'canceled' => 'ملغية',
+    'expired' => 'منتهي',
+    'total' => 'الإجمالي',
+    'paymentMethod' => 'وسيلة الدفع',
+    'cash' => 'كاش',
+    'vodafoneCash' => 'فودافون كاش',
+    'instapay' => 'انستا باي',
+    'wallet' => 'المحفظة',
+    'code' => 'الكود',
+    'start_date' => 'تاريخ البداية',
+    'end_date' => 'تاريخ الإنتهاء',
+    'period' => 'الفترة',
+    'termly' => 'بالترم',
+    'yearly' => 'سنوياً',
 
     # Modals
     'items' => 'عدد العناصر',
     'editItem' => 'تعديل :item',
     'deleteItem' => 'مسح :item',
+    'cancelItem' => 'إلغاء :item',
     'archiveItem' => 'أرشفة :item',
     'restoreItem' => 'إسترجاع :item',
     'delete_warning' => 'اللي هيتمسح:',
@@ -127,6 +167,9 @@ return [
     'restore_warning' => 'اللي هيتعمله استرجاع:',
     'confirm_restoration' => 'مُتأكد إنك عايز تسترجع العناصر دي؟',
     'restore_note' => 'العناصر المسترجعة هترجع تبقى نشطة تاني.',
+    'cancel_warning' => 'اللي هيتم إلغاؤه:',
+    'confirm_cancelation' => 'مُتأكد إنك عايز تلغي العناصر دي؟',
+    'cancel_note' => 'مش هتقدر ترجع حاجه لغتها بعد كدا.',
 
     # Buttons
     'submit' => 'تمام',
@@ -134,6 +177,7 @@ return [
     'search' => 'بحث',
     'share' => 'مشاركة',
     'yes_delete' => 'آه, إمسح',
+    'yes_cancel' => 'آه, إلغيها',
     'yes_archive' => 'آه, أرشف',
     'yes_restore' => 'آه, رجعهم',
     'processing' => 'اصبر',
@@ -143,6 +187,7 @@ return [
     'added' => 'تم إضافة :item بنجاح!',
     'edited' => 'تم تعديل :item بنجاح!',
     'deleted' => 'تم مسح :item بنجاح!',
+    'canceledE' => 'تم إلغاء :item بنجاح!',
     'archived' => 'تم أرشفة :item بنجاح!',
     'restored' => 'تم إسترجاع :item بنجاح!',
     'deletedSelected' => 'تم مسح :item المحددة بنجاح!',
@@ -160,4 +205,5 @@ return [
     # Other
     'mr' => 'مستر',
     'mrs' => 'مس',
+    'showAll' => 'عرض الجميع',
 ];

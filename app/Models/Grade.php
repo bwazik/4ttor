@@ -44,11 +44,6 @@ class Grade extends Model
         return $this->hasMany(Group::class, 'grade_id');
     }
 
-    public function fees()
-    {
-        return $this->hasMany(Fee::class, 'grade_id');
-    }
-
     public function attendances()
     {
         return $this->hasMany(Attendance::class, 'grade_id');
@@ -67,6 +62,11 @@ class Grade extends Model
     public function assignments()
     {
         return $this->hasMany(Assignment::class, 'grade_id');
+    }
+
+    public function fees()
+    {
+        return $this->hasMany(Fee::class, 'grade_id');
     }
 
     # Scopes

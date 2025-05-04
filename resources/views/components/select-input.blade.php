@@ -4,6 +4,7 @@
     'options' => [],
     'required' => false,
     'readonly' => false,
+    'disabled' => false,
     'id' => null,
     'multiple' => false,
     'context' => null,
@@ -27,7 +28,7 @@ $selectedValues = is_array($selected) ? $selected : [$selected];
     <div class="form-floating form-floating-outline">
         <div class="select2-primary">
             <select id="{{ $id ?? $name }}" class="form-select" name="{{ $name }}{{ $multiple ? '[]' : '' }}"
-            {{ $multiple ? 'multiple' : '' }} {{ $required ? "required" : "" }} {{ $readonly ? 'readonly' : '' }}>
+            {{ $multiple ? 'multiple' : '' }} {{ $required ? "required" : "" }} {{ $readonly ? 'readonly' : '' }} {{ $disabled ? 'disabled' : '' }}>
             @foreach($options as $value => $optionLabel)
                 <option value="{{ $value }}" {{ in_array($value, $selectedValues) ? 'selected' : '' }}>
                     {{ $optionLabel }}
@@ -38,4 +39,7 @@ $selectedValues = is_array($selected) ? $selected : [$selected];
         <label for="{{ $id ?? $name }}">{{ $label }}</label>
     </div>
     <span class="invalid-feedback" id="{{ $id ?? $name }}_error" role="alert"></span>
+    @if($name === 'is_exempted')
+        <div class="form-text">لو حضرتك مخترتش هيبقي غير معفي تلقائياٌ</div>
+    @endif
 </div>

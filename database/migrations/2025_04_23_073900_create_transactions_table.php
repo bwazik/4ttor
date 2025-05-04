@@ -20,7 +20,7 @@ return new class extends Migration
             $table->decimal('amount')->default(0.00);
             $table->decimal('balance_after')->comment('User balance after transaction');
             $table->text('description')->nullable();
-            $table->tinyInteger('payment_method')->nullable()->comment('1 => cash, 2 => vodafone_cash, 3 => balance');
+            $table->tinyInteger('payment_method')->nullable()->comment('1 => cash, 2 => vodafone_cash, 3 => instapay, 4 => balance');
             $table->date('date');
             $table->timestamps();
         });

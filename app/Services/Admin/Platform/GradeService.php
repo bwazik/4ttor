@@ -22,7 +22,7 @@ class GradeService
                 return $row->name;
             })
             ->editColumn('is_active', function ($row) {
-                return $row->is_active ? '<span class="badge rounded-pill bg-label-success" text-capitalized="">'.trans('main.active').'</span>' : '<span class="badge rounded-pill bg-label-secondary" text-capitalized="">'.trans('main.inactive').'</span>';
+                return $row->is_active ? '<span class="badge rounded-pill bg-label-success text-capitalized">'.trans('main.active').'</span>' : '<span class="badge rounded-pill bg-label-secondary text-capitalized">'.trans('main.inactive').'</span>';
             })
             ->editColumn('stage_id', function ($row) {
                 return $row->stage->name;

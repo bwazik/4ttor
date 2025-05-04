@@ -8,7 +8,7 @@
         <x-basic-input context="modal" type="password" name="password" label="{{ trans('main.password') }}" required/>
         <x-basic-input context="modal" type="number" name="phone" label="{{ trans('main.phone') }}" placeholder="{{ trans('admin/students.placeholders.phone') }}" required/>
         <x-basic-input context="modal" type="email" name="email" label="{{ trans('main.email') }}" placeholder="{{ trans('admin/students.placeholders.email') }}"/>
-        <x-basic-input context="modal" type="text" name="birth_date" classes="flatpickr-date" label="{{ trans('main.birth_date') }}" placeholder="YYYY-MM-DD"/>
+        <x-basic-input context="modal" type="text" name="birth_date" classes="flatpickr-date" label="{{ trans('main.birth_date') }}" placeholder="YYYY-MM-DD" value="{{ now()->format('Y-m-d') }}"/>
         <x-select-input context="modal" name="gender" label="{{ trans('main.gender') }}" :options="[1 => trans('main.male'), 2 => trans('main.female')]" required/>
         <x-select-input context="modal" name="grade_id" label="{{ trans('main.grade') }}" :options="$grades"  required/>
         <x-select-input context="modal" name="parent_id" label="{{ trans('main.parent') }}" :options="$parents"/>

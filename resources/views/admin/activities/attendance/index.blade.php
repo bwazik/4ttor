@@ -153,18 +153,20 @@
                             searchable: false
                         },
                         {
-                            data: 'DT_RowIndex',
-                            name: 'DT_RowIndex',
+                            data: 'id',
+                            name: 'id',
+                        },
+                        {
+                            data: 'name',
+                            name: 'name',
                             orderable: false,
                             searchable: false
                         },
                         {
-                            data: 'name',
-                            name: 'name'
-                        },
-                        {
                             data: 'note',
-                            name: 'note'
+                            name: 'note',
+                            orderable: false,
+                            searchable: false
                         },
                         {
                             data: 'actions',

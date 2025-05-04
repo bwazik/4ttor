@@ -38,8 +38,15 @@ return [
     # Finance Managment
     'financeManagment' => 'Finance Managment',
     'fees' => 'Fees',
+    'student-fees' => 'Student Fees',
+    'teacher-subscriptions' => 'Teacher Subscriptions',
     'invoices' => 'Invoices',
     'teachersInvoices' => 'Teachers Invoices',
     'studentsInvoices' => 'Students Invoices',
-
+    'transactions' => 'Transactions',
+    'teacherTransactions' => 'Teacher Transactions',
+    'studentTransactions' => 'Student Transactions',
+    'coupons' => 'Coupons',
+    'teacherCoupons' => 'Teacher Coupons',
+    'studentCoupons' => 'Student Coupons',
 ];

@@ -50,4 +50,16 @@ trait ServiceResponseTrait
                 : $exception->getMessage()
         );
     }
+
+
+    /**
+     * Generate a 404 error response error message
+     *
+     * @param \Exception $exception
+     * @return array
+     */
+    protected function notFoundErrorResponse(\Exception $exception, ?string $customMessage = null): array
+    {
+        return $this->errorResponse($customMessage ?? $exception->getMessage());
+    }
 }

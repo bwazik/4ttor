@@ -39,8 +39,15 @@ return [
     # Finance Managment
     'financeManagment' => 'إدارة المالية',
     'fees' => 'المصاريف',
+    'student-fees' => 'مصاريف الطلاب',
+    'teacher-subscriptions' => 'إشتراكات المدرسين',
     'invoices' => 'الفواتير',
     'teachersInvoices' => 'فواتير المدرسين',
     'studentsInvoices' => 'فواتير الطلاب',
-
+    'transactions' => 'المعاملات',
+    'teachersTransactions' => 'معاملات المدرسين',
+    'studentsTransactions' => 'معاملات الطلاب',
+    'coupons' => 'الكوبونات',
+    'teachersCoupons' => 'كوبونات المدرسين',
+    'studentsCoupons' => 'كوبونات الطلاب',
 ];

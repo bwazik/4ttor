@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('student_fees', function (Blueprint $table) {
 			$table->increments('id');
+            $table->uuid('uuid')->unique();
             $table->integer('student_id')->unsigned();
             $table->integer('fee_id')->unsigned();
             $table->decimal('discount', 5, 2)->default(0.00)->comment('Percentage discount, e.g., 10.00 for 10%');
