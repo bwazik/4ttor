@@ -5,6 +5,24 @@ const weekdays = window.translations.weekdays;
 const currentLocale = window.translations.currentLocale;
 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
+document.addEventListener('DOMContentLoaded', function () {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl, {
+            boundary: document.body
+        });
+    });
+});
+
+$('#datatable').on('draw.dt', function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl, {
+            boundary: document.body
+        });
+    });
+});
+
 // Function to toggle all checkboxes and update the main checkbox state
 function toggleCheckboxes(className, mainCheckbox) {
     $(`.${className}`).prop('checked', $(mainCheckbox).prop('checked'));
@@ -129,7 +147,6 @@ document.addEventListener('DOMContentLoaded', function () {
     Array.from(datePickers).forEach((datepicker) => {
         flatpickr(datepicker, {
             dateFormat: 'Y-m-d',
-            defaultDate: 'today',
         });
     });
     Array.from(timePickers).forEach((timePicker) => {
@@ -606,7 +623,7 @@ function setupModal({ buttonId, modalId, fields = {}, onShow = null }) {
 
         // Execute any custom logic before showing the modal
         if (typeof onShow === 'function') {
-            onShow($modal, $(this));
+            onShow($modal, $(this), buttonId);
         }
     });
 }
@@ -808,14 +825,15 @@ function fetchMultipleDataByAjax(triggerSelector, urlTemplate, targetSelector, r
     });
 }
 
-function fetchSingleDataByAjax(triggerSelector, urlTemplate, targetSelector, requestDataKey, type = 'POST') {
+function fetchSingleDataByAjax(triggerSelector, urlTemplate, mappings, requestDataKey, type = 'GET', secondSelectId = null) {
     $(triggerSelector).on('change', function(e) {
         e.preventDefault();
 
-        const selectedValue  = $(this).val();
+        const selectedValue = $(this).val();
+        const secondSelectedValue = $(this).closest('form').find(`select[id="${secondSelectId}"]`).val();
 
-        if (selectedValue  && selectedValue .length > 0) {
-            const url = urlTemplate.replace('__ID__', selectedValue);
+        if (selectedValue && selectedValue.length > 0) {
+            const url = urlTemplate.replace('__ID__', selectedValue).replace('__SECOND_ID__', secondSelectedValue);
 
             $.ajax({
                 url: url,
@@ -827,15 +845,43 @@ function fetchSingleDataByAjax(triggerSelector, urlTemplate, targetSelector, req
                 },
                 success: function(response) {
                     if (response.status === 'success') {
-                        $(targetSelector).val(response.data);
-                    } else {
-                        console.log(response);
+                        mappings.forEach(mapping => {
+                            let value = response.data;
 
+                            if (mapping.dataKey && typeof response.data === 'object') {
+                                const keys = mapping.dataKey.split('.');
+                                value = keys.reduce((obj, key) => obj && obj[key], response.data);
+                            }
+
+                            const $target = $(mapping.targetSelector);
+                            if ($target.is('select')) {
+                                const [modalId, elementId] = mapping.targetSelector.substring(1).split(' #');
+                                let disabledStatus = false;
+                                if (elementId === 'exemptition') {
+                                    disabledStatus = true;
+                                }
+                                initializeSelect2(modalId, elementId, value, disabledStatus);
+                            } else if ($target.is('input')) {
+                                $target.val(value);
+                            } else {
+                                $target.text(value);
+                            }
+                        });
+                    } else {
                         toastr.error(response.message || errorMessage);
                     }
                 },
                 error: function(xhr) {
-                    $(targetSelector).val('');
+                    // Clear all target fields on error
+                    mappings.forEach(mapping => {
+                        const $target = $(mapping.targetSelector);
+                        if ($target.is('input')) {
+                            $target.val('');
+                        } else {
+                            $target.text('');
+                        }
+                    });
+
                     if (xhr.status === 429) {
                         toastr.error(tooManyRequestsMessage);
                     } else if (xhr.responseJSON) {
@@ -856,7 +902,15 @@ function fetchSingleDataByAjax(triggerSelector, urlTemplate, targetSelector, req
                 },
             });
         } else {
-            $(targetSelector).val('');
+            // Clear all target fields when no value is selected
+            mappings.forEach(mapping => {
+                const $target = $(mapping.targetSelector);
+                if ($target.is('input')) {
+                    $target.val('');
+                } else {
+                    $target.text('');
+                }
+            });
         }
     });
 }
@@ -1075,3 +1129,63 @@ function toggleShareButton()
         });
     });
 }
+
+function calculateAmountAndDiscount() {
+    let originalAmount = 0;
+    let savedDiscount = 0;
+
+    function updateAmount() {
+        if ($('#amount').val() && !originalAmount) {
+            originalAmount = parseFloat($('#amount').val());
+        }
+
+        const isExempted = $('#is_exempted').val() === '1';
+
+        if (isExempted) {
+            savedDiscount = parseFloat($('#discount').val()) || 0;
+            $('#discount').val(0);
+            $('#amount').val('0.00');
+            $('#amount').attr('readonly', true);
+        } else {
+            const discount = Math.min(100, Math.max(0, parseFloat($('#discount').val()) || 0));
+            $('#discount').val(discount);
+            let amount = originalAmount * (1 - discount / 100);
+            amount = Math.max(0, Math.min(originalAmount, amount)).toFixed(2);
+            $('#amount').val(amount);
+            $('#amount').removeAttr('readonly');
+        }
+    }
+
+    function updateDiscount() {
+        if (originalAmount > 0 && $('#is_exempted').val() !== '1') {
+            let currentAmount = parseFloat($('#amount').val()) || 0;
+            currentAmount = Math.min(originalAmount, currentAmount);
+            const discount = ((originalAmount - currentAmount) / originalAmount * 100).toFixed(2);
+            if (discount >= 0 && discount <= 100) {
+                $('#discount').val(discount);
+            }
+        }
+    }
+
+    $('#discount').on('input', updateAmount);
+    $('#is_exempted').on('change', function() {
+        if ($(this).val() === '0') {
+            $('#discount').val(savedDiscount);
+        }
+        updateAmount();
+    });
+    $('#amount').on('input', function() {
+        if (!originalAmount) {
+            originalAmount = parseFloat($(this).val()) || 0;
+        }
+        updateDiscount();
+    });
+    updateAmount();
+
+    $('#fee_id').on('change', function() {
+        originalAmount = 0;
+        savedDiscount = 0;
+        updateAmount();
+    });
+}
+

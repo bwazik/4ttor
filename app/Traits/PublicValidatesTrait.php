@@ -2,12 +2,17 @@
 
 namespace App\Traits;
 
+use App\Models\Fee;
 use App\Models\Quiz;
 use App\Models\Group;
 use App\Models\Answer;
+use App\Models\Wallet;
+use App\Models\Invoice;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\Question;
+use App\Models\StudentFee;
+use App\Models\TeacherSubscription;
 use App\Models\ZoomAccount;
 use App\Traits\ServiceResponseTrait;
 use Illuminate\Support\Facades\Auth;
@@ -145,7 +150,6 @@ trait PublicValidatesTrait
         return ZoomAccount::where('teacher_id', $teacherId)->exists();
     }
 
-
     protected function configureZoomAPI(int $teacherId)
     {
         if (!$this->hasZoomAccount($teacherId)) {
@@ -229,6 +233,288 @@ trait PublicValidatesTrait
 
         if ($isOwner == false) {
             return $this->errorResponse(trans('toasts.ownershipError'));
+        }
+
+        return null;
+    }
+
+    protected function validateStudentFee($studentId, $feeId, $excludeId = null)
+    {
+        $student = Student::findOrFail($studentId);
+        $fee = Fee::findOrFail($feeId);
+
+        $existingFeeQuery = StudentFee::where('student_id', $studentId)
+            ->where('fee_id', $feeId);
+
+        if ($excludeId !== null) {
+            $existingFeeQuery->where('id', '!=', $excludeId);
+        }
+
+        if ($existingFeeQuery->exists()) {
+            return $this->errorResponse(trans('toasts.validateDuplicateFee'));
+        }
+
+        if ($fee->grade_id && $student->grade_id !== $fee->grade_id) {
+            return $this->errorResponse(trans('toasts.validateStudentGrade'));
+        }
+
+        if ($fee->teacher_id) {
+            $hasTeacher = $student->teachers()->where('teachers.id', $fee->teacher_id)->exists();
+            if (!$hasTeacher) {
+                return $this->errorResponse(trans('toasts.validateStudentTeacher'));
+            }
+        }
+
+        return null;
+    }
+
+    protected function validateStudentFeeForInvoice(int $studentFeeId, int $studentId, ?int $excludeInvoiceId = null): array|null
+    {
+        $studentFee = StudentFee::with([
+            'fee:id,grade_id,teacher_id',
+            'student:id,grade_id'
+        ])
+            ->select('id', 'student_id', 'fee_id', 'discount', 'is_exempted')
+            ->findOrFail($studentFeeId);
+
+        if ($studentFee->student_id !== $studentId) {
+            return $this->errorResponse(trans('toasts.validateStudentFeeMismatch'));
+        }
+
+        if (!$studentFee->fee) {
+            return ['status' => 'error', 'message' => trans('toasts.noFeesFound')];
+        }
+
+        if ($studentFee->fee->grade_id && $studentFee->student->grade_id !== $studentFee->fee->grade_id) {
+            return ['status' => 'error', 'message' => trans('toasts.validateStudentGrade')];
+        }
+
+        if ($studentFee->fee->teacher_id) {
+            $hasTeacher = $studentFee->student->teachers()->where('teachers.id', $studentFee->fee->teacher_id)->exists();
+            if (!$hasTeacher) {
+                return ['status' => 'error', 'message' => trans('toasts.validateStudentTeacher')];
+            }
+        }
+
+        if ($studentFee->amount < 0) {
+            return ['status' => 'error', 'message' => trans('toasts.validateInvalidAmount')];
+        }
+
+        $query = Invoice::where('student_fee_id', $studentFeeId)
+            ->whereIn('status', [1, 2, 3]);
+
+        if ($excludeInvoiceId) {
+            $query->where('id', '!=', $excludeInvoiceId);
+        }
+
+        if ($query->exists()) {
+            return $this->errorResponse(trans('toasts.validateDuplicateInvoice'));
+        }
+
+        return null;
+    }
+
+    protected function validatePaymentData(int $invoiceId, float $amount): array|null
+    {
+        $invoice = Invoice::with([
+            'studentFee:id,student_id,fee_id,is_exempted',
+            'fee:id,teacher_id,grade_id',
+            'student:id,grade_id',
+            'fee.teacher:id',
+            'transactions' => fn($query) => $query->whereIn('type', [2, 3]),
+        ])
+            ->select('id', 'student_id', 'student_fee_id', 'fee_id', 'amount', 'status')
+            ->findOrFail($invoiceId);
+
+        if (!in_array($invoice->status, [1, 3])) {
+            return $this->errorResponse(trans('toasts.invoiceNotPayable'));
+        }
+
+        if (!$invoice->studentFee || $invoice->studentFee->id !== $invoice->student_fee_id) {
+            return $this->errorResponse(trans('toasts.noFeesFound'));
+        }
+
+        if (!$invoice->fee) {
+            return $this->errorResponse(trans('toasts.noFeesFound'));
+        }
+
+        if ($invoice->fee->grade_id && $invoice->student->grade_id !== $invoice->fee->grade_id) {
+            return $this->errorResponse(trans('toasts.validateStudentGrade'));
+        }
+
+        if ($invoice->fee->teacher_id) {
+            $hasTeacher = $invoice->student->teachers()->where('teachers.id', $invoice->fee->teacher_id)->exists();
+            if (!$hasTeacher) {
+                return $this->errorResponse(trans('toasts.validateStudentTeacher'));
+            }
+        }
+
+        if ($invoice->studentFee->is_exempted && $amount != 0) {
+            return $this->errorResponse(trans('toasts.invalidAmountForExempted'));
+        }
+
+        $netPaid = $invoice->transactions->sum('amount');
+        $remaining = bcsub((string)$invoice->amount, (string)$netPaid, 2);
+        if (!$invoice->studentFee->is_exempted && ($amount <= 0 || $amount > $remaining)) {
+            return $this->errorResponse(trans('toasts.paymentExceedsRemaining', ['remaining' => number_format($remaining, 2)]));
+        }
+
+        return null;
+    }
+
+    protected function validateRefundData(int $invoiceId, float $amount): array|null
+    {
+        $invoice = Invoice::with([
+            'studentFee:id,uuid,student_id,fee_id,is_exempted',
+            'fee:id,teacher_id,grade_id',
+            'student:id,grade_id',
+            'fee.teacher:id',
+            'transactions' => fn($query) => $query->whereIn('type', [2, 3]),
+            ])
+            ->select('id', 'student_id', 'student_fee_id', 'fee_id', 'amount', 'status')
+            ->findOrFail($invoiceId);
+
+        if (!in_array($invoice->status, [1, 2, 3])) {
+            return $this->errorResponse(trans('toasts.invoiceNotRefundable'));
+        }
+
+        if (!$invoice->studentFee || $invoice->studentFee->id !== $invoice->student_fee_id) {
+            return $this->errorResponse(trans('toasts.noFeesFound'));
+        }
+
+        if (!$invoice->fee) {
+            return $this->errorResponse(trans('toasts.noFeesFound'));
+        }
+
+        if ($invoice->fee->grade_id && $invoice->student->grade_id !== $invoice->fee->grade_id) {
+            return $this->errorResponse(trans('toasts.validateStudentGrade'));
+        }
+
+        if ($invoice->fee->teacher_id) {
+            $hasTeacher = $invoice->student->teachers()->where('teachers.id', $invoice->fee->teacher_id)->exists();
+            if (!$hasTeacher) {
+                return $this->errorResponse(trans('toasts.validateStudentTeacher'));
+            }
+        }
+
+        if ($invoice->studentFee->is_exempted && $amount != 0) {
+            return $this->errorResponse(trans('toasts.invalidAmountForExempted'));
+        }
+
+        $netPaid = $invoice->transactions->whereIn('type', [2, 3])->sum('amount');
+        if ($netPaid <= 0 && !$invoice->studentFee->is_exempted) {
+            return $this->errorResponse(trans('toasts.noPaymentsToRefund'));
+        }
+
+        if (!$invoice->studentFee->is_exempted && ($amount <= 0 || $amount > $netPaid)) {
+            return $this->errorResponse(trans('toasts.refundExceedsPaid', ['paid' => number_format($netPaid, 2)]));
+        }
+
+        $wallet = Wallet::where('teacher_id', $invoice->fee->teacher_id)->first();
+        if (!$wallet || $wallet->balance < $amount) {
+            return $this->errorResponse(trans('toasts.insufficientWalletBalance'));
+        }
+
+        return null;
+    }
+
+    protected function validateTeacherSubscriptionForInvoice(int $teacherSubscriptionId, int $teacherId, ?int $excludeInvoiceId = null): array|null
+    {
+        $teacherSubscription = TeacherSubscription::with(['teacher', 'plan'])
+            ->select('id', 'teacher_id', 'plan_id')
+            ->findOrFail($teacherSubscriptionId);
+
+        if ($teacherSubscription->teacher_id !== $teacherId) {
+            return $this->errorResponse(trans('toasts.validateTeacherSubscriptionMismatch'));
+        }
+
+        if (!$teacherSubscription->plan) {
+            return ['status' => 'error', 'message' => trans('toasts.noSubscriptionsFound')];
+        }
+
+        if ($teacherSubscription->amount < 0) {
+            return ['status' => 'error', 'message' => trans('toasts.validateInvalidAmount')];
+        }
+
+        $query = Invoice::where('subscription_id', $teacherSubscriptionId)
+            ->whereIn('status', [1, 2, 3]);
+
+        if ($excludeInvoiceId) {
+            $query->where('id', '!=', $excludeInvoiceId);
+        }
+
+        if ($query->exists()) {
+            return $this->errorResponse(trans('toasts.validateDuplicateInvoice'));
+        }
+
+        return null;
+    }
+
+    protected function validateTeacherPaymentData(int $invoiceId, float $amount): array|null
+    {
+        $invoice = Invoice::with([
+            'subscription:id,plan_id',
+            'subscription.plan:id',
+            'transactions' => fn($query) => $query->whereIn('type', [2, 3]),
+        ])
+            ->select('id', 'subscription_id', 'amount', 'status')
+            ->findOrFail($invoiceId);
+
+        if (!in_array($invoice->status, [1, 3])) {
+            return $this->errorResponse(trans('toasts.invoiceNotPayable'));
+        }
+
+        if (!$invoice->subscription || $invoice->subscription->id !== $invoice->subscription_id) {
+            return $this->errorResponse(trans('toasts.noSubscriptionsFound'));
+        }
+
+        if (!$invoice->subscription->plan) {
+            return $this->errorResponse(trans('toasts.noSubscriptionsFound'));
+        }
+
+        $netPaid = $invoice->transactions->sum('amount');
+        $remaining = bcsub((string)$invoice->amount, (string)$netPaid, 2);
+        if ($amount <= 0 || $amount > $remaining) {
+            return $this->errorResponse(trans('toasts.paymentExceedsRemaining', ['remaining' => number_format($remaining, 2)]));
+        }
+
+        return null;
+    }
+
+    protected function validateTeacherRefundData(int $invoiceId, float $amount): array|null
+    {
+        $invoice = Invoice::with([
+            'subscription:id,plan_id',
+            'subscription.plan:id',
+            'transactions' => fn($query) => $query->whereIn('type', [2, 3]),
+            ])
+            ->select('id', 'subscription_id', 'amount', 'status')
+            ->findOrFail($invoiceId);
+
+        if (!in_array($invoice->status, [1, 2, 3])) {
+            return $this->errorResponse(trans('toasts.invoiceNotRefundable'));
+        }
+
+        if (!$invoice->subscription || $invoice->subscription->id !== $invoice->subscription_id) {
+            return $this->errorResponse(trans('toasts.noSubscriptionsFound'));
+        }
+
+        if (!$invoice->subscription->plan) {
+            return $this->errorResponse(trans('toasts.noSubscriptionsFound'));
+        }
+
+        $netPaid = $invoice->transactions->whereIn('type', [2, 3])->sum('amount');
+        if ($netPaid <= 0) {
+            return $this->errorResponse(trans('toasts.noPaymentsToRefund'));
+        }
+
+        if ($amount <= 0 || $amount > $netPaid) {
+            return $this->errorResponse(trans('toasts.refundExceedsPaid', ['paid' => number_format($netPaid, 2)]));
+        }
+
+        $wallet = Wallet::where('user_id', 1)->first();
+        if (!$wallet || $wallet->balance < $amount) {
+            return $this->errorResponse(trans('toasts.insufficientWalletBalance'));
         }
 
         return null;

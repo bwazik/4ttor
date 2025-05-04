@@ -11,9 +11,6 @@ body > :not(.invoice-print) {
   min-width: 768px !important;
   font-size: 15px !important;
 }
-.invoice-print svg {
-  fill: #676b7b !important;
-}
 
 .invoice-print * {
   color: #676b7b !important;
@@ -25,3 +22,4 @@ body > :not(.invoice-print) {
 .dark-style .invoice-print th {
   color: #fff !important;
 }
+

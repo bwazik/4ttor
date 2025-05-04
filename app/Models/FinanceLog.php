@@ -3,10 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
 
 class FinanceLog extends Model
 {
+    use HasTranslations;
+
     protected $table = 'audit_logs';
+
+    public $translatable = ['details', 'details'];
+
+    public $timestamps = false;
 
     protected $fillable = [
         'teacher_id',
@@ -14,9 +21,6 @@ class FinanceLog extends Model
         'student_id',
         'action',
         'details',
-    ];
-
-    protected $hidden = [
         'created_at',
     ];
 

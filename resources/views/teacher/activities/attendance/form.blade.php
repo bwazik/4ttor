@@ -17,7 +17,7 @@
                 <div class="row g-5">
                     <x-select-input context="modal" name="grade_id" label="{{ trans('main.grade') }}" :options="$grades" />
                     <x-select-input context="modal" name="group_id" label="{{ trans('main.group') }}"  />
-                    <x-basic-input divContext="col-12" type="text" name="date" classes="flatpickr-date" label="{{ trans('main.date') }}" placeholder="YYYY-MM-DD"/>
+                    <x-basic-input divContext="col-12" type="text" name="date" classes="flatpickr-date" label="{{ trans('main.date') }}" placeholder="YYYY-MM-DD" value="{{ now()->format('Y-m-d') }}"/>
                 </div>
                 <div class="pt-6">
                     <button type="submit" id="submit" class="btn btn-primary me-sm-2">{{ trans('main.search') }}</button>

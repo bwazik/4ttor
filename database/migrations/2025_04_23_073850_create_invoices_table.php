@@ -17,6 +17,7 @@ return new class extends Migration
             $table->tinyInteger('type')->default(1)->comment('1 => subscription, 2 => fee');
             $table->integer('teacher_id')->unsigned()->nullable();
             $table->integer('student_id')->unsigned()->nullable();
+            $table->integer('student_fee_id')->unsigned()->nullable();
             $table->integer('fee_id')->unsigned()->nullable();
             $table->integer('subscription_id')->unsigned()->nullable();
             $table->decimal('amount')->default(0.00);

@@ -148,9 +148,9 @@
                 datatable = initializePostDataTable('#datatable', url, [2, 3, 4],
                     [
                         { data: "", orderable: false, searchable: false },
-                        { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                        { data: 'name', name: 'name' },
-                        { data: 'note', name: 'note' },
+                        { data: 'id', name: 'id' },
+                        { data: 'name', name: 'name', orderable: false, searchable: false },
+                        { data: 'note', name: 'note', orderable: false, searchable: false },
                         { data: 'actions', name: 'actions', orderable: false, searchable: false }
                     ], {
                         grade_id: $('#students-form #grade_id').val(),

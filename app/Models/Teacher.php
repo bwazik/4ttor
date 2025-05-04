@@ -79,11 +79,6 @@ class Teacher extends Authenticatable
         return $this->hasMany(Group::class, 'teacher_id');
     }
 
-    public function fees()
-    {
-        return $this->hasMany(Fee::class, 'teacher_id');
-    }
-
     public function attendances()
     {
         return $this->hasMany(Attendance::class, 'teacher_id');
@@ -122,6 +117,36 @@ class Teacher extends Authenticatable
     public function assignments()
     {
         return $this->hasMany(Assignment::class, 'teacher_id');
+    }
+
+    public function teacherSubscriptions()
+    {
+        return $this->hasMany(TeacherSubscription::class, 'teacher_id');
+    }
+
+    public function fees()
+    {
+        return $this->hasMany(Fee::class, 'teacher_id');
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class, 'teacher_id');
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'teacher_id');
+    }
+
+    public function coupons()
+    {
+        return $this->hasMany(Coupon::class, 'teacher_id');
+    }
+
+    public function wallet()
+    {
+        return $this->hasOne(Wallet::class, 'teacher_id');
     }
 
     # Scopes

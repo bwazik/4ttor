@@ -33,7 +33,6 @@ class AttendanceService
             ->where('student_group.group_id', $request['group_id']);
 
         return datatables()->eloquent($studentsQuery)
-            ->addIndexColumn()
             ->editColumn('name', fn($row) => $row->name)
             ->addColumn('note', fn($row) => $this->generateNoteCell($row))
             ->addColumn('actions', fn($row) => $this->generateActionsCell($row))

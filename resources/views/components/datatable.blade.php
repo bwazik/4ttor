@@ -1,4 +1,21 @@
 <div class="card">
+    {{-- <div class="card-header border-bottom">
+        <div class="d-flex justify-content-between align-items-center row gap-5 gx-6 gap-md-0">
+            @isset($studentOrTeacherFilter)
+                @if ($studentOrTeacherFilter)
+                <div class="col-md-12">
+                    <form id="student-or-teacher-filter-form" class="me-4" method="GET" action="{{ $route }}">
+                        <select id="type" class="form-select" name="type">
+                            <option value="all" selected>{{ trans('main.showAll') }}</option>
+                            <option value="teachers">{{ trans('admin/teachers.teachers') }}</option>
+                            <option value="students">{{ trans('admin/students.students') }}</option>
+                        </select>
+                    </form>
+                </div>
+                @endif
+            @endisset
+        </div>
+    </div> --}}
     <div class="card-datatable table-responsive pt-0">
         <div class="card-header d-flex align-items-center justify-content-between flex-column flex-md-row border-bottom">
             <div class="head-label text-center">
@@ -77,6 +94,16 @@
                                     <span class="d-none d-sm-inline-block">{{ $otherButton }}</span>
                                 </span>
                             </button>
+                        @endif
+                    @endisset
+                    @isset($hrefButton)
+                        @if ($hrefButton)
+                            <a href="{{ $hrefButtonRoute }}" id="href-button" class="btn btn-primary waves-effect waves-light" style="border-radius: 0.5rem; !important">
+                                <span>
+                                    <i class="ri-add-line ri-16px me-sm-2"></i>
+                                    <span class="d-none d-sm-inline-block">{{ $hrefButton }}</span>
+                                </span>
+                            </a>
                         @endif
                     @endisset
                 </div>

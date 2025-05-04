@@ -97,6 +97,26 @@ class Student extends Authenticatable
         return $this->hasMany(AssignmentSubmission::class, 'student_id');
     }
 
+    public function studentFees()
+    {
+        return $this->hasMany(StudentFee::class, 'student_id');
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class, 'student_id');
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'student_id');
+    }
+
+    public function coupons()
+    {
+        return $this->hasMany(Coupon::class, 'student_id');
+    }
+
     # Scopes
     public function scopeUuid($query, $uuid)
     {

@@ -12,6 +12,8 @@ return [
     'archiveSelected' => 'Archive Selected',
     'restoreSelected' => 'Restore Selected',
     'addItem' => 'Add :item',
+    'previewItem' => 'Preview :item',
+    'printItem' => 'Print :item',
     'datatable' => [
         'search' => 'Search:',
         'empty_table' => 'No data available in table',
@@ -31,6 +33,7 @@ return [
     'plan' => 'Plan',
     'stage' => 'Stage',
     'grade' => 'Grade',
+    'founder' => 'Founder',
     'parent' => 'Parent',
     'teacher' => 'Teacher',
     'group' => 'Group',
@@ -49,6 +52,9 @@ return [
     'delete' => 'Delete',
     'archive' => 'Archive',
     'restore' => 'Restore',
+    'print' => 'Print',
+    'payment' => 'Payments',
+    'refund' => 'Refunds',
 
     # Weekdays
     'weekdays' => [
@@ -63,8 +69,10 @@ return [
 
     # Placeholders
     'placeholders' => [
+        'description' => 'Write a brief description here...',
         'description_ar' => 'اكتب وصف مختصر للعنصر دا.',
-        'description_en' => 'Enter a brief description of the item.',
+        'description_en' => 'Write a brief description of this item.',
+        'realName' => 'Full Name',
     ],
 
     # Main inputs
@@ -98,6 +106,11 @@ return [
     'is_correct' => 'Is Correct',
     'correct' => 'Correct',
     'wrong' => 'Incorrect',
+    'is_exempted' => 'Is Exempted',
+    'exempted' => 'Exempted',
+    'notexempted' => 'Not Exempted',
+    'used' => 'Used',
+    'unused' => 'Available',
     'score' => 'Score',
     'files' => 'Files',
     'video_url' => 'Video URL',
@@ -111,11 +124,36 @@ return [
     'downloads' => 'Downloads',
     'download' => 'Download',
     'views' => 'Views',
+    'frequency' => 'Frequency',
+    'one_time' => 'One Time',
+    'monthly' => 'Monthly',
+    'custom' => 'Custom',
+    'discount' => 'Discount',
+    'due_amount' => 'Due Amount',
+    'due_date' => 'Due Date',
+    'pending' => 'Pending',
+    'paid' => 'Paid',
+    'overdue' => 'Overdue',
+    'canceled' => 'Canceled',
+    'expired' => 'Expired',
+    'total' => 'Total',
+    'paymentMethod' => 'Payment Method',
+    'cash' => 'Cash',
+    'vodafoneCash' => 'Vodafone Cash',
+    'instapay' => 'Instapay',
+    'wallet' => 'Wallet',
+    'code' => 'Code',
+    'start_date' => 'Start Date',
+    'end_date' => 'End Date',
+    'period' => 'Period',
+    'termly' => 'By Term',
+    'yearly' => 'Yearly',
 
     # Modals
     'items' => 'Items Count',
     'editItem' => 'Edit :item',
     'deleteItem' => 'Delete :item',
+    'cancelItem' => 'cancel :item',
     'archiveItem' => 'Archive :item',
     'restoreItem' => 'Restore :item',
     'delete_warning' => 'This will delete:',
@@ -127,6 +165,9 @@ return [
     'restore_warning' => 'This will restore:',
     'confirm_restoration' => 'Are you sure you want to restore these items?',
     'restore_note' => 'Restored items will be active again.',
+    'cancel_warning' => 'This will cancel:',
+    'confirm_cancelation' => 'Are you sure you want to cancel these items?',
+    'cancel_note' => 'This action cannot be undone.',
 
     # Buttons
     'submit' => 'Submit',
@@ -134,6 +175,7 @@ return [
     'search' => 'Search',
     'share' => 'Share',
     'yes_delete' => 'Yes, Delete',
+    'yes_cancel' => 'Yes, Cancel',
     'yes_archive' => 'Yes, Archive',
     'yes_restore' => 'Yes, Restore',
     'processing' => 'Processing',
@@ -143,6 +185,7 @@ return [
     'added' => ':item has been added successfully!',
     'edited' => ':item has been edited successfully!',
     'deleted' => ':item has been deleted successfully!',
+    'canceledE' => ':item has been canceled successfully!',
     'archived' => ':item has been archived successfully!',
     'restored' => ':item has been restored successfully!',
     'deletedSelected' => 'Selected :item has been deleted successfully!',
@@ -160,4 +203,5 @@ return [
     # Other
     'mr' => 'Mr',
     'mrs' => 'Mrs',
+    'showAll' => 'Show All',
 ];

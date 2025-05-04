@@ -89,6 +89,19 @@
         </div>
         <span class="invalid-feedback" id="{{ $id ?? $name }}_error" role="alert"></span>
     </div>
+@elseif($name === 'discount')
+    <div class="{{ $divClasses }}">
+        <div class="input-group input-group-merge">
+            <div class="form-floating form-floating-outline">
+                <input type="{{ $type }}" id="{{ $id ?? $name }}" class="form-control{{ $classes ? ' ' . $classes : '' }}"
+                    name="{{ $name }}" value="{{ e($value) }}" {{ $required ? 'required' : '' }} {{ $readonly ? 'readonly' : '' }} {{ $disabled ? 'disabled' : '' }} placeholder="{{ $placeholder }}"
+                    aria-label="{{ $placeholder }}"/>
+                <label for="{{ $id ?? $name }}">{{ $label }}</label>
+            </div>
+            <span class="input-group-text">%</span>
+        </div>
+        <span class="invalid-feedback" id="{{ $id ?? $name }}_error" role="alert"></span>
+    </div>
 @elseif($type === 'file')
     <div class="{{ $divClasses }}">
         <label for="{{ $id ?? $name }}">{{ $label }}</label>

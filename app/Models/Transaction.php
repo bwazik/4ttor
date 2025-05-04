@@ -16,12 +16,12 @@ class Transaction extends Model
         'amount',
         'balance_after',
         'description',
-        'payment_method', // 1 => cash, 2 => vodafone_cash, 3 => balance
+        'payment_method', // 1 => cash, 2 => vodafone_cash, 3 => instapay, 4 => balance
         'date',
+        'created_at',
     ];
 
     protected $hidden = [
-        'created_at',
         'updated_at',
     ];
 
@@ -40,5 +40,56 @@ class Transaction extends Model
     public function invoice()
     {
         return $this->belongsTo(Invoice::class, 'invoice_id');
+    }
+
+    # Scopes
+    public function scopeInvoice($query)
+    {
+        return $query->where('type', 1);
+    }
+
+    public function scopePayment($query)
+    {
+        return $query->where('type', 2);
+    }
+
+    public function scopeRefund($query)
+    {
+        return $query->where('type', 3);
+    }
+
+    public function scopeCoupon($query)
+    {
+        return $query->where('type', 4);
+    }
+
+    public function scopeStudent($query)
+    {
+        return $query->where('payment_method', 1);
+    }
+
+    public function scopeVodafoneCash($query)
+    {
+        return $query->where('payment_method', 2);
+    }
+
+    public function scopeInstapay($query)
+    {
+        return $query->where('payment_method', 3);
+    }
+
+    public function scopeBalance($query)
+    {
+        return $query->where('payment_method', 4);
+    }
+
+    # Accessors
+    public function getCreatedAtAttribute($value)
+    {
+        return isoFormat($value);
+    }
+    public function getUpdatedAtAttribute($value)
+    {
+        return isoFormat($value);
     }
 }

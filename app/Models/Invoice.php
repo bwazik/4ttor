@@ -28,6 +28,7 @@ class Invoice extends Model
         'type', // 1 => subscription, 2 => fee
         'teacher_id',
         'student_id',
+        'student_fee_id',
         'fee_id',
         'subscription_id',
         'amount',
@@ -54,6 +55,11 @@ class Invoice extends Model
         return $this->belongsTo(Student::class, 'student_id');
     }
 
+    public function studentFee()
+    {
+        return $this->belongsTo(StudentFee::class, 'student_fee_id');
+    }
+
     public function fee()
     {
         return $this->belongsTo(Fee::class, 'fee_id');
@@ -62,6 +68,11 @@ class Invoice extends Model
     public function subscription()
     {
         return $this->belongsTo(TeacherSubscription::class, 'subscription_id');
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'invoice_id');
     }
 
     # Scopes
@@ -73,5 +84,35 @@ class Invoice extends Model
     public function scopeUuids($query, $uuids)
     {
         return $query->whereIn('uuid', $uuids);
+    }
+
+    public function scopeFee($query)
+    {
+        return $query->where('type', 2);
+    }
+
+    public function scopeSubscription($query)
+    {
+        return $query->where('type', 1);
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', 1);
+    }
+
+    public function scopePaid($query)
+    {
+        return $query->where('status', 2);
+    }
+
+    public function scopeOverdue($query)
+    {
+        return $query->where('status', 3);
+    }
+
+    public function scopeCanceled($query)
+    {
+        return $query->where('status', 4);
     }
 }

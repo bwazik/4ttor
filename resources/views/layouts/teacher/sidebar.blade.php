@@ -105,71 +105,6 @@
             </a>
         </li>
 
-        {{-- <!-- Finance -->
-        <li class="menu-header mt-5">
-            <span class="menu-header-text">{{ trans('layouts/sidebar.financeManagment') }}</span>
-        </li>
-        <li class="menu-item {{ isActiveRoute('admin.fees.index') ? 'active' : '' }}">
-            <a href="{{ route('admin.fees.index') }}" class="menu-link">
-                <i class="menu-icon tf-icons ri-wallet-line"></i>
-                <div>{{ trans('layouts/sidebar.fees') }}</div>
-            </a>
-        </li>
-        <li class="menu-item {{ isActiveRoute(['admin.invoices.teachers.index', 'admin.invoices.students.index']) ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
-                <i class="menu-icon tf-icons ri-file-list-3-line"></i>
-                <div>{{ trans('layouts/sidebar.invoices') }}</div>
-            </a>
-            <ul class="menu-sub">
-                <li class="menu-item {{ isActiveRoute('admin.invoices.teachers.index') ? 'active' : '' }}">
-                    <a href="{{ route('admin.invoices.teachers.index') }}" class="menu-link">
-                        <div>{{ trans('layouts/sidebar.teachersInvoices') }}</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ isActiveRoute('admin.invoices.students.index') ? 'active' : '' }}">
-                    <a href="{{ route('admin.invoices.students.index') }}" class="menu-link">
-                        <div>{{ trans('layouts/sidebar.studentsInvoices') }}</div>
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="menu-item {{ isActiveRoute(['admin.receipts.teachers.index', 'admin.receipts.students.index']) ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
-                <i class="menu-icon tf-icons ri-receipt-line"></i>
-                <div>{{ trans('layouts/sidebar.receipts') }}</div>
-            </a>
-            <ul class="menu-sub">
-                <li class="menu-item {{ isActiveRoute('admin.receipts.teachers.index') ? 'active' : '' }}">
-                    <a href="{{ route('admin.receipts.teachers.index') }}" class="menu-link">
-                        <div>{{ trans('layouts/sidebar.teachersReceipts') }}</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ isActiveRoute('admin.receipts.students.index') ? 'active' : '' }}">
-                    <a href="{{ route('admin.receipts.students.index') }}" class="menu-link">
-                        <div>{{ trans('layouts/sidebar.studentsReceipts') }}</div>
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="menu-item {{ isActiveRoute(['admin.refunds.teachers.index', 'admin.refunds.students.index']) ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
-                <i class="menu-icon tf-icons ri-refund-2-line"></i>
-                <div>{{ trans('layouts/sidebar.refunds') }}</div>
-            </a>
-            <ul class="menu-sub">
-                <li class="menu-item {{ isActiveRoute('admin.refunds.teachers.index') ? 'active' : '' }}">
-                    <a href="{{ route('admin.refunds.teachers.index') }}" class="menu-link">
-                        <div>{{ trans('layouts/sidebar.teachersRefunds') }}</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ isActiveRoute('admin.refunds.students.index') ? 'active' : '' }}">
-                    <a href="{{ route('admin.refunds.students.index') }}" class="menu-link">
-                        <div>{{ trans('layouts/sidebar.studentsRefunds') }}</div>
-                    </a>
-                </li>
-            </ul>
-        </li> --}}
-
         <!-- Activities -->
         <li class="menu-header mt-5">
             <span class="menu-header-text">{{ trans('layouts/sidebar.activities') }}</span>
@@ -196,6 +131,35 @@
             <a href="{{ route('teacher.assignments.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons ri-file-copy-2-line"></i>
                 <div>{{ trans('layouts/sidebar.assignments') }}</div>
+            </a>
+        </li>
+
+        <!-- Finance -->
+        <li class="menu-header mt-5">
+            <span class="menu-header-text">{{ trans('layouts/sidebar.financeManagment') }}</span>
+        </li>
+        <li class="menu-item {{ isActiveRoute('teacher.fees.index') ? 'active' : '' }}">
+            <a href="{{ route('teacher.fees.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons ri-bank-line"></i>
+                <div>{{ trans('layouts/sidebar.fees') }}</div>
+            </a>
+        </li>
+        <li class="menu-item {{ isActiveRoute('teacher.student-fees.index') ? 'active' : '' }}">
+            <a href="{{ route('teacher.student-fees.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons ri-user-2-line"></i>
+                <div>{{ trans('layouts/sidebar.student-fees') }}</div>
+            </a>
+        </li>
+        <li class="menu-item {{ isActiveRoute('teacher.invoices.index') ? 'active' : '' }}">
+            <a href="{{ route('teacher.invoices.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons ri-money-dollar-circle-line"></i>
+                <div>{{ trans('layouts/sidebar.invoices') }}</div>
+            </a>
+        </li>
+        <li class="menu-item {{ isActiveRoute('teacher.transactions.index') ? 'active' : '' }}">
+            <a href="{{ route('teacher.transactions.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons ri-exchange-dollar-line"></i>
+                <div>{{ trans('layouts/sidebar.transactions') }}</div>
             </a>
         </li>
     </ul>

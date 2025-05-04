@@ -30,6 +30,14 @@ use App\Http\Controllers\Admin\Activities\QuestionsController;
 use App\Http\Controllers\Admin\Activities\AnswersController;
 use App\Http\Controllers\Admin\Activities\AssignmentsController;
 
+use App\Http\Controllers\Admin\Finance\FeesController;
+use App\Http\Controllers\Admin\Finance\StudentFeesController;
+use App\Http\Controllers\Admin\Finance\InvoicesController;
+use App\Http\Controllers\Admin\Finance\TransactionsController;
+use App\Http\Controllers\Admin\Finance\CouponsController;
+use App\Http\Controllers\Admin\Finance\TeacherSubscriptionsController;
+use App\Http\Controllers\Admin\Finance\TeachersInvoicesController;
+
 Route::group(
     [
         'prefix' => LaravelLocalization::setLocale(),
@@ -57,6 +65,15 @@ Route::group(
             # Api Responses
             Route::prefix('fetch')->controller(DataFetchController::class)->name('fetch.')->group(function () {
                 Route::get('teachers/{teacher}/grades/{grade}/groups', 'getTeacherGroupsByGrade')->name('teachers.grade.groups');
+                Route::get('teachers/{teacher}/teacher-subscriptions', 'getTeacherSubscriptionsByTeacher')->name('teachers.teacher-subscriptions');
+                Route::get('teachers/{teacher}', 'getTeacherData')->name('teachers.data');
+                Route::get('students/{student}', 'getStudentData')->name('students.data');
+                Route::get('students/{student}/fees', 'getStudentFeesByStudent')->name('students.fees');
+                Route::get('students/{student}/student-fees', 'getStudentRegisteredFeesByStudent')->name('students.student-fees');
+                Route::get('fees/{fee}', 'getFeeData')->name('fees.data');
+                Route::get('student-fees/{studentFee}', 'getStudentFeeData')->name('student-fees.data');
+                Route::get('teacher-subscriptions/{teacherSubscription}', 'getTeacherSubscriptionData')->name('teacher-subscriptions.data');
+                Route::get('plans/{plan}/{period?}', 'getPlanData')->name('plans.data');
             });
 
         # Start Platform Managment
@@ -302,7 +319,87 @@ Route::group(
 
 
         # Start Finance Managment
+            Route::prefix('fees')->controller(FeesController::class)->name('fees.')->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::middleware('throttle:10,1')->group(function () {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
+            });
 
+            Route::prefix('student-fees')->controller(StudentFeesController::class)->name('student-fees.')->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::middleware('throttle:10,1')->group(function () {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
+            });
+
+            Route::prefix('teacher-subscriptions')->controller(TeacherSubscriptionsController::class)->name('teacher-subscriptions.')->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::middleware('throttle:10,1')->group(function () {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
+            });
+
+            Route::prefix('invoices/students')->controller(InvoicesController::class)->name('invoices.')->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/archived', 'archived')->name('archived');
+                Route::get('{id}/print', 'print')->name('print');
+                Route::get('create', 'create')->name('create');
+                Route::get('{id}', 'preview')->name('preview');
+                Route::get('{id}/edit', 'edit')->name('edit');
+                Route::middleware('throttle:10,1')->group(function () {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('{id}/update', 'update')->name('update');
+                    Route::post('{id}/payment', 'payment')->name('payment');
+                    Route::post('{id}/refund', 'refund')->name('refund');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('cancel', 'cancel')->name('cancel');
+                    Route::post('archive', 'archive')->name('archive');
+                    Route::post('restore', 'restore')->name('restore');
+                });
+            });
+            Route::prefix('invoices/teachers')->controller(TeachersInvoicesController::class)->name('invoices.teachers.')->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/archived', 'archived')->name('archived');
+                Route::get('{id}/print', 'print')->name('print');
+                Route::get('create', 'create')->name('create');
+                Route::get('{id}', 'preview')->name('preview');
+                Route::get('{id}/edit', 'edit')->name('edit');
+                Route::middleware('throttle:10,1')->group(function () {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('{id}/update', 'update')->name('update');
+                    Route::post('{id}/payment', 'payment')->name('payment');
+                    Route::post('{id}/refund', 'refund')->name('refund');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('cancel', 'cancel')->name('cancel');
+                    Route::post('archive', 'archive')->name('archive');
+                    Route::post('restore', 'restore')->name('restore');
+                });
+            });
+
+            Route::prefix('transactions')->controller(TransactionsController::class)->name('transactions.')->group(function () {
+                Route::get('/students', 'students')->name('students');
+                Route::get('/teachers', 'teachers')->name('teachers');
+            });
+
+            Route::prefix('coupons')->controller(CouponsController::class)->name('coupons.')->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::middleware('throttle:10,1')->group(function () {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
+            });
         # End Finance Managment
         });
     }
