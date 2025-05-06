@@ -75,6 +75,11 @@ class Group extends Model
         return $this->belongsToMany(Assignment::class, 'assignment_group');
     }
 
+    public function lessons()
+    {
+        return $this->hasMany(Lesson::class, 'group_id');
+    }
+
     # Scopes
     public function scopeUuid($query, $uuid)
     {

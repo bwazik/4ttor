@@ -27,6 +27,7 @@ return [
     # Tools
     'tools' => 'أنشطة المعلم',
     'groups' => 'المجاميع',
+    'lessons' => 'الحصص',
     'resources' => 'المستندات',
 
     # Activities

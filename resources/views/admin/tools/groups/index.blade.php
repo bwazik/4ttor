@@ -15,6 +15,7 @@
         <th class="dt-checkboxes-cell dt-checkboxes-select-all"><input type="checkbox" id="select-all" class="form-check-input"></th>
         <th>#</th>
         <th>{{ trans('main.name') }}</th>
+        <th>{{ trans('admin/lessons.lessons') }}</th>
         <th>{{ trans('main.teacher') }}</th>
         <th>{{ trans('main.grade') }}</th>
         <th>{{ trans('admin/groups.day_1') }}</th>
@@ -37,6 +38,7 @@
                 { data: 'selectbox', name: 'selectbox', orderable: false, searchable: false },
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 { data: 'name', name: 'name' },
+                { data: 'lessons', name: 'lessons', orderable: false, searchable: false },
                 { data: 'teacher_id', name: 'teacher_id' },
                 { data: 'grade_id', name: 'grade_id' },
                 { data: 'day_1', name: 'day_1' },
@@ -91,7 +93,7 @@
         handleFormSubmit('#edit-form', fields, '#edit-modal', 'offcanvas', '#datatable');
         handleDeletionFormSubmit('#delete-form', '#delete-modal', '#datatable')
         handleDeletionFormSubmit('#delete-selected-form', '#delete-selected-modal', '#datatable')
-        fetchMultipleDataByAjax('#add-form #teacher_id', "{{ route('admin.teachers.grades', '__ID__') }}", '#add-form #grade_id', 'teacher_id', 'GET');
+        fetchMultipleDataByAjax('#add-form #teacher_id', "{{ route('admin.teachers.getGrades', '__ID__') }}", '#add-form #grade_id', 'teacher_id', 'GET');
 
         $('#day_1, #day_2, #grade_id, #time').on('change', function () {
             updateGroupNames();

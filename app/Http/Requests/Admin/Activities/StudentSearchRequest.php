@@ -16,6 +16,7 @@ class StudentSearchRequest extends FormRequest
         $rules = [
             'grade_id' => 'required|integer|exists:grades,id',
             'group_id' => 'required|integer|exists:groups,id',
+            'lesson_id' => 'required|integer|exists:lessons,id',
             'date' => 'required|date|date_format:Y-m-d',
         ];
 

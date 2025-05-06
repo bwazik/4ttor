@@ -38,7 +38,10 @@ class AssignmentsController extends Controller
         $teachers = Teacher::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
         $grades = Grade::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
         $groups = Group::query()->select('id', 'name', 'teacher_id', 'grade_id')
-            ->with(['teacher:id,name', 'grade:id,name'])->orderBy('id')->get()
+            ->with(['teacher:id,name', 'grade:id,name'])
+            ->orderBy('teacher_id')
+            ->orderBy('grade_id')
+            ->get()
             ->mapWithKeys(function ($group) {
                 $gradeName = $group->grade->name ?? 'N/A';
                 $teacherName = $group->teacher->name ?? 'N/A';

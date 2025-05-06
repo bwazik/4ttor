@@ -3,9 +3,7 @@
 namespace App\Services\Admin\Activities;
 
 use App\Models\Student;
-use App\Models\Teacher;
 use App\Models\Attendance;
-use Illuminate\Support\Facades\DB;
 use App\Traits\PreventDeletionIfRelated;
 use App\Traits\DatabaseTransactionTrait;
 use App\Traits\PublicValidatesTrait;
@@ -26,7 +24,8 @@ class AttendanceService
             ->leftJoin('attendances', function ($join) use ($request) {
                 $join->on('students.id', '=', 'attendances.student_id')
                     ->where('attendances.teacher_id', '=', $request['teacher_id'])
-                    ->where('attendances.date', '=', $request['date']);
+                    ->where('attendances.date', '=', $request['date'])
+                    ->where('attendances.lesson_id', '=', $request['lesson_id']);
             })
             ->where('student_teacher.teacher_id', $request['teacher_id'])
             ->where('students.grade_id', $request['grade_id'])
@@ -88,6 +87,7 @@ class AttendanceService
             $gradeId = $request['grade_id'];
             $groupId = $request['group_id'];
             $date = $request['date'];
+            $lessonId = $request['lesson_id'] ?? null;
             $attendanceData = $request['attendance'];
 
             if ($validationResult = $this->validateTeacherGradeAndGroups($teacherId, $groupId, $gradeId, true))
@@ -103,6 +103,7 @@ class AttendanceService
                     [
                         'student_id' => $entry['student_id'],
                         'date' => $date,
+                        'lesson_id' => $lessonId,
                         'teacher_id' => $teacherId,
                     ],
                     [

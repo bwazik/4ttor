@@ -12,6 +12,7 @@ return [
     'top_grade' => 'أعلى صف',
     'most_populated_grade' => 'أكتر صف فيه مجاميع',
     'selectedGroups' => 'المجاميع المحددة',
+    'lessonsLink' => 'رابط الحصص',
     'placeholders' => [
         'name_ar' => 'اللغة العربية',
         'name_en' => 'Arabic Language',

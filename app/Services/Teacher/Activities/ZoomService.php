@@ -34,7 +34,7 @@ class ZoomService
             ->editColumn('group_id', fn($row) => formatRelation($row->group_id, $row->group, 'name'))
             ->addColumn('duration', fn($row) => formatDuration($row->duration))
             ->editColumn('start_time', fn($row) => isoFormat($row->start_time))
-            ->editColumn('join_url', fn($row) => formatJoinUrl($row->join_url))
+            ->editColumn('join_url', fn($row) => formatSpanUrl($row->join_url, trans('main.join_url')))
             ->addColumn('actions', fn($row) => $this->generateActionButtons($row))
             ->filterColumn('grade_id', fn($query, $keyword) => filterByRelation($query, 'grade', 'name', $keyword))
             ->filterColumn('group_id', fn($query, $keyword) => filterByRelation($query, 'group', 'name', $keyword))
