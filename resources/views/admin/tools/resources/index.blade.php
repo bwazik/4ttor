@@ -263,7 +263,7 @@
         handleFormSubmit('#add-form', fields, '#add-modal', 'offcanvas');
         handleFormSubmit('#edit-form', fields, '#edit-modal', 'offcanvas');
         handleDeletionFormSubmit('#delete-form', '#delete-modal');
-        fetchMultipleDataByAjax('#add-form #teacher_id', "{{ route('admin.teachers.grades', '__ID__') }}",
+        fetchMultipleDataByAjax('#add-form #teacher_id', "{{ route('admin.teachers.getGrades', '__ID__') }}",
             '#add-form #grade_id', 'teacher_id', 'GET');
 
         function updateResources(page = 1) {

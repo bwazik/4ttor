@@ -1,38 +1,37 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Activities;
+namespace App\Http\Controllers\Admin\Tools;
 
-use App\Models\Zoom;
-use App\Models\Grade;
 use App\Models\Group;
+use App\Models\Lesson;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
-use App\Services\Admin\Activities\ZoomService;
-use App\Http\Requests\Admin\Activities\ZoomsRequest;
+use App\Services\Admin\Tools\LessonService;
+use App\Http\Requests\Admin\Tools\LessonsRequest;
 
-class ZoomsController extends Controller
+class LessonsController extends Controller
 {
     use ValidatesExistence;
 
-    protected $zoomService;
+    protected $lessonService;
 
-    public function __construct(ZoomService $zoomService)
+    public function __construct(LessonService $lessonService)
     {
-        $this->zoomService = $zoomService;
+        $this->lessonService = $lessonService;
     }
 
     public function index(Request $request)
     {
-        $zoomsQuery = Zoom::query()->select('id', 'teacher_id', 'grade_id', 'group_id', 'meeting_id', 'topic', 'duration', 'start_time', 'start_url', 'join_url', 'created_at', 'updated_at');
+        $lessonsQuery = Lesson::query()->with(['group'])
+            ->select('id', 'title', 'group_id', 'date', 'time', 'status');
 
         if ($request->ajax()) {
-            return $this->zoomService->getZoomsForDatatable($zoomsQuery);
+            return $this->lessonService->getLessonsForDatatable($lessonsQuery);
         }
 
         $teachers = Teacher::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
-        $grades = Grade::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
         $groups = Group::query()->select('id', 'name', 'teacher_id', 'grade_id')
             ->with(['teacher:id,name', 'grade:id,name'])
             ->orderBy('teacher_id')
@@ -43,13 +42,13 @@ class ZoomsController extends Controller
                 $teacherName = $group->teacher->name ?? 'N/A';
                 return [$group->id => $group->name . ' - ' . $gradeName . ' - ' . $teacherName];
             });
-            
-        return view('admin.activities.zooms.index', compact('teachers', 'grades', 'groups'));
+
+        return view('admin.tools.lessons.index', compact('teachers', 'groups'));
     }
 
-    public function insert(ZoomsRequest $request)
+    public function insert(LessonsRequest $request)
     {
-        $result = $this->zoomService->insertZoom($request->validated());
+        $result = $this->lessonService->insertLesson($request->validated());
 
         if ($result['status'] === 'success') {
             return response()->json(['success' => $result['message']], 200);
@@ -58,9 +57,9 @@ class ZoomsController extends Controller
         return response()->json(['error' => $result['message']], 500);
     }
 
-    public function update(ZoomsRequest $request)
+    public function update(LessonsRequest $request)
     {
-        $result = $this->zoomService->updateZoom($request->id, $request->meeting_id, $request->validated());
+        $result = $this->lessonService->updateLesson($request->id, $request->validated());
 
         if ($result['status'] === 'success') {
             return response()->json(['success' => $result['message']], 200);
@@ -71,9 +70,9 @@ class ZoomsController extends Controller
 
     public function delete(Request $request)
     {
-        $this->validateExistence($request, 'zooms');
+        $this->validateExistence($request, 'lessons');
 
-        $result = $this->zoomService->deleteZoom($request->id, $request->meeting_id);
+        $result = $this->lessonService->deleteLesson($request->id);
 
         if ($result['status'] === 'success') {
             return response()->json(['success' => $result['message']], 200);
@@ -84,9 +83,9 @@ class ZoomsController extends Controller
 
     public function deleteSelected(Request $request)
     {
-        $this->validateExistence($request, 'zooms');
+        $this->validateExistence($request, 'lessons');
 
-        $result = $this->zoomService->deleteSelectedZooms($request->ids);
+        $result = $this->lessonService->deleteSelectedLessons($request->ids);
 
         if ($result['status'] === 'success') {
             return response()->json(['success' => $result['message']], 200);

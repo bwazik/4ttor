@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\Users\Parents\ParentsController;
 use App\Http\Controllers\Admin\Users\Parents\ParentsDetailsController;
 
 use App\Http\Controllers\Admin\Tools\GroupsController;
+use App\Http\Controllers\Admin\Tools\LessonsController;
 use App\Http\Controllers\Admin\Tools\ResourcesController;
 
 use App\Http\Controllers\Admin\Activities\AttendanceController;
@@ -74,6 +75,7 @@ Route::group(
                 Route::get('student-fees/{studentFee}', 'getStudentFeeData')->name('student-fees.data');
                 Route::get('teacher-subscriptions/{teacherSubscription}', 'getTeacherSubscriptionData')->name('teacher-subscriptions.data');
                 Route::get('plans/{plan}/{period?}', 'getPlanData')->name('plans.data');
+                Route::get('groups/{group}/lessons', 'getGroupLessons')->name('groups.lessons');
             });
 
         # Start Platform Managment
@@ -90,7 +92,6 @@ Route::group(
             # Grades
             Route::prefix('grades')->controller(GradesController::class)->name('grades.')->group(function () {
                 Route::get('/', 'index')->name('index');
-                Route::get('{id}/teachers', 'getGradeTeachers')->name('teachers');
                 Route::middleware('throttle:10,1')->group(function () {
                     Route::post('insert', 'insert')->name('insert');
                     Route::post('update', 'update')->name('update');
@@ -127,9 +128,10 @@ Route::group(
                 Route::controller(TeachersController::class)->group(function () {
                     Route::get('/', 'index')->name('index');
                     Route::get('/archived', 'archived')->name('archived');
+                    Route::get('{teacherId}/grades', 'grades')->name('grades');
+                    Route::get('{teacherId}/grades/{gradeId}', 'getTeacherGroupsByGrade')->name('grades.groups');
                     Route::post('groups', 'getTeacherGroups')->name('groups');
-                    Route::get('{id}/grades', 'getTeacherGrades')->name('grades');
-                    Route::get('{id}/fees', 'getTeacherFees')->name('fees');
+                    Route::get('{id}/get-grades', 'getTeacherGrades')->name('getGrades');
                     Route::middleware('throttle:10,1')->group(function () {
                         Route::post('insert', 'insert')->name('insert');
                         Route::post('update', 'update')->name('update');
@@ -220,7 +222,19 @@ Route::group(
             # Groups
             Route::prefix('groups')->controller(GroupsController::class)->name('groups.')->group(function () {
                 Route::get('/', 'index')->name('index');
-                Route::get('{id}/students', 'getGroupStudents')->name('students');
+                Route::get('teachers/{teacherId}/grades/{gradeId}', 'getTeacherGroups')->name('teachers.grades');
+                Route::get('{groupId}/lessons', 'lessons')->name('lessons');
+                Route::middleware('throttle:10,1')->group(function () {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
+            });
+
+            # Lessons
+            Route::prefix('lessons')->controller(LessonsController::class)->name('lessons.')->group(function () {
+                Route::get('/', 'index')->name('index');
                 Route::middleware('throttle:10,1')->group(function () {
                     Route::post('insert', 'insert')->name('insert');
                     Route::post('update', 'update')->name('update');

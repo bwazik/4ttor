@@ -42,4 +42,5 @@ return [
     'validatePlanStatus' => 'This subscription plan is not active. Please contact support.',
     'noSubscriptionsFound' => 'No subscriptions found for this teacher. You must register subscriptions before performing this action.',
     'validateTeacherSubscriptionMismatch' => 'These subscriptions are not assigned to this teacher. Please select the correct subscriptions.',
+    'noLessonsFound' => 'No lessons found for this group. You must add lessons before performing this action.',
 ];

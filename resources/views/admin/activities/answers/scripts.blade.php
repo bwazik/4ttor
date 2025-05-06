@@ -3,10 +3,6 @@
         return `#datatable${questionId}`;
     }
 
-    function getRoute(route, questionId) {
-        return route.replace('questionId', questionId);
-    }
-
     $(document).ready(function() {
         $('.accordion-button').on('click', function() {
             const accordionItem = $(this).closest('.accordion-item');

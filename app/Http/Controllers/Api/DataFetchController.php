@@ -9,6 +9,7 @@ use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\StudentFee;
 use App\Http\Controllers\Controller;
+use App\Models\Lesson;
 use App\Models\TeacherSubscription;
 use App\Traits\PublicValidatesTrait;
 
@@ -357,6 +358,38 @@ class DataFetchController extends Controller
             ];
 
             return response()->json(['status' => 'success', 'data' => $data]);
+        } catch (\Exception $e) {
+            return $this->productionErrorResponse($e);
+        }
+    }
+
+    public function getGroupLessons($groupId)
+    {
+        $isAdminContext = isAdmin() ? true : false;
+        $effectiveTeacherId = $isAdminContext ? null : $this->teacherId;
+
+        try {
+            $group = $isAdminContext
+                ? Group::findOrFail($groupId)
+                : Group::uuid($groupId)->firstOrFail();
+
+            if (!$isAdminContext) {
+                if ($group->teacher_id !== $effectiveTeacherId) {
+                    return $this->errorResponse(trans('toasts.ownershipError'));
+                }
+            }
+
+            $lessons = Lesson::where('group_id', $group->id)->get()
+                ->mapWithKeys(function ($lesson) use ($isAdminContext) {
+                    $key = $isAdminContext ? $lesson->id : $lesson->uuid;
+                    return [$key => $lesson->title];
+                });
+
+            if ($lessons->isEmpty()) {
+                return $this->errorResponse(trans('toasts.noLessonsFound'));
+            }
+
+            return response()->json(['status' => 'success', 'data' => $lessons]);
         } catch (\Exception $e) {
             return $this->productionErrorResponse($e);
         }

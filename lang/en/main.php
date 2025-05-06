@@ -27,6 +27,7 @@ return [
 
     # Datatable headers
     'name' => 'Name',
+    'title' => 'Title',
     'username' => 'Username',
     'email' => 'Email',
     'phone' => 'Phone',
@@ -37,6 +38,7 @@ return [
     'parent' => 'Parent',
     'teacher' => 'Teacher',
     'group' => 'Group',
+    'lesson' => 'Lesson',
     'amount' => 'Amount',
     'date' => 'Date',
     'student' => 'Student',
@@ -148,6 +150,9 @@ return [
     'period' => 'Period',
     'termly' => 'By Term',
     'yearly' => 'Yearly',
+    'scheduled' => 'Scheduled',
+    'completed' => 'Completed',
+    'time' => 'Time',
 
     # Modals
     'items' => 'Items Count',

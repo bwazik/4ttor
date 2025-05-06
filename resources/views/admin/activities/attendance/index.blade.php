@@ -119,7 +119,7 @@
                 submitButton = $(this).find('button[type="submit"]');
                 submitButton.prop('disabled', true);
 
-                const fields = ['teacher_id', 'grade_id', 'group_id', 'date'];
+                const fields = ['teacher_id', 'grade_id', 'group_id', 'lesson_id', 'date'];
                 // Clear previous error states
                 $.each(fields, function(_, field) {
                     $(formId + ' #' + field).removeClass('is-invalid');
@@ -131,11 +131,12 @@
                     teacher_id: $(formId + ' #teacher_id').val(),
                     grade_id: $(formId + ' #grade_id').val(),
                     group_id: $(formId + ' #group_id').val(),
+                    lesson_id: $(formId + ' #lesson_id').val(),
                     date: $(formId + ' #date').val()
                 };
 
-                if (!formData.teacher_id || !formData.grade_id || !formData.group_id || !formData.date) {
-                    toastr.error('Please select a teacher, grade, group, and date');
+                if (!formData.teacher_id || !formData.grade_id || !formData.group_id || !formData.lesson_id || !formData.date) {
+                    toastr.error('Please select a teacher, grade, group, lesson, and date');
                     setTimeout(function() {
                         submitButton.prop('disabled', false);
                     }, 1500);
@@ -178,6 +179,7 @@
                         teacher_id: $('#students-form #teacher_id').val(),
                         grade_id: $('#students-form #grade_id').val(),
                         group_id: $('#students-form #group_id').val(),
+                        lesson_id: $('#students-form #lesson_id').val(),
                         date: $('#students-form #date').val(),
                     },
                     '#students-form'
@@ -221,6 +223,7 @@
                     teacher_id: form.find('#teacher_id').val(),
                     grade_id: form.find('#grade_id').val(),
                     group_id: form.find('#group_id').val(),
+                    lesson_id: form.find('#lesson_id').val(),
                     date: form.find('#date').val(),
                     attendance: data
                 };
@@ -339,11 +342,14 @@
         initializeSelect2('students-form', 'grade_id');
         initializeSelect2('students-form', 'teacher_id');
         initializeSelect2('students-form', 'group_id');
+        initializeSelect2('students-form', 'lesson_id');
         initializeSelect2('select2-primary', 'status_1');
-        fetchMultipleDataByAjax('#students-form #teacher_id', "{{ route('admin.teachers.grades', '__ID__') }}",
+        fetchMultipleDataByAjax('#students-form #teacher_id', "{{ route('admin.teachers.getGrades', '__ID__') }}",
             '#students-form #grade_id', 'teacher_id', 'GET');
         fetchMultipleDataByAjax('#students-form #grade_id',
             "{{ route('admin.fetch.teachers.grade.groups', ['__SECOND_ID__', '__ID__']) }}", '#students-form #group_id',
             'grade_id', 'GET');
+        fetchMultipleDataByAjax('#students-form #group_id', "{{ route('admin.fetch.groups.lessons', '__ID__') }}",
+        '#students-form #lesson_id', 'group_id', 'GET');
     </script>
 @endsection

@@ -12,6 +12,7 @@ class Attendance extends Authenticatable
         'teacher_id',
         'grade_id',
         'group_id',
+        'lesson_id',
         'student_id',
         'date',
         'note',
@@ -52,6 +53,11 @@ class Attendance extends Authenticatable
     public function group()
     {
         return $this->belongsTo(Group::class, 'group_id');
+    }
+
+    public function lesson()
+    {
+        return $this->belongsTo(Lesson::class, 'lesson_id');
     }
 
     public function student()

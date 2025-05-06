@@ -11,8 +11,14 @@ class GroupService
 {
     use PreventDeletionIfRelated, PublicValidatesTrait, DatabaseTransactionTrait;
 
-    protected $relationships = ['students', 'attendances', 'zooms'];
+    protected $relationships = ['students', 'attendances', 'zooms', 'lessons'];
     protected $transModelKey = 'admin/groups.groups';
+    protected $lessonService;
+
+    public function __construct(LessonService $lessonService)
+    {
+        $this->lessonService = $lessonService;
+    }
 
     public function getGroupsForDatatable($groupsQuery)
     {
@@ -20,6 +26,7 @@ class GroupService
             ->addIndexColumn()
             ->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
             ->editColumn('name', fn($row) => $row->name)
+            ->addColumn('lessons', fn($row) => formatSpanUrl(route('admin.groups.lessons', $row->id), trans('admin/groups.lessonsLink')))
             ->editColumn('teacher_id', fn($row) => formatRelation($row->teacher_id, $row->teacher, 'name', 'admin.teachers.details'))
             ->editColumn('grade_id', fn($row) => $row->grade_id ? $row->grade->name : '-')
             ->editColumn('day_1', fn($row) => $row->day_1 ? getDayName($row->day_1) : '-')
@@ -29,7 +36,7 @@ class GroupService
             ->filterColumn('teacher_id', fn($query, $keyword) => filterByRelation($query, 'teacher', 'name', $keyword))
             ->filterColumn('grade_id', fn($query, $keyword) => filterByRelation($query, 'grade', 'name', $keyword))
             ->filterColumn('is_active', fn($query, $keyword) => filterByStatus($query, $keyword))
-            ->rawColumns(['selectbox', 'teacher_id', 'is_active', 'actions'])
+            ->rawColumns(['selectbox', 'lessons', 'teacher_id', 'is_active', 'actions'])
             ->make(true);
     }
 
@@ -72,7 +79,7 @@ class GroupService
             if ($validationResult = $this->validateTeacherGrade($request['grade_id'], $request['teacher_id']))
                 return $validationResult;
 
-            Group::create([
+            $group = Group::create([
                 'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
                 'teacher_id' => $request['teacher_id'],
                 'grade_id' => $request['grade_id'],
@@ -80,6 +87,8 @@ class GroupService
                 'day_2' => $request['day_2'] ?? null,
                 'time' => $request['time'],
             ]);
+
+            $this->lessonService->generateLessonsForGroup($group->id);
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/groups.group')]));
         });
@@ -89,11 +98,10 @@ class GroupService
     {
         return $this->executeTransaction(function () use ($id, $request)
         {
-            $group = Group::findOrFail($id);
-
             if ($validationResult = $this->validateTeacherGrade($request['grade_id'], $request['teacher_id']))
                 return $validationResult;
 
+            $group = Group::findOrFail($id);
             $group->update([
                 'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
                 'teacher_id' => $request['teacher_id'],
@@ -141,6 +149,20 @@ class GroupService
 
             return $this->successResponse(trans('main.deletedSelected', ['item' => strtolower(trans('admin/groups.groups'))]));
         });
+    }
+
+    public function getTeacherGroupsByGradeForDatatable($groupsQuery)
+    {
+        return datatables()->eloquent($groupsQuery)
+            ->addIndexColumn()
+            ->editColumn('name', fn($row) => $row->name)
+            ->addColumn('lessons', fn($row) => formatSpanUrl(route('admin.groups.lessons', $row->id), trans('admin/groups.lessonsLink')))
+            ->editColumn('day_1', fn($row) => $row->day_1 ? getDayName($row->day_1) : '-')
+            ->editColumn('day_2', fn($row) => $row->day_2 ? getDayName($row->day_2) : '-')
+            ->editColumn('is_active', fn($row) => formatActiveStatus($row->is_active))
+            ->addColumn('actions', fn($row) => $this->generateActionButtons($row))
+            ->rawColumns(['selectbox', 'lessons', 'is_active', 'actions'])
+            ->make(true);
     }
 
     public function checkDependenciesForSingleDeletion($group)

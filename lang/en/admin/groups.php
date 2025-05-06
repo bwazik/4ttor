@@ -12,6 +12,7 @@ return [
     'top_grade' => 'Top Grade',
     'most_populated_grade' => 'Most Populated Grade',
     'selectedGroups' => 'Selected Groups',
+    'lessonsLink' => 'Lessons Link',
     'placeholders' => [
         'name_ar' => 'اللغة العربية',
         'name_en' => 'Arabic Language',

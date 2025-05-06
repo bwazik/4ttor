@@ -47,6 +47,9 @@ class TeacherService
                     '<li>
                         <a target="_blank" href="'.route('admin.teachers.details', $row->id).'" class="dropdown-item">'.trans('main.details').'</a>
                     </li>' .
+                    '<li>
+                        <a target="_blank" href="'.route('admin.teachers.grades', $row->id).'" class="dropdown-item">'.trans('admin/grades.grades').'</a>
+                    </li>' .
                     '<li>' .
                         '<a href="javascript:;" class="dropdown-item" ' .
                             'id="archive-button" ' .

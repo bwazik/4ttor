@@ -27,6 +27,7 @@ return [
 
     # Datatable headers
     'name' => 'الإسم',
+    'title' => 'العنوان',
     'username' => 'اسم المستخدم',
     'email' => 'الإيميل',
     'phone' => 'الموبايل',
@@ -37,6 +38,7 @@ return [
     'parent' => 'ولي الأمر',
     'teacher' => 'المدرس',
     'group' => 'المجموعة',
+    'lesson' => 'الحصة',
     'amount' => 'المبلغ',
     'date' => 'التاريخ',
     'student' => 'الطالب',
@@ -150,6 +152,9 @@ return [
     'period' => 'الفترة',
     'termly' => 'بالترم',
     'yearly' => 'سنوياً',
+    'scheduled' => 'مُجدولة',
+    'completed' => 'مُكتملة',
+    'time' => 'الوقت',
 
     # Modals
     'items' => 'عدد العناصر',

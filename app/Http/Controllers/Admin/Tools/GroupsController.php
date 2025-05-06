@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Tools;
 
 use App\Models\Grade;
 use App\Models\Group;
+use App\Models\Lesson;
 use App\Models\Student;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use App\Traits\ValidatesExistence;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Services\Admin\Tools\GroupService;
+use App\Services\Admin\Tools\LessonService;
 use App\Http\Requests\Admin\Tools\GroupsRequest;
 
 class GroupsController extends Controller
@@ -18,15 +20,18 @@ class GroupsController extends Controller
     use ValidatesExistence;
 
     protected $groupService;
+    protected $lessonService;
 
-    public function __construct(GroupService $groupService)
+    public function __construct(GroupService $groupService, LessonService $lessonService)
     {
         $this->groupService = $groupService;
+        $this->lessonService = $lessonService;
     }
 
     public function index(Request $request)
     {
-        $groupsQuery = Group::query()->select('id', 'name', 'teacher_id', 'grade_id', 'day_1', 'day_2', 'time', 'is_active', 'created_at', 'updated_at');
+        $groupsQuery = Group::query()->with(['teacher', 'grade'])
+            ->select('id', 'name', 'teacher_id', 'grade_id', 'day_1', 'day_2', 'time', 'is_active', 'created_at', 'updated_at');
 
         if ($request->ajax()) {
             return $this->groupService->getGroupsForDatatable($groupsQuery);
@@ -97,35 +102,20 @@ class GroupsController extends Controller
         return response()->json(['error' => $result['message']], 500);
     }
 
-    public function getGroupStudents($id)
+    public function lessons(Request $request, $groupId)
     {
-        try {
-            Group::select('id')->findOrFail($id);
+        $group = Group::with(['teacher:id,name'])
+            ->select('id', 'name', 'teacher_id')
+            ->findOrFail($groupId);
 
-            $students = Student::whereHas('groups', function ($query) use ($id) {
-                $query->where('group_id', $id);
-            })
-                ->select('id', 'name')
-                ->orderBy('id')
-                ->get()
-                ->mapWithKeys(fn($student) => [$student->id => $student->name]);
+        $lessonsQuery = Lesson::query()->with(['group'])
+            ->select('id', 'title', 'group_id', 'date', 'time', 'status')
+            ->where('group_id', $groupId);
 
-            if ($students->isEmpty()) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => trans('main.noStudentsAssigned'),
-                ], 404);
-            }
-
-            return response()->json(['status' => 'success', 'data' => $students]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => config('app.env') === 'production'
-                    ? trans('main.errorMessage')
-                    : $e->getMessage(),
-            ], 500);
+        if ($request->ajax()) {
+            return $this->lessonService->getLessonsForDatatable($lessonsQuery);
         }
 
+        return view('admin.tools.groups.lessons', compact('group'));
     }
 }

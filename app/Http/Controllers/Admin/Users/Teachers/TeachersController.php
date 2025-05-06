@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Services\Admin\Tools\GroupService;
 use App\Services\Admin\Users\TeacherService;
 use App\Http\Requests\Admin\Users\TeachersRequest;
 
@@ -20,10 +21,12 @@ class TeachersController extends Controller
     use ValidatesExistence;
 
     protected $teacherService;
+    protected $groupService;
 
-    public function __construct(TeacherService $teacherService)
+    public function __construct(TeacherService $teacherService, GroupService $groupService)
     {
         $this->teacherService = $teacherService;
+        $this->groupService = $groupService;
     }
 
     public function index(Request $request)
@@ -164,47 +167,29 @@ class TeachersController extends Controller
         return response()->json(['error' => $result['message']], 500);
     }
 
-    // public function groups($ids)
-    // {
-    //     try {
-    //         $teacherIdsArray = explode(',', $ids);
+    public function grades($teacherId)
+    {
+        $teacher = Teacher::select('id', 'name')->findOrFail($teacherId);
 
-    //         $validTeachers = Teacher::whereIn('id', $teacherIdsArray)->pluck('id')->toArray();
+        $grades = Grade::query()->select('id', 'name')->orderBy('id')
+            ->whereHas('teachers', fn($query) => $query->where('teacher_id', $teacherId))
+            ->get();
 
-    //         if (empty($validTeachers)) {
-    //             return response()->json([
-    //                 'status' => 'error',
-    //                 'message' => trans('main.noTeachersFound'),
-    //             ], 404);
-    //         }
+        return view('admin.users.teachers.manage.grades', compact('teacher', 'grades'));
+    }
 
-    //         $groups = Group::whereIn('teacher_id', $validTeachers)
-    //             ->select('id', 'name', 'teacher_id')
-    //             ->with('teacher:id,name')
-    //             ->orderBy('id')
-    //             ->get()
-    //             ->mapWithKeys(fn($group) => [$group->id => $group->name . ' - ' . $group->teacher->name]);
 
-    //         if ($groups->isEmpty()) {
-    //             return response()->json([
-    //                 'status' => 'error',
-    //                 'message' => trans('main.noGroupsAssigned'),
-    //             ], 404);
-    //         }
+    public function getTeacherGroupsByGrade(Request $request, $teacherId, $gradeId)
+    {
+        $groupsQuery = Group::query()->with(['teacher', 'grade'])
+            ->select('id', 'name', 'teacher_id', 'grade_id', 'day_1', 'day_2', 'time', 'is_active', 'created_at', 'updated_at')
+            ->where('teacher_id', $teacherId)
+            ->where('grade_id', $gradeId);
 
-    //         return response()->json([
-    //             'status' => 'success',
-    //             'data' => $groups,
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'status' => 'error',
-    //             'message' => config('app.env') === 'production'
-    //                 ? trans('main.errorMessage')
-    //                 : $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
+        if ($request->ajax()) {
+            return $this->groupService->getTeacherGroupsByGradeForDatatable($groupsQuery);
+        }
+    }
 
     public function getTeacherGroups(Request $request)
     {
@@ -228,37 +213,6 @@ class TeachersController extends Controller
 
         return response()->json(['status' => 'success', 'data' => $groups]);
     }
-
-    // public function getTeacherGroupsByGrade($id, $grade_id)
-    // {
-    //     try {
-    //         Teacher::select('id')->findOrFail($id);
-
-    //         $groups = Group::where('teacher_id', $id)
-    //         ->where('grade_id', $grade_id)
-    //         ->select('id', 'name', 'teacher_id')
-    //         ->with('teacher:id,name')
-    //         ->orderBy('id')
-    //         ->get()
-    //         ->mapWithKeys(fn($group) => [$group->id => $group->name . ' - ' . $group->teacher->name]);
-
-    //         if ($groups->isEmpty()) {
-    //             return response()->json([
-    //                 'status' => 'error',
-    //                 'message' => trans('main.noGroupsAssigned'),
-    //             ], 404);
-    //         }
-
-    //         return response()->json(['status' => 'success', 'data' => $groups]);
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'status' => 'error',
-    //             'message' => config('app.env') === 'production'
-    //                 ? trans('main.errorMessage')
-    //                 : $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
 
     public function getTeacherGrades($id)
     {

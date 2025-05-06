@@ -302,6 +302,23 @@ if (!function_exists('formatSubscriptionStatus')) {
     }
 }
 
+
+if (!function_exists('formatLessonStatus')) {
+    function formatLessonStatus($status): string
+    {
+        switch ($status) {
+            case 1:
+                return '<span class="badge rounded-pill bg-label-warning text-capitalize">' . trans('main.scheduled') . '</span>';
+            case 2:
+                return '<span class="badge rounded-pill bg-label-success text-capitalize">' . trans('main.completed') . '</span>';
+            case 3:
+                return '<span class="badge rounded-pill bg-label-danger text-capitalize">' . trans('main.canceled') . '</span>';
+            default:
+                return '<span class="badge rounded-pill bg-label-secondary text-capitalize">-</span>';
+        }
+    }
+}
+
 if (!function_exists('formatRelation')) {
     function formatRelation($id, $related, string $attribute = 'name', ?string $routeName = null): string
     {
@@ -341,13 +358,13 @@ if (!function_exists('formatDuration')) {
     }
 }
 
-if (!function_exists('formatJoinUrl')) {
-    function formatJoinUrl($url): string
+if (!function_exists('formatSpanUrl')) {
+    function formatSpanUrl($href, $linkText, $color = 'success'): string
     {
         return
-            '<a href="'.$url.'" target="_blank"' .
-            'class="btn btn-sm btn-label-success waves-effect">' .
-                trans('main.join_url') .
+            '<a href="'.$href.'" target="_blank"' .
+            'class="btn btn-sm btn-label-'.$color.' waves-effect">' .
+                $linkText .
             '</a>';
     }
 }
@@ -460,8 +477,15 @@ if (!function_exists('formatInvoiceReference')) {
 }
 
 if (!function_exists('formatDate')) {
-    function formatDate($date): string
+    function formatDate($date, $isLesson = false): string
     {
-        return Carbon::parse($date)->translatedFormat('d M Y');
+        $format = 'd M Y';
+
+        if($isLesson)
+        {
+            $format = 'l d M Y';
+        }
+
+        return Carbon::parse($date)->translatedFormat($format);
     }
 }

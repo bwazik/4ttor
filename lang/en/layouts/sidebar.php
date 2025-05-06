@@ -26,6 +26,7 @@ return [
     # Tools
     'tools' => 'Teacher Activities',
     'groups' => 'Groups',
+    'lessons' => 'Lessons',
     'resources' => 'Resources',
 
     # Activities

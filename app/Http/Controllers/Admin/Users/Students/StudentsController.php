@@ -51,13 +51,15 @@ class StudentsController extends Controller
         $parents = MyParent::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
         $teachers = Teacher::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
         $groups = Group::query()->select('id', 'name', 'teacher_id', 'grade_id')
-            ->with(['teacher:id,name', 'grade:id,name'])->orderBy('id')->get()
+            ->with(['teacher:id,name', 'grade:id,name'])
+            ->orderBy('teacher_id')
+            ->orderBy('grade_id')
+            ->get()
             ->mapWithKeys(function ($group) {
                 $gradeName = $group->grade->name ?? 'N/A';
                 $teacherName = $group->teacher->name ?? 'N/A';
                 return [$group->id => $group->name . ' - ' . $gradeName . ' - ' . $teacherName];
             });
-
 
         return view('admin.users.students.manage.index', compact('pageStatistics', 'teachers', 'grades', 'parents', 'groups'));
     }
