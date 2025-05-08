@@ -119,7 +119,7 @@
                 submitButton = $(this).find('button[type="submit"]');
                 submitButton.prop('disabled', true);
 
-                const fields = ['teacher_id', 'grade_id', 'group_id', 'lesson_id', 'date'];
+                const fields = ['teacher_id', 'grade_id', 'group_id', 'lesson_id'];
                 // Clear previous error states
                 $.each(fields, function(_, field) {
                     $(formId + ' #' + field).removeClass('is-invalid');
@@ -132,11 +132,10 @@
                     grade_id: $(formId + ' #grade_id').val(),
                     group_id: $(formId + ' #group_id').val(),
                     lesson_id: $(formId + ' #lesson_id').val(),
-                    date: $(formId + ' #date').val()
                 };
 
-                if (!formData.teacher_id || !formData.grade_id || !formData.group_id || !formData.lesson_id || !formData.date) {
-                    toastr.error('Please select a teacher, grade, group, lesson, and date');
+                if (!formData.teacher_id || !formData.grade_id || !formData.group_id || !formData.lesson_id) {
+                    toastr.error('Please select a teacher, grade, group, and lesson');
                     setTimeout(function() {
                         submitButton.prop('disabled', false);
                     }, 1500);
@@ -180,7 +179,6 @@
                         grade_id: $('#students-form #grade_id').val(),
                         group_id: $('#students-form #group_id').val(),
                         lesson_id: $('#students-form #lesson_id').val(),
-                        date: $('#students-form #date').val(),
                     },
                     '#students-form'
                 );
@@ -224,7 +222,6 @@
                     grade_id: form.find('#grade_id').val(),
                     group_id: form.find('#group_id').val(),
                     lesson_id: form.find('#lesson_id').val(),
-                    date: form.find('#date').val(),
                     attendance: data
                 };
 
@@ -290,17 +287,18 @@
             checkAllStatusSelected();
         });
 
-        document.getElementById('date').addEventListener('change', function () {
-            let selectedDate = this.value;
+        function checkDateAndUpdateButton() {
+            let selectedDate = document.getElementById('date').value;
             let today = "{{ now()->toDateString() }}";
-
             let submitButton = document.getElementById('other-button');
 
-            if (selectedDate !== today) {
-                submitButton.disabled = true;
-            } else {
-                submitButton.disabled = false;
-            }
+            submitButton.disabled = selectedDate !== today;
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            checkDateAndUpdateButton();
+        });
+        document.getElementById('date').addEventListener('change', function() {
+            checkDateAndUpdateButton();
         });
 
         $('#mark-all').on('click', function () {
@@ -351,5 +349,8 @@
             'grade_id', 'GET');
         fetchMultipleDataByAjax('#students-form #group_id', "{{ route('admin.fetch.groups.lessons', '__ID__') }}",
         '#students-form #lesson_id', 'group_id', 'GET');
+        fetchSingleDataByAjax('#students-form #lesson_id', "{{ route('admin.fetch.lessons.data', '__ID__') }}", [
+            { targetSelector: '#students-form #date', dataKey: 'date' },
+        ], 'lesson_id');
     </script>
 @endsection

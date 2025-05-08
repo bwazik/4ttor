@@ -1,4 +1,4 @@
-@extends('layouts.admin.master')
+@extends('layouts.teacher.master')
 
 @section('page-css')
 
@@ -21,13 +21,13 @@
         <th>{{ trans('main.status') }}</th>
         <th>{{ trans('main.actions') }}</th>
     </x-datatable>
-    @include('admin.tools.lessons.modals')
+    @include('teacher.tools.lessons.modals')
     <!--/ DataTable with Buttons -->
 @endsection
 
 @section('page-js')
     <script>
-        initializeDataTable('#datatable', "{{ route('admin.lessons.index') }}", [2, 3, 4, 5, 6, 7],
+        initializeDataTable('#datatable', "{{ route('teacher.lessons.index') }}", [2, 3, 4, 5, 6, 7],
             [
                 { data: "", orderable: false, searchable: false },
                 { data: 'selectbox', name: 'selectbox', orderable: false, searchable: false },
@@ -82,7 +82,6 @@
         handleFormSubmit('#edit-form', fields, '#edit-modal', 'offcanvas', '#datatable');
         handleDeletionFormSubmit('#delete-form', '#delete-modal', '#datatable')
         handleDeletionFormSubmit('#delete-selected-form', '#delete-selected-modal', '#datatable')
-        fetchMultipleDataByAjax('#add-form #teacher_id', "{{ route('admin.teachers.getGrades', '__ID__') }}", '#add-form #grade_id', 'teacher_id', 'GET')
-        fetchMultipleDataByAjax('#add-form #grade_id', "{{ route('admin.fetch.teachers.grade.groups', ['__SECOND_ID__', '__ID__']) }}", '#add-form #group_id', 'grade_id', 'GET');
+        fetchMultipleDataByAjax('#add-form #grade_id', "{{ route('teacher.fetch.grade.groups', '__ID__') }}", '#add-form #group_id', 'grade_id', 'GET')
     </script>
 @endsection

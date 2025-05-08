@@ -15,13 +15,15 @@ class StudentSearchRequest extends FormRequest
     {
         $rules = [
             'grade_id' => 'required|integer|exists:grades,id',
-            'group_id' => 'required|integer|exists:groups,id',
-            'lesson_id' => 'required|integer|exists:lessons,id',
-            'date' => 'required|date|date_format:Y-m-d',
         ];
 
         if (isAdmin()) {
             $rules['teacher_id'] = 'required|integer|exists:teachers,id';
+            $rules['group_id'] = 'required|integer|exists:groups,id';
+            $rules['lesson_id'] = 'required|integer|exists:lessons,id';
+        } else {
+            $rules['group_id'] = 'required|string|uuid|exists:groups,uuid';
+            $rules['lesson_id'] = 'required|string|uuid|exists:lessons,uuid';
         }
 
         return $rules;

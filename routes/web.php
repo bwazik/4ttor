@@ -76,6 +76,7 @@ Route::group(
                 Route::get('teacher-subscriptions/{teacherSubscription}', 'getTeacherSubscriptionData')->name('teacher-subscriptions.data');
                 Route::get('plans/{plan}/{period?}', 'getPlanData')->name('plans.data');
                 Route::get('groups/{group}/lessons', 'getGroupLessons')->name('groups.lessons');
+                Route::get('lessons/{lesson}', 'getLessonData')->name('lessons.data');
             });
 
         # Start Platform Managment
@@ -129,7 +130,7 @@ Route::group(
                     Route::get('/', 'index')->name('index');
                     Route::get('/archived', 'archived')->name('archived');
                     Route::get('{teacherId}/grades', 'grades')->name('grades');
-                    Route::get('{teacherId}/grades/{gradeId}', 'getTeacherGroupsByGrade')->name('grades.groups');
+                    Route::get('{teacherId}/grades/{gradeId}/groups', 'getTeacherGroupsByGrade')->name('grades.groups');
                     Route::post('groups', 'getTeacherGroups')->name('groups');
                     Route::get('{id}/get-grades', 'getTeacherGrades')->name('getGrades');
                     Route::middleware('throttle:10,1')->group(function () {
@@ -222,7 +223,6 @@ Route::group(
             # Groups
             Route::prefix('groups')->controller(GroupsController::class)->name('groups.')->group(function () {
                 Route::get('/', 'index')->name('index');
-                Route::get('teachers/{teacherId}/grades/{gradeId}', 'getTeacherGroups')->name('teachers.grades');
                 Route::get('{groupId}/lessons', 'lessons')->name('lessons');
                 Route::middleware('throttle:10,1')->group(function () {
                     Route::post('insert', 'insert')->name('insert');
@@ -235,6 +235,7 @@ Route::group(
             # Lessons
             Route::prefix('lessons')->controller(LessonsController::class)->name('lessons.')->group(function () {
                 Route::get('/', 'index')->name('index');
+                Route::get('{lessonId}/attendances', 'attendances')->name('attendances');
                 Route::middleware('throttle:10,1')->group(function () {
                     Route::post('insert', 'insert')->name('insert');
                     Route::post('update', 'update')->name('update');

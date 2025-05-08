@@ -121,6 +121,7 @@ return [
     'select_option' => 'Select an option from the list',
     'selectAll' => 'Select All',
     'attendances' => 'Attendances',
+    'attendance' => 'Attendance',
     'zoomAccount' => 'Zoom Account',
     'dependencyDept' => ':dependency Dept',
     'downloads' => 'Downloads',

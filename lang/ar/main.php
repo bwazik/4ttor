@@ -123,6 +123,7 @@ return [
     'select_option' => 'اختار حاجة من الاختيارات',
     'selectAll' => 'تحديد الكل',
     'attendances' => 'الحضور والغياب',
+    'attendance' => 'الغياب',
     'zoomAccount' => 'أكونت الزوم',
     'dependencyDept' => 'مديونية ال:dependency',
     'downloads' => 'التحميلات',

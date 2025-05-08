@@ -65,6 +65,17 @@
             </a>
         </li>
 
+        <!-- Platform Managment -->
+        <li class="menu-header mt-5">
+            <span class="menu-header-text">{{ trans('layouts/sidebar.platformManagment') }}</span>
+        </li>
+        <li class="menu-item {{ isActiveRoute('admin.grades.index') ? 'active' : '' }}">
+            <a href="{{ route('teacher.grades.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons ri-survey-line"></i>
+                <div>{{ trans('layouts/sidebar.grades') }}</div>
+            </a>
+        </li>
+
         <!-- Tools -->
         <li class="menu-header mt-5">
             <span class="menu-header-text">{{ trans('layouts/sidebar.tools') }}</span>
@@ -73,6 +84,12 @@
             <a href="{{ route('teacher.groups.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons ri-group-2-line"></i>
                 <div>{{ trans('layouts/sidebar.groups') }}</div>
+            </a>
+        </li>
+        <li class="menu-item {{ isActiveRoute('teacher.lessons.index') ? 'active' : '' }}">
+            <a href="{{ route('teacher.lessons.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons ri-pencil-ruler-line"></i>
+                <div>{{ trans('layouts/sidebar.lessons') }}</div>
             </a>
         </li>
         <li class="menu-item {{ isActiveRoute('teacher.resources.index') ? 'active' : '' }}">

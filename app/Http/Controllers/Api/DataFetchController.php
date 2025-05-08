@@ -42,16 +42,17 @@ class DataFetchController extends Controller
                 return $validationResult;
             }
 
-            $query = Group::select('id', 'name', 'grade_id')
+            $query = Group::select('id', 'uuid', 'name', 'grade_id')
                 ->where('teacher_id', $effectiveTeacherId)
                 ->where('grade_id', $gradeId)
                 ->with('grade:id,name');
 
             $groups = $query->orderBy($isAdminContext ? 'id' : 'grade_id')
                 ->get()
-                ->mapWithKeys(function ($group) {
+                ->mapWithKeys(function ($group) use ($isAdminContext){
+                    $key = $isAdminContext ? $group->id : $group->uuid;
                     $gradeName = $group->grade?->name ?? 'Unknown Grade';
-                    return [$group->id => "{$group->name} - {$gradeName}"];
+                    return [$key => "{$group->name} - {$gradeName}"];
             });
 
             if ($groups->isEmpty()) {
@@ -390,6 +391,32 @@ class DataFetchController extends Controller
             }
 
             return response()->json(['status' => 'success', 'data' => $lessons]);
+        } catch (\Exception $e) {
+            return $this->productionErrorResponse($e);
+        }
+    }
+
+    public function getLessonData($lessonId)
+    {
+        $isAdminContext = isAdmin() ? true : false;
+        $effectiveTeacherId = $isAdminContext ? null : $this->teacherId;
+
+        try {
+            $lesson = $isAdminContext
+                ? Lesson::findOrFail($lessonId)
+                : Lesson::uuid($lessonId)->firstOrFail();
+
+            if (!$isAdminContext) {
+                if ($lesson->group->teacher_id !== $effectiveTeacherId) {
+                    return $this->errorResponse(trans('toasts.ownershipError'));
+                }
+            }
+
+            $data = [
+                'date' => $lesson->date,
+            ];
+
+            return response()->json(['status' => 'success', 'data' => $data]);
         } catch (\Exception $e) {
             return $this->productionErrorResponse($e);
         }

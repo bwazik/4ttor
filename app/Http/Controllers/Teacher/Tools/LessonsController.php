@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Tools;
+namespace App\Http\Controllers\Teacher\Tools;
 
+use App\Models\Grade;
 use App\Models\Group;
 use App\Models\Lesson;
 use App\Models\Student;
@@ -10,9 +11,9 @@ use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
 use App\Traits\PublicValidatesTrait;
-use App\Services\Admin\Tools\LessonService;
+use App\Services\Teacher\Tools\LessonService;
 use App\Http\Requests\Admin\Tools\LessonsRequest;
-use App\Services\Admin\Activities\AttendanceService;
+use App\Services\Teacher\Activities\AttendanceService;
 
 class LessonsController extends Controller
 {
@@ -20,35 +21,40 @@ class LessonsController extends Controller
 
     protected $lessonService;
     protected $attendanceService;
+    protected $teacherId;
 
     public function __construct(LessonService $lessonService, AttendanceService $attendanceService)
     {
         $this->lessonService = $lessonService;
         $this->attendanceService = $attendanceService;
+        $this->teacherId = auth()->guard('teacher')->user()->id;
     }
 
     public function index(Request $request)
     {
         $lessonsQuery = Lesson::query()->with(['group'])
-            ->select('id', 'title', 'group_id', 'date', 'time', 'status');
+            ->select('id', 'uuid', 'title', 'group_id', 'date', 'time', 'status')
+            ->whereHas('group', fn($query) => $query->where('teacher_id', $this->teacherId));
 
         if ($request->ajax()) {
             return $this->lessonService->getLessonsForDatatable($lessonsQuery);
         }
 
-        $teachers = Teacher::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray();
-        $groups = Group::query()->select('id', 'name', 'teacher_id', 'grade_id')
-            ->with(['teacher:id,name', 'grade:id,name'])
-            ->orderBy('teacher_id')
+        $grades = Grade::whereHas('teachers', fn($query) => $query->where('teacher_id', $this->teacherId))
+            ->select('id', 'name')
+            ->orderBy('id')
+            ->pluck('name', 'id')
+            ->toArray();
+
+        $groups = Group::query()
+            ->select('uuid', 'name', 'grade_id')
+            ->where('teacher_id', $this->teacherId)
+            ->with('grade:id,name')
             ->orderBy('grade_id')
             ->get()
-            ->mapWithKeys(function ($group) {
-                $gradeName = $group->grade->name ?? 'N/A';
-                $teacherName = $group->teacher->name ?? 'N/A';
-                return [$group->id => $group->name . ' - ' . $gradeName . ' - ' . $teacherName];
-            });
+            ->mapWithKeys(fn($group) => [$group->uuid => $group->name . ' - ' . $group->grade->name]);
 
-        return view('admin.tools.lessons.index', compact('teachers', 'groups'));
+        return view('teacher.tools.lessons.index', compact('grades', 'groups'));
     }
 
     public function insert(LessonsRequest $request)
@@ -64,7 +70,9 @@ class LessonsController extends Controller
 
     public function update(LessonsRequest $request)
     {
-        $result = $this->lessonService->updateLesson($request->id, $request->validated());
+        $id = Lesson::uuid($request->id)->value('id');
+
+        $result = $this->lessonService->updateLesson($id, $request->validated());
 
         if ($result['status'] === 'success') {
             return response()->json(['success' => $result['message']], 200);
@@ -75,6 +83,9 @@ class LessonsController extends Controller
 
     public function delete(Request $request)
     {
+        $id = Lesson::uuid($request->id)->value('id');
+        $request->merge(['id' => $id]);
+
         $this->validateExistence($request, 'lessons');
 
         $result = $this->lessonService->deleteLesson($request->id);
@@ -88,6 +99,9 @@ class LessonsController extends Controller
 
     public function deleteSelected(Request $request)
     {
+        $ids = Lesson::whereIn('uuid', $request->ids ?? [])->pluck('id')->toArray();
+        !empty($ids) ? $request->merge(['ids' => $ids]) : null;
+
         $this->validateExistence($request, 'lessons');
 
         $result = $this->lessonService->deleteSelectedLessons($request->ids);
@@ -99,12 +113,12 @@ class LessonsController extends Controller
         return response()->json(['error' => $result['message']], 500);
     }
 
-    public function attendances(Request $request, $lessonId)
+    public function attendances(Request $request, $uuid)
     {
-        $lesson = Lesson::with(['group:id,name,teacher_id,grade_id', 'group.teacher:id,name', 'group.grade:id,name'])
-            ->select('id', 'title', 'group_id', 'date')->findOrFail($lessonId);
+        $lesson = Lesson::with(['group:id,uuid,name,teacher_id,grade_id', 'group.teacher:id,uuid,name', 'group.grade:id,name'])
+            ->select('id', 'uuid', 'title', 'group_id', 'date')->uuid($uuid)->firstOrFail();
 
-        if ($validationResult = $this->validateTeacherGradeAndGroups($lesson->group->teacher_id, $lesson->group_id, $lesson->group->grade_id, true)){
+        if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $lesson->group_id, $lesson->group->grade_id, true)){
             abort(404);
         }
 
@@ -114,11 +128,11 @@ class LessonsController extends Controller
             ->join('student_group', 'students.id', '=', 'student_group.student_id')
             ->leftJoin('attendances', function ($join) use ($lesson) {
                 $join->on('students.id', '=', 'attendances.student_id')
-                    ->where('attendances.teacher_id', '=', $lesson->group->teacher_id)
-                    ->where('attendances.date', '=', $lesson->date)
-                    ->where('attendances.lesson_id', '=', $lesson->id);
+                    ->where('attendances.teacher_id', '=', $this->teacherId)
+                    ->where('attendances.lesson_id', '=', $lesson->id)
+                    ->where('attendances.date', '=', $lesson->date);
             })
-            ->where('student_teacher.teacher_id', $lesson->group->teacher_id)
+            ->where('student_teacher.teacher_id', $this->teacherId)
             ->where('students.grade_id', $lesson->group->grade_id)
             ->where('student_group.group_id', $lesson->group_id);
 
@@ -131,6 +145,6 @@ class LessonsController extends Controller
                 ->make(true);
         }
 
-        return view('admin.tools.lessons.attendances', compact('lesson'));
+        return view('teacher.tools.lessons.attendances', compact('lesson'));
     }
 }

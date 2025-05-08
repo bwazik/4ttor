@@ -2,11 +2,13 @@
 
 namespace App\Services\Teacher\Activities;
 
+use App\Models\Group;
+use App\Models\Lesson;
 use App\Models\Student;
 use App\Models\Attendance;
-use App\Traits\PreventDeletionIfRelated;
-use App\Traits\DatabaseTransactionTrait;
 use App\Traits\PublicValidatesTrait;
+use App\Traits\DatabaseTransactionTrait;
+use App\Traits\PreventDeletionIfRelated;
 
 class AttendanceService
 {
@@ -21,21 +23,25 @@ class AttendanceService
 
     public function getStudentsByFilter(array $request)
     {
-        if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $request['group_id'], $request['grade_id'], true))
+        $groupId = Group::uuid($request['group_id'])->firstOrFail('id')->id;
+        $lesson = Lesson::uuid($request['lesson_id'])->firstOrFail(['id', 'date']);
+
+        if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $groupId, $request['grade_id'], true))
             return $validationResult;
 
             $studentsQuery = Student::query()
-            ->select('students.id', 'students.name', 'attendances.status', 'attendances.note')
-            ->join('student_teacher', 'students.id', '=', 'student_teacher.student_id')
-            ->join('student_group', 'students.id', '=', 'student_group.student_id')
-            ->leftJoin('attendances', function ($join) use ($request) {
-                $join->on('students.id', '=', 'attendances.student_id')
-                    ->where('attendances.teacher_id', '=', $this->teacherId)
-                    ->where('attendances.date', '=', $request['date']);
-            })
-            ->where('student_teacher.teacher_id', $this->teacherId)
-            ->where('students.grade_id', $request['grade_id'])
-            ->where('student_group.group_id', $request['group_id']);
+                ->select('students.id', 'students.name', 'attendances.status', 'attendances.note')
+                ->join('student_teacher', 'students.id', '=', 'student_teacher.student_id')
+                ->join('student_group', 'students.id', '=', 'student_group.student_id')
+                ->leftJoin('attendances', function ($join) use ($lesson) {
+                    $join->on('students.id', '=', 'attendances.student_id')
+                        ->where('attendances.teacher_id', '=', $this->teacherId)
+                        ->where('attendances.lesson_id', '=', $lesson->id)
+                        ->where('attendances.date', '=', $lesson->date);
+                })
+                ->where('student_teacher.teacher_id', $this->teacherId)
+                ->where('students.grade_id', $request['grade_id'])
+                ->where('student_group.group_id', $groupId);
 
         return datatables()->eloquent($studentsQuery)
             ->editColumn('name', fn($row) => $row->name)
@@ -45,7 +51,7 @@ class AttendanceService
             ->make(true);
     }
 
-    private function generateActionsCell($student): string
+    public function generateActionsCell($student): string
     {
         $statuses = [
             1 => ['color' => 'success', 'label' => trans('admin/attendance.p')],
@@ -73,7 +79,7 @@ class AttendanceService
         return $html;
     }
 
-    private function generateNoteCell($student): string
+    public function generateNoteCell($student): string
     {
         return sprintf(
             '<input type="text" id="note_%d" class="form-control form-control-sm note-input"
@@ -90,11 +96,11 @@ class AttendanceService
         return $this->executeTransaction(function () use ($request)
         {
             $gradeId = $request['grade_id'];
-            $groupId = $request['group_id'];
-            $date = $request['date'];
+            $groupId = Group::uuid($request['group_id'])->firstOrFail('id')->id;
+            $lesson = Lesson::uuid($request['lesson_id'])->firstOrFail(['id', 'date']);
             $attendanceData = $request['attendance'];
 
-            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $request['group_id'], $request['grade_id'], true))
+            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $groupId, $request['grade_id'], true))
                 return $validationResult;
 
             $studentIds = collect($attendanceData)->pluck('student_id')->toArray();
@@ -106,7 +112,8 @@ class AttendanceService
                 Attendance::updateOrCreate(
                     [
                         'student_id' => $entry['student_id'],
-                        'date' => $date,
+                        'date' => $lesson->date,
+                        'lesson_id' => $lesson->id,
                         'teacher_id' => $this->teacherId,
                     ],
                     [
