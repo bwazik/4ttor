@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin\Tools;
 use App\Models\Grade;
 use App\Models\Group;
 use App\Models\Lesson;
-use App\Models\Student;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;

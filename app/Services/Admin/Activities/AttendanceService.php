@@ -2,11 +2,12 @@
 
 namespace App\Services\Admin\Activities;
 
+use App\Models\Lesson;
 use App\Models\Student;
 use App\Models\Attendance;
-use App\Traits\PreventDeletionIfRelated;
-use App\Traits\DatabaseTransactionTrait;
 use App\Traits\PublicValidatesTrait;
+use App\Traits\DatabaseTransactionTrait;
+use App\Traits\PreventDeletionIfRelated;
 
 class AttendanceService
 {
@@ -14,6 +15,8 @@ class AttendanceService
 
     public function getStudentsByFilter(array $request)
     {
+        $lesson = Lesson::select('id', 'date')->findOrFail($request['lesson_id']);
+
         if ($validationResult = $this->validateTeacherGradeAndGroups($request['teacher_id'], $request['group_id'], $request['grade_id'], true))
             return $validationResult;
 
@@ -21,11 +24,11 @@ class AttendanceService
             ->select('students.id', 'students.name', 'attendances.status', 'attendances.note')
             ->join('student_teacher', 'students.id', '=', 'student_teacher.student_id')
             ->join('student_group', 'students.id', '=', 'student_group.student_id')
-            ->leftJoin('attendances', function ($join) use ($request) {
+            ->leftJoin('attendances', function ($join) use ($request, $lesson) {
                 $join->on('students.id', '=', 'attendances.student_id')
                     ->where('attendances.teacher_id', '=', $request['teacher_id'])
-                    ->where('attendances.date', '=', $request['date'])
-                    ->where('attendances.lesson_id', '=', $request['lesson_id']);
+                    ->where('attendances.lesson_id', '=', $request['lesson_id'])
+                    ->where('attendances.date', '=', $lesson->date);
             })
             ->where('student_teacher.teacher_id', $request['teacher_id'])
             ->where('students.grade_id', $request['grade_id'])
@@ -39,7 +42,7 @@ class AttendanceService
             ->make(true);
     }
 
-    private function generateActionsCell($student): string
+    public function generateActionsCell($student): string
     {
         $statuses = [
             1 => ['color' => 'success', 'label' => trans('admin/attendance.p')],
@@ -67,7 +70,7 @@ class AttendanceService
         return $html;
     }
 
-    private function generateNoteCell($student): string
+    public function generateNoteCell($student): string
     {
         return sprintf(
             '<input type="text" id="note_%d" class="form-control form-control-sm note-input"
@@ -86,12 +89,15 @@ class AttendanceService
             $teacherId = $request['teacher_id'];
             $gradeId = $request['grade_id'];
             $groupId = $request['group_id'];
-            $date = $request['date'];
-            $lessonId = $request['lesson_id'] ?? null;
+            $lesson = Lesson::select('id', 'date')->findOrFail($request['lesson_id']);
             $attendanceData = $request['attendance'];
 
             if ($validationResult = $this->validateTeacherGradeAndGroups($teacherId, $groupId, $gradeId, true))
                 return $validationResult;
+
+            if ($lesson->date !== now()->toDateString()) {
+                return $this->errorResponse(trans('admin/attendance.dateRestriction'));
+            }
 
             $studentIds = collect($attendanceData)->pluck('student_id')->toArray();
 
@@ -102,8 +108,8 @@ class AttendanceService
                 Attendance::updateOrCreate(
                     [
                         'student_id' => $entry['student_id'],
-                        'date' => $date,
-                        'lesson_id' => $lessonId,
+                        'date' => $lesson->date,
+                        'lesson_id' => $lesson->id,
                         'teacher_id' => $teacherId,
                     ],
                     [

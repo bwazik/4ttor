@@ -181,8 +181,8 @@ class TeachersController extends Controller
 
     public function getTeacherGroupsByGrade(Request $request, $teacherId, $gradeId)
     {
-        $groupsQuery = Group::query()->with(['teacher', 'grade'])
-            ->select('id', 'name', 'teacher_id', 'grade_id', 'day_1', 'day_2', 'time', 'is_active', 'created_at', 'updated_at')
+        $groupsQuery = Group::query()->with(['grade'])
+            ->select('id', 'name', 'grade_id', 'day_1', 'day_2', 'time', 'is_active', 'created_at', 'updated_at')
             ->where('teacher_id', $teacherId)
             ->where('grade_id', $gradeId);
 

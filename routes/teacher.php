@@ -5,7 +5,10 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 use App\Http\Controllers\Api\DataFetchController;
 
+use App\Http\Controllers\Teacher\Platform\GradesController;
+
 use App\Http\Controllers\Teacher\Tools\GroupsController;
+use App\Http\Controllers\Teacher\Tools\LessonsController;
 use App\Http\Controllers\Teacher\Tools\ResourcesController;
 
 use App\Http\Controllers\Teacher\Users\AssistantsController;
@@ -36,20 +39,41 @@ Route::group(
         # Api Responses
         Route::prefix('fetch')->controller(DataFetchController::class)->name('fetch.')->group(function () {
             Route::get('grades/{grade}/groups', 'getTeacherGroupsByGrade')->name('grade.groups');
-
             Route::get('students/{student}', 'getStudentData')->name('students.data');
             Route::get('students/{student}/fees', 'getStudentFeesByStudent')->name('students.fees');
             Route::get('students/{student}/student-fees', 'getStudentRegisteredFeesByStudent')->name('students.student-fees');
-
             Route::get('fees/{fee}', 'getFeeData')->name('fees.data');
             Route::get('student-fees/{studentFee}', 'getStudentFeeData')->name('student-fees.data');
+            Route::get('groups/{group}/lessons', 'getGroupLessons')->name('groups.lessons');
+            Route::get('lessons/{lesson}', 'getLessonData')->name('lessons.data');
         });
+
+        # Start Platform Managment
+            # Grades
+            Route::prefix('grades')->controller(GradesController::class)->name('grades.')->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('{gradeId}/groups', 'getTeacherGroupsByGrade')->name('groups');
+            });
+        # End Platform Managment
 
         # Start Tools
             # Groups
             Route::prefix('groups')->controller(GroupsController::class)->name('groups.')->group(function() {
                 Route::get('/', 'index')->name('index');
+                Route::get('{uuid}/lessons', 'lessons')->name('lessons');
                 Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
+            });
+
+            # Lessons
+            Route::prefix('lessons')->controller(LessonsController::class)->name('lessons.')->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('{uuid}/attendances', 'attendances')->name('attendances');
+                Route::middleware('throttle:10,1')->group(function () {
                     Route::post('insert', 'insert')->name('insert');
                     Route::post('update', 'update')->name('update');
                     Route::post('delete', 'delete')->name('delete');

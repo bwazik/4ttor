@@ -93,7 +93,34 @@
 @section('title', pageTitle('admin/attendance.attendance'))
 
 @section('content')
-    @include('teacher.activities.attendance.form')
+    <div class="col-12 mb-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4>{{ trans('admin/attendance.studentsSearch') }}</h4>
+                <div class="attendance-legend no-print">
+                    <div class="d-flex gap-4">
+                        <div><span class="status-present rounded"></span> {{ trans('admin/attendance.present') }}</div>
+                        <div><span class="status-absent rounded"></span> {{ trans('admin/attendance.absent') }}</div>
+                        <div><span class="status-late rounded"></span> {{ trans('admin/attendance.late') }}</div>
+                        <div><span class="status-excused rounded"></span> {{ trans('admin/attendance.excused') }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="students-form">
+                    <div class="row g-5">
+                        <x-select-input context="modal" name="grade_id" label="{{ trans('main.grade') }}" :options="[$lesson->group->grade_id => $lesson->group->grade->name]" required readonly/>
+                        <x-select-input context="modal" name="group_id" label="{{ trans('main.group') }}" :options="[$lesson->group->uuid => $lesson->group->name]" required readonly/>
+                        <x-select-input context="modal" name="lesson_id" label="{{ trans('main.lesson') }}" :options="[$lesson->uuid => $lesson->title]"  required readonly/>
+                        <x-basic-input context="modal" type="text" name="date" classes="flatpickr-date" label="{{ trans('main.date') }}" placeholder="YYYY-MM-DD" value="{{ $lesson->date }}" required disabled/>
+                    </div>
+                    <div class="pt-6">
+                        <button type="button" id="mark-all" class="btn btn-success">{{ trans('admin/attendance.markAllPresent') }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- DataTable with Buttons -->
     <x-datatable datatableTitle="{{ trans('main.datatableTitle', ['item' => trans('admin/attendance.attendance')]) }}"
         dataToggle="offcanvas" otherButton="{{ trans('admin/attendance.submit') }}" otherIcon="ri-add-line">
@@ -146,12 +173,33 @@
                 }
 
                 datatable = initializePostDataTable('#datatable', url, [2, 3, 4],
-                    [
-                        { data: "", orderable: false, searchable: false },
-                        { data: 'id', name: 'id' },
-                        { data: 'name', name: 'name', orderable: false, searchable: false },
-                        { data: 'note', name: 'note', orderable: false, searchable: false },
-                        { data: 'actions', name: 'actions', orderable: false, searchable: false }
+                    [{
+                            data: "",
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'id',
+                            name: 'id',
+                        },
+                        {
+                            data: 'name',
+                            name: 'name',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'note',
+                            name: 'note',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'actions',
+                            name: 'actions',
+                            orderable: false,
+                            searchable: false
+                        }
                     ], {
                         grade_id: $('#students-form #grade_id').val(),
                         group_id: $('#students-form #group_id').val(),
@@ -161,6 +209,15 @@
                 );
             });
         });
+        initializeDataTable('#datatable', "{{ route('teacher.lessons.attendances', $lesson->uuid) }}", [2, 3, 4],
+            [
+                { data: "", orderable: false, searchable: false },
+                { data: 'id', name: 'id' },
+                { data: 'name', name: 'name', orderable: false, searchable: false },
+                { data: 'note', name: 'note', orderable: false, searchable: false },
+                { data: 'actions', name: 'actions', orderable: false, searchable: false }
+            ],
+        );
 
         function gatherAttendanceData() {
             let attendanceData = [];
@@ -195,6 +252,7 @@
 
                 let payload = {
                     _token: $('meta[name="csrf-token"]').attr('content'),
+                    teacher_id: form.find('#teacher_id').val(),
                     grade_id: form.find('#grade_id').val(),
                     group_id: form.find('#group_id').val(),
                     lesson_id: form.find('#lesson_id').val(),
@@ -301,7 +359,6 @@
             }
         });
 
-
         function checkAllStatusSelected() {
             let allSelected = true;
             $('.status-container').each(function () {
@@ -313,13 +370,8 @@
             $('#other-button').prop('disabled', !allSelected);
         }
 
-        // Setup students form
-        initializeSelect2('students-form', 'grade_id');
-        initializeSelect2('students-form', 'group_id');
-        initializeSelect2('students-form', 'lesson_id');
-        initializeSelect2('select2-primary', 'status_1');
-        fetchMultipleDataByAjax('#students-form #grade_id', "{{ route('teacher.fetch.grade.groups', '__ID__') }}", '#students-form #group_id', 'grade_id', 'GET')
-        fetchMultipleDataByAjax('#students-form #group_id', "{{ route('teacher.fetch.groups.lessons', '__ID__') }}", '#students-form #lesson_id', 'group_id', 'GET');
-        fetchSingleDataByAjax('#students-form #lesson_id', "{{ route('teacher.fetch.lessons.data', '__ID__') }}", [{ targetSelector: '#students-form #date', dataKey: 'date' }], 'lesson_id');
+        initializeSelect2('students-form', 'grade_id', '{{ $lesson->group->grade_id }}', true);
+        initializeSelect2('students-form', 'group_id', '{{ $lesson->group->uuid }}', true);
+        initializeSelect2('students-form', 'lesson_id', '{{ $lesson->uuid }}', true);
     </script>
 @endsection

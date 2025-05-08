@@ -15,18 +15,6 @@ class AttendanceRequest extends FormRequest
     {
         $rules = [
             'grade_id' => 'required|integer|exists:grades,id',
-            'group_id' => 'required|integer|exists:groups,id',
-            'lesson_id' => 'required|integer|exists:lessons,id',
-            'date' => [
-                'required',
-                'date',
-                'date_format:Y-m-d',
-                function ($attribute, $value, $fail) {
-                    if ($value !== now()->toDateString()) {
-                        $fail(trans('admin/attendance.dateRestriction'));
-                    }
-                }
-            ],
             'attendance' => 'required|array|min:1',
             'attendance.*.student_id' => 'required|integer|exists:students,id',
             'attendance.*.status' => 'nullable|integer|in:1,2,3,4',
@@ -35,6 +23,11 @@ class AttendanceRequest extends FormRequest
 
         if (isAdmin()) {
             $rules['teacher_id'] = 'required|integer|exists:teachers,id';
+            $rules['group_id'] = 'required|integer|exists:groups,id';
+            $rules['lesson_id'] = 'required|integer|exists:lessons,id';
+        } else {
+            $rules['group_id'] = 'required|string|uuid|exists:groups,uuid';
+            $rules['lesson_id'] = 'required|string|uuid|exists:lessons,uuid';
         }
 
         return $rules;

@@ -261,6 +261,7 @@ function initializeDataTable(tableId, ajaxUrl, exportColumns, columns) {
                                 },
                                 customize: function (win) {
                                     //customize print view for dark
+
                                     $(win.document.body)
                                         .css(
                                             "color",

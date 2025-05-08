@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Admin\Tools;
+namespace App\Services\Teacher\Tools;
 
 use Carbon\Carbon;
 use App\Models\Group;
@@ -15,52 +15,19 @@ class LessonService
 
     protected $relationships = [];
     protected $transModelKey = 'admin/lessons.lessons';
+    protected $teacherId;
 
-    public function generateLessonsForGroup($groupId, $startDate = null, $endDate = null)
+    public function __construct()
     {
-        $group = Group::findOrFail($groupId);
-
-        $days = array_filter([$group->day_1, $group->day_2]);
-        if (empty($days)) {
-            return;
-        }
-
-        $timezone = config('app.timezone', 'Africa/Cairo');
-        $start = $startDate ? Carbon::parse($startDate, $timezone)->startOfDay() : now($timezone)->startOfDay();
-        $end = $endDate ? Carbon::parse($endDate, $timezone)->startOfDay() : $start->copy()->addMonth();
-
-        $lessonCount = Lesson::where('group_id', $group->id)->count();
-
-        for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
-            $dayOfWeek = $date->dayOfWeek;
-            $day = ($dayOfWeek == 6) ? 1 : $dayOfWeek + 2;
-            if (in_array($day, $days)) {
-                $currentLessonNumber = ++$lessonCount;
-
-                $lessonTransAr = trans('admin/lessons.theLesson', [], 'ar');
-                $lessonTransEn = trans('admin/lessons.theLesson', [], 'en');
-                $titleAr = "{$lessonTransAr} {$currentLessonNumber} - {$group->getTranslation('name', 'ar')}";
-                $titleEn = "{$lessonTransEn} {$currentLessonNumber} - {$group->getTranslation('name', 'en')}";
-
-                $lessonData = [
-                    'title' => ['ar' => $titleAr, 'en' => $titleEn],
-                    'group_id' => $group->id,
-                    'date' => $date->toDateString(),
-                    'time' => $group->time,
-                    'status' => 1, // Scheduled
-                ];
-
-                Lesson::create($lessonData);
-            }
-        }
+        $this->teacherId = auth()->guard('teacher')->user()->id;
     }
 
     public function getLessonsForDatatable($lessonsQuery)
     {
         return datatables()->eloquent($lessonsQuery)
             ->addIndexColumn()
-            ->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
-            ->addColumn('attendances', fn($row) => formatSpanUrl(route('admin.lessons.attendances', $row->id), trans('admin/lessons.attendancesLink')))
+            ->addColumn('selectbox', fn($row) => generateSelectbox($row->uuid))
+            ->addColumn('attendances', fn($row) => formatSpanUrl(route('teacher.lessons.attendances', $row->uuid), trans('admin/lessons.attendancesLink')))
             ->editColumn('title', fn($row) => $row->title)
             ->editColumn('group_id', fn($row) => $row->group_id ? $row->group->name : '-')
             ->editColumn('date', fn($row) => formatDate($row->date, true))
@@ -80,10 +47,10 @@ class LessonService
                         'tabindex="0" type="button" ' .
                         'data-bs-toggle="offcanvas" data-bs-target="#edit-modal" ' .
                         'id="edit-button" ' .
-                        'data-id="' . $row->id . '" ' .
+                        'data-id="' . $row->uuid . '" ' .
                         'data-title_ar="' . $row->getTranslation('title', 'ar') . '" ' .
                         'data-title_en="' . $row->getTranslation('title', 'en') . '" ' .
-                        'data-group_id="' . $row->group_id . '" ' .
+                        'data-group_id="' . $row->group->uuid . '" ' .
                         'data-date="' . $row->date . '" ' .
                         'data-time="' . $row->time . '" ' .
                         'data-status="' . $row->status . '">' .
@@ -92,7 +59,7 @@ class LessonService
                 '</span>' .
                 '<button class="btn btn-sm btn-icon btn-text-danger rounded-pill text-body waves-effect waves-light me-1" ' .
                     'id="delete-button" ' .
-                    'data-id="' . $row->id . '" ' .
+                    'data-id="' . $row->uuid . '" ' .
                     'data-title_ar="' . $row->getTranslation('title', 'ar') . '" ' .
                     'data-title_en="' . $row->getTranslation('title', 'en') . '" ' .
                     'data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
@@ -105,9 +72,11 @@ class LessonService
     {
         return $this->executeTransaction(function () use ($request)
         {
+            $groupId = Group::uuid($request['group_id'])->firstOrFail('id')->id;
+
             Lesson::create([
                 'title' => ['ar' => $request['title_ar'], 'en' => $request['title_en']],
-                'group_id' => $request['group_id'],
+                'group_id' => $groupId,
                 'date' => $request['date'],
                 'time' => $request['time'],
                 'status' => $request['status'],
@@ -121,11 +90,12 @@ class LessonService
     {
         return $this->executeTransaction(function () use ($id, $request)
         {
+            $groupId = Group::uuid($request['group_id'])->firstOrFail('id')->id;
             $lesson = Lesson::findOrFail($id);
 
             $lesson->update([
                 'title' => ['ar' => $request['title_ar'], 'en' => $request['title_en']],
-                'group_id' => $request['group_id'],
+                'group_id' => $groupId,
                 'date' => $request['date'],
                 'time' => $request['time'],
                 'status' => $request['status'],

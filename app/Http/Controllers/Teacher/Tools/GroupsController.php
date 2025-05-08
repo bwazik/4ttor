@@ -4,30 +4,34 @@ namespace App\Http\Controllers\Teacher\Tools;
 
 use App\Models\Grade;
 use App\Models\Group;
+use App\Models\Lesson;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\Tools\GroupsRequest;
 use App\Services\Teacher\Tools\GroupService;
+use App\Services\Teacher\Tools\LessonService;
+use App\Http\Requests\Admin\Tools\GroupsRequest;
 
 class GroupsController extends Controller
 {
     use ValidatesExistence;
 
     protected $groupService;
+    protected $lessonService;
     protected $teacherId;
 
-    public function __construct(GroupService $groupService)
+    public function __construct(GroupService $groupService, LessonService $lessonService)
     {
         $this->groupService = $groupService;
+        $this->lessonService = $lessonService;
         $this->teacherId = auth()->guard('teacher')->user()->id;
     }
 
     public function index(Request $request)
     {
-        $groupsQuery = Group::query()
-            ->select('id', 'name', 'grade_id', 'day_1', 'day_2', 'time', 'is_active', 'created_at', 'updated_at')
+        $groupsQuery = Group::query()->with(['grade'])
+            ->select('id', 'uuid', 'name', 'grade_id', 'day_1', 'day_2', 'time', 'is_active', 'created_at', 'updated_at')
             ->where('teacher_id', $this->teacherId);
 
         if ($request->ajax()) {
@@ -102,5 +106,22 @@ class GroupsController extends Controller
         }
 
         return response()->json(['error' => $result['message']], 500);
+    }
+
+    public function lessons(Request $request, $uuid)
+    {
+        $group = Group::select('id', 'uuid', 'name', 'teacher_id')
+            ->uuid($uuid)
+            ->firstOrFail();
+
+        $lessonsQuery = Lesson::query()->with(['group'])
+            ->select('id', 'uuid', 'title', 'group_id', 'date', 'time', 'status')
+            ->where('group_id', $group->id);
+
+        if ($request->ajax()) {
+            return $this->lessonService->getLessonsForDatatable($lessonsQuery);
+        }
+
+        return view('teacher.tools.groups.lessons', compact('group'));
     }
 }
