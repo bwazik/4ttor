@@ -403,8 +403,8 @@
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <span class="fw-medium d-block small">{{ Auth::user()->username }}</span>
-                                    <small class="text-muted">{{ Auth::user()->phone }}</small>
+                                    <span class="fw-medium d-block small">{{ Auth::user()->name }}</span>
+                                    <small class="text-muted">{{ Auth::user()->username }}</small>
                                 </div>
                             </div>
                         </a>
@@ -414,21 +414,28 @@
                     </li>
                     <li>
                         <a class="dropdown-item" href="pages-profile-user.html">
-                            <i class="ri-user-3-line ri-22px me-3"></i><span class="align-middle">My
-                                Profile</span>
+                            <i class="ri-user-3-line ri-22px me-3"></i><span class="align-middle">{{ trans('layouts/navbar.myProfile') }}</span>
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="pages-account-settings-account.html">
-                            <i class="ri-settings-4-line ri-22px me-3"></i><span class="align-middle">Settings</span>
+                        <a class="dropdown-item" href="{{ route('teacher.account.personal.edit') }}">
+                            <i class="ri-settings-4-line ri-22px me-3"></i><span class="align-middle">{{ trans('layouts/navbar.settings') }}</span>
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="pages-account-settings-billing.html">
+                        <a class="dropdown-item" href="{{ route('teacher.billing.index') }}">
                             <span class="d-flex align-items-center align-middle">
                                 <i class="flex-shrink-0 ri-file-text-line ri-22px me-3"></i>
-                                <span class="flex-grow-1 align-middle">Billing</span>
-                                <span class="flex-shrink-0 badge badge-center rounded-pill bg-danger">4</span>
+                                <span class="flex-grow-1 align-middle">{{ trans('layouts/navbar.billing') }}</span>
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="#">
+                            <span class="d-flex align-items-center align-middle">
+                                <i class="flex-shrink-0 ri-wallet-line ri-22px me-3"></i>
+                                <span class="flex-grow-1 align-middle">{{ trans('main.balance') }}</span>
+                                <span class="flex-shrink-0 badge rounded-pill bg-primary">{{ trans('main.currency') }} {{ number_format(Auth::user()->balance, 2) }}</span>
                             </span>
                         </a>
                     </li>
@@ -436,20 +443,20 @@
                         <div class="dropdown-divider"></div>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="pages-pricing.html">
+                        <a class="dropdown-item" href="{{ route('teacher.plans.index') }}">
                             <i class="ri-money-dollar-circle-line ri-22px me-3"></i><span
-                                class="align-middle">Pricing</span>
+                                class="align-middle">{{ trans('layouts/navbar.plans') }}</span>
                         </a>
                     </li>
                     <li>
                         <a class="dropdown-item" href="pages-faq.html">
-                            <i class="ri-question-line ri-22px me-3"></i><span class="align-middle">FAQ</span>
+                            <i class="ri-question-line ri-22px me-3"></i><span class="align-middle">{{ trans('layouts/navbar.faq') }}</span>
                         </a>
                     </li>
                     <li>
                         <div class="d-grid px-4 pt-2 pb-1">
                             <a class="btn btn-sm btn-danger d-flex" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <small class="align-middle">Logout</small>
+                                <small class="align-middle">{{ trans('layouts/navbar.logout') }}</small>
                                 <i class="ri-logout-box-r-line ms-2 ri-16px"></i>
                             </a>
                             <form id="logout-form" action="{{ route('logout', auth()->guard()->name) }}" method="POST"

@@ -30,7 +30,12 @@ class TransactionsController extends Controller
 
         if ($request->ajax()) {
             return datatables()->eloquent($transactionsQuery)
-            ->editColumn('invoice_id', fn($row) => formatInvoiceReference($row->invoice->uuid, route('teacher.invoices.preview', $row->invoice->uuid)))
+            ->editColumn('invoice_id', function($row) {
+                if (!$row->invoice_id) {
+                    return 'N/A';
+                }
+                return formatInvoiceReference($row->invoice->uuid, route('teacher.invoices.preview', $row->invoice->uuid));
+            })
             ->editColumn('type', fn($row) => formatTransactionType($row->type))
             ->editColumn('student_id', fn($row) => formatRelation($row->student_id, $row->student, 'name', 'admin.students.details'))
             ->editColumn('amount', fn($row) => formatCurrency($row->amount) . ' ' . trans('main.currency'))

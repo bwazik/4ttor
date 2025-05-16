@@ -17,7 +17,12 @@ class TransactionsController extends Controller
 
         if ($request->ajax()) {
             return datatables()->eloquent($transactionsQuery)
-            ->editColumn('invoice_id', fn($row) => formatInvoiceReference($row->invoice_id, route('admin.invoices.preview', $row->invoice_id)))
+            ->editColumn('invoice_id', function($row) {
+                if (!$row->invoice_id) {
+                    return 'N/A';
+                }
+                return formatInvoiceReference($row->invoice_id, route('admin.invoices.preview', $row->invoice_id));
+            })
             ->editColumn('type', fn($row) => formatTransactionType($row->type))
             ->editColumn('student_id', fn($row) => formatRelation($row->student_id, $row->student, 'name', 'admin.students.details'))
             ->editColumn('amount', fn($row) => formatCurrency($row->amount) . ' ' . trans('main.currency'))
@@ -42,7 +47,12 @@ class TransactionsController extends Controller
 
         if ($request->ajax()) {
             return datatables()->eloquent($transactionsQuery)
-            ->editColumn('invoice_id', fn($row) => formatInvoiceReference($row->invoice_id, route('admin.invoices.preview', $row->invoice_id)))
+            ->editColumn('invoice_id', function($row) {
+                if (!$row->invoice_id) {
+                    return 'N/A';
+                }
+                return formatInvoiceReference($row->invoice_id, route('admin.invoices.preview', $row->invoice_id));
+            })
             ->editColumn('type', fn($row) => formatTransactionType($row->type))
             ->editColumn('teacher_id', fn($row) => formatRelation($row->teacher_id, $row->teacher, 'name', 'admin.teachers.details'))
             ->editColumn('amount', fn($row) => formatCurrency($row->amount) . ' ' . trans('main.currency'))

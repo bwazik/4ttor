@@ -125,7 +125,7 @@
                         <li class="d-flex align-items-center mb-4">
                             <i class="ri-money-dollar-circle-line ri-24px"></i>
                             <span class="fw-medium mx-2">{{ trans('main.plan') }}:</span>
-                            <span>{{ $teacher->plan->name }}</span>
+                            <span>{{ $teacher->plan->name ?? 'N/A' }}</span>
                         </li>
                     </ul>
                 </div>

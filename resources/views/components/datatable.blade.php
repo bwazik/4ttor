@@ -1,4 +1,19 @@
-<div class="card">
+@props([
+    'id' => 'datatable',
+    'datatableTitle',
+    'cardClasses' => null,
+    'deleteButton' => false,
+    'archiveButton' => false,
+    'restoreButton' => false,
+    'addButton' => false,
+    'dataToggle' => 'modal',
+    'otherButton' => false,
+    'otherIcon' => null,
+    'hrefButton' => false,
+    'hrefButtonRoute' => null
+])
+
+<div class="card {{ $cardClasses }}">
     {{-- <div class="card-header border-bottom">
         <div class="d-flex justify-content-between align-items-center row gap-5 gx-6 gap-md-0">
             @isset($studentOrTeacherFilter)
@@ -109,7 +124,7 @@
                 </div>
             </div>
         </div>
-        <table id="datatable" class="datatables-basic table">
+        <table id="{{ $id }}" class="datatables-basic table ">
             <thead>
                 <tr>
                     {{ $slot }}

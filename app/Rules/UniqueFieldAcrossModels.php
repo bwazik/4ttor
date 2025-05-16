@@ -20,7 +20,7 @@ class UniqueFieldAcrossModels implements ValidationRule
     {
         $this->exceptModelId = $exceptModelId;
         $this->field = $field;
-        $this->errorMessage = 'The '.$field.' is already in use by another entity.';
+        $this->errorMessage = trans('toasts.fieldAlreadyInUse', ['field' => $field]);
     }
 
     /**

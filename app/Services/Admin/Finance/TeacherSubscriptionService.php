@@ -140,27 +140,6 @@ class TeacherSubscriptionService
         });
     }
 
-    protected function validateTeacherSubscription($teacherId, $planId, $excludeId = null)
-    {
-        $plan = Plan::findOrFail($planId);
-
-        $existingSubscriptionQuery = TeacherSubscription::where('teacher_id', $teacherId);
-
-        if ($excludeId !== null) {
-            $existingSubscriptionQuery->where('id', '!=', $excludeId);
-        }
-
-        if ($existingSubscriptionQuery->exists()) {
-            return $this->errorResponse(trans('toasts.validateDuplicateSubscription'));
-        }
-
-        if ($plan->inactive()->exists()) {
-            return $this->errorResponse(trans('toasts.validatePlanStatus'));
-        }
-
-        return null;
-    }
-
     public function checkDependenciesForSingleDeletion($teacherSubscription)
     {
         return $this->checkForSingleDependencies($teacherSubscription, $this->relationships, $this->transModelKey);

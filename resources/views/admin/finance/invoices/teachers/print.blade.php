@@ -62,8 +62,7 @@
                 <p class="mb-0">bwazik@outlook.com</p>
             </div>
             <div>
-                <h4 class="mb-6">{{ strtoupper(trans('admin/invoices.theInvoice')) }} #{{ $invoice->id }}
-                </h4>
+                <h4 class="mb-6">{{ strtoupper(trans('admin/invoices.theInvoice')) }} #{{ isAdmin() ? $invoice->id : substr($invoice->uuid, 14, 4) }}</h4>
                 <div class="mb-2">
                     <span>{{ trans('main.status') }}:</span>
                     @switch($invoice->status)

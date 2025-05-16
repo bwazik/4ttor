@@ -199,7 +199,7 @@ class InvoiceService
                 'amount' => $studentFee->amount,
                 'balance_after' => $this->getTeacherWalletBalance($invoice->fee->teacher_id),
                 'description' => $request['description'] ?? null,
-                'date' => $request['date'],
+                'date' => now()->format('Y-m-d'),
             ]);
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/invoices.invoice')]));
@@ -246,7 +246,6 @@ class InvoiceService
                     'student_id' => $request['student_id'],
                     'amount' => $studentFee->amount,
                     'description' => $request['description'] ?? null,
-                    'date' => $request['date'],
                 ]);
             }
 
@@ -642,7 +641,7 @@ class InvoiceService
                 'amount' => $teacherSubscription->amount,
                 'balance_after' => $this->getFounderWalletBalance(),
                 'description' => $request['description'] ?? null,
-                'date' => $request['date'],
+                'date' => now()->format('Y-m-d'),
             ]);
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/invoices.invoice')]));
@@ -688,7 +687,6 @@ class InvoiceService
                     'teacher_id' => $request['teacher_id'],
                     'amount' => $teacherSubscription->amount,
                     'description' => $request['description'] ?? null,
-                    'date' => $request['date'],
                 ]);
             }
 
@@ -772,7 +770,8 @@ class InvoiceService
                 'teacher_id' => $invoice->teacher_id,
                 'invoice_id' => $invoice->id,
                 'amount' => -bcadd((string)$request['amount'], '0', 2),
-                'balance_after' => bcsub((string)$this->getFounderWalletBalance(), (string)$request['amount'], 2),                'description' => $request['description'] ?? null,
+                'balance_after' => bcsub((string)$this->getFounderWalletBalance(), (string)$request['amount'], 2),
+                'description' => $request['description'] ?? null,
                 'payment_method' => $request['payment_method'],
                 'date' => now()->format('Y-m-d'),
             ]);
@@ -870,11 +869,6 @@ class InvoiceService
         });
     }
 
-    protected function getFounderWalletBalance()
-    {
-        $wallet = Wallet::where('user_id', 1)->first();
-        return $wallet ? $wallet->balance : 0.00;
-    }
 
     public function checkDependenciesForSingleDeletion($invoice)
     {

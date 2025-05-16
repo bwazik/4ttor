@@ -1,6 +1,6 @@
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
     <div class="app-brand demo">
-        <a href="index.html" class="app-brand-link">
+        <a href="{{ route('admin.dashboard') }}" class="app-brand-link">
             <span class="app-brand-logo demo">
                 <img width="50" height="50" src="{{ asset('assets/img/brand/navbar.png') }}" alt="Shattor">
             </span>

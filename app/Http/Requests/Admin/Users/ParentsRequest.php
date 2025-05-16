@@ -18,7 +18,7 @@ class ParentsRequest extends FormRequest
 
         return [
             'username' => ['required','min:5','max:20',new UniqueFieldAcrossModels('username', $this->id)],
-            'password' => $isUpdate ? 'nullable|min:8|max:100' : 'required|min:8|max:100',
+            'password' => $isUpdate ? 'nullable|min:8|max:50' : 'required|min:8|max:50',
             'name_ar' => 'required|min:3|max:100',
             'name_en' => 'required|min:3|max:100',
             'phone' => ['required','numeric','regex:/^(01)[0-9]{9}$/',new UniqueFieldAcrossModels('phone', $this->id)],

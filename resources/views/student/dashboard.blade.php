@@ -1,4 +1,4 @@
-@extends('layouts.admin.master')
+@extends('layouts.student.master')
 
 @section('vendors-css')
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/apex-charts/apex-charts.css') }}" />

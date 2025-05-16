@@ -62,4 +62,14 @@ trait ServiceResponseTrait
     {
         return $this->errorResponse($customMessage ?? $exception->getMessage());
     }
+
+
+    protected function conrtollerJsonResponse(array $result)
+    {
+        if ($result['status'] === 'success') {
+            return response()->json(['success' => $result['message']], 200);
+        }
+
+        return response()->json(['error' => $result['message']], 500);
+    }
 }

@@ -15,7 +15,7 @@ class PaymentsRequest extends FormRequest
     {
         return [
             'amount' => 'required|numeric|between:0,999999.99',
-            'payment_method' => 'required|integer|in:1,2,3',
+            'payment_method' => 'required|integer|in:1,2,3,4',
             'description' => 'nullable|string|max:500',
         ];
     }
