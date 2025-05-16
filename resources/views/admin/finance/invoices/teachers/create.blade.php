@@ -51,7 +51,7 @@
                                 </dt>
                                 <dd class="col-sm-7 mb-0">
                                     <input type="text" id="due_date" class="form-control form-control-sm flatpickr-date"
-                                        name="due_date" placeholder="YYYY-MM-DD" value="{{ now()->addDays(30)->format('Y-m-d') }}"/>
+                                        name="due_date" placeholder="YYYY-MM-DD" value="{{ now()->addDays(7)->format('Y-m-d') }}"/>
                                     <span class="invalid-feedback" id="due_date_error" role="alert"></span>
                                 </dd>
                             </dl>

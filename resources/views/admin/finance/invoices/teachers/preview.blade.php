@@ -26,7 +26,7 @@
                             <p class="mb-0">bwazik@outlook.com</p>
                         </div>
                         <div>
-                            <h5 class="mb-6">{{ trans('admin/invoices.theInvoice') }} #{{ $invoice->id }}</h5>
+                            <h5 class="mb-6">{{ trans('admin/invoices.theInvoice') }} #{{ isAdmin() ? $invoice->id : substr($invoice->uuid, 14, 4) }}</h5>
                             <div class="mb-2">
                                 <span>{{ trans('main.status') }}:</span>
                                 @switch($invoice->status)
@@ -123,21 +123,41 @@
             </div>
         </div>
         <div class="col-xl-3 col-md-4 col-12 invoice-actions">
-            <div class="card">
-                <div class="card-body">
-                    <a href="{{ route('admin.invoices.teachers.edit', $invoice->id) }}" id="print" class="btn btn-primary d-grid w-100 mb-4">
-                        <span class="d-flex align-items-center justify-content-center text-nowrap">{{ trans('main.edit') }}</span>
-                    </a>
-                    <div class="d-flex">
-                        <a target="_blank" href="{{ route('admin.invoices.teachers.print', $invoice->id) }}" class="btn btn-outline-secondary d-grid w-100 me-4 waves-effect text-nowrap">
-                            {{ trans('main.print') }}
+            @if(isAdmin())
+                <div class="card">
+                    <div class="card-body">
+                        <a href="{{ route('admin.invoices.teachers.edit', $invoice->id) }}" id="print" class="btn btn-primary d-grid w-100 mb-4">
+                            <span class="d-flex align-items-center justify-content-center text-nowrap">{{ trans('main.edit') }}</span>
                         </a>
-                        <a href="{{ route('admin.invoices.teachers.index') }}" class="btn btn-outline-secondary d-grid w-100 waves-effect text-nowrap">
-                            {{ trans('admin/invoices.invoices') }}
-                        </a>
+                        <div class="d-flex">
+                            <a target="_blank" href="{{ route('admin.invoices.teachers.print', $invoice->id) }}" class="btn btn-outline-secondary d-grid w-100 me-4 waves-effect text-nowrap">
+                                {{ trans('main.print') }}
+                            </a>
+                            <a href="{{ route('admin.invoices.teachers.index') }}" class="btn btn-outline-secondary d-grid w-100 waves-effect text-nowrap">
+                                {{ trans('admin/invoices.invoices') }}
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
+            @else
+                <div class="card">
+                    <div class="card-body">
+                        @if($invoice->status === 1 || $invoice->status === 3)
+                            <a href="{{ $payUrl }}" id="print" class="btn btn-success d-grid w-100 mb-4">
+                                <span class="d-flex align-items-center justify-content-center text-nowrap">{{ trans('main.addItem', ['item' => trans('main.payment')]) }}</span>
+                            </a>
+                        @endif
+                        <div class="d-flex">
+                            <a target="_blank" href="{{ route('teacher.billing.invoices.print', $invoice->uuid) }}" class="btn btn-outline-secondary d-grid w-100 me-4 waves-effect text-nowrap">
+                                {{ trans('main.print') }}
+                            </a>
+                            <a href="{{ route('teacher.billing.index') }}" class="btn btn-outline-secondary d-grid w-100 waves-effect text-nowrap">
+                                {{ trans('account.billing') }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 @endsection

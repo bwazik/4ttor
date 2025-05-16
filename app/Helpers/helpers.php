@@ -89,6 +89,20 @@ if (!function_exists('isTeacher')) {
     }
 }
 
+if (!function_exists('isAssistant')) {
+    function isAssistant()
+    {
+        return auth()->guard('assistant')->check();
+    }
+}
+
+if (!function_exists('isStudent')) {
+    function isStudent()
+    {
+        return auth()->guard('student')->check();
+    }
+}
+
 
 if (!function_exists('filterByRelation')) {
     function filterByRelation($query, $relation, $column, $keyword)

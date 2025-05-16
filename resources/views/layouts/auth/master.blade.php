@@ -1,3 +1,4 @@
+{{-- layout.blade.php --}}
 @extends('layouts.base.index')
 
 @section('html-classes', 'light-style layout-wide customizer-hide')
@@ -12,78 +13,63 @@
     <div class="position-relative">
         <div class="authentication-wrapper authentication-basic container-p-y p-4 p-sm-0">
             <div class="authentication-inner py-6">
-                <!-- Login -->
+                <!-- Card -->
                 <div class="card p-md-7 p-1">
                     <!-- Logo -->
                     <div class="app-brand justify-content-center mt-5">
-                        <a href="index.html" class="app-brand-link gap-2">
+                        <a href="{{ route('landing') }}" class="app-brand-link gap-2">
                             <span class="app-brand-logo demo">
-                                <span style="color: var(--bs-primary)">
-                                    <svg width="268" height="150" viewBox="0 0 38 20" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M30.0944 2.22569C29.0511 0.444187 26.7508 -0.172113 24.9566 0.849138C23.1623 1.87039 22.5536 4.14247 23.5969 5.92397L30.5368 17.7743C31.5801 19.5558 33.8804 20.1721 35.6746 19.1509C37.4689 18.1296 38.0776 15.8575 37.0343 14.076L30.0944 2.22569Z"
-                                            fill="currentColor" />
-                                        <path
-                                            d="M30.171 2.22569C29.1277 0.444187 26.8274 -0.172113 25.0332 0.849138C23.2389 1.87039 22.6302 4.14247 23.6735 5.92397L30.6134 17.7743C31.6567 19.5558 33.957 20.1721 35.7512 19.1509C37.5455 18.1296 38.1542 15.8575 37.1109 14.076L30.171 2.22569Z"
-                                            fill="url(#paint0_linear_2989_100980)" fill-opacity="0.4" />
-                                        <path
-                                            d="M22.9676 2.22569C24.0109 0.444187 26.3112 -0.172113 28.1054 0.849138C29.8996 1.87039 30.5084 4.14247 29.4651 5.92397L22.5251 17.7743C21.4818 19.5558 19.1816 20.1721 17.3873 19.1509C15.5931 18.1296 14.9843 15.8575 16.0276 14.076L22.9676 2.22569Z"
-                                            fill="currentColor" />
-                                        <path
-                                            d="M14.9558 2.22569C13.9125 0.444187 11.6122 -0.172113 9.818 0.849138C8.02377 1.87039 7.41502 4.14247 8.45833 5.92397L15.3983 17.7743C16.4416 19.5558 18.7418 20.1721 20.5361 19.1509C22.3303 18.1296 22.9391 15.8575 21.8958 14.076L14.9558 2.22569Z"
-                                            fill="currentColor" />
-                                        <path
-                                            d="M14.9558 2.22569C13.9125 0.444187 11.6122 -0.172113 9.818 0.849138C8.02377 1.87039 7.41502 4.14247 8.45833 5.92397L15.3983 17.7743C16.4416 19.5558 18.7418 20.1721 20.5361 19.1509C22.3303 18.1296 22.9391 15.8575 21.8958 14.076L14.9558 2.22569Z"
-                                            fill="url(#paint1_linear_2989_100980)" fill-opacity="0.4" />
-                                        <path
-                                            d="M7.82901 2.22569C8.87231 0.444187 11.1726 -0.172113 12.9668 0.849138C14.7611 1.87039 15.3698 4.14247 14.3265 5.92397L7.38656 17.7743C6.34325 19.5558 4.04298 20.1721 2.24875 19.1509C0.454514 18.1296 -0.154233 15.8575 0.88907 14.076L7.82901 2.22569Z"
-                                            fill="currentColor" />
-                                        <defs>
-                                            <linearGradient id="paint0_linear_2989_100980" x1="5.36642" y1="0.849138"
-                                                x2="10.532" y2="24.104" gradientUnits="userSpaceOnUse">
-                                                <stop offset="0" stop-opacity="1" />
-                                                <stop offset="1" stop-opacity="0" />
-                                            </linearGradient>
-                                            <linearGradient id="paint1_linear_2989_100980" x1="5.19475" y1="0.849139"
-                                                x2="10.3357" y2="24.1155" gradientUnits="userSpaceOnUse">
-                                                <stop offset="0" stop-opacity="1" />
-                                                <stop offset="1" stop-opacity="0" />
-                                            </linearGradient>
-                                        </defs>
-                                    </svg>
-                                </span>
+                                <img width="80" height="80" src="{{ asset('assets/img/brand/navbar.png') }}" alt="Shattor">
                             </span>
-                            <span class="app-brand-text demo text-heading fw-semibold">Materialize</span>
+                            <span class="app-brand-text demo text-heading fw-semibold">{{ trans('layouts/sidebar.platformName') }}</span>
                         </a>
                     </div>
                     <!-- /Logo -->
                     <div class="card-body mt-1">
                         @yield('content')
+
                         <div class="divider my-5">
-                            <div class="divider-text">or</div>
+                            <div class="divider-text">{{ trans('layouts/login.or_divider_text') }}</div>
                         </div>
 
-                        <div class="d-flex justify-content-center gap-2">
-                            <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-facebook">
-                                <i class="tf-icons ri-facebook-fill"></i>
-                            </a>
+                        <div class="d-flex justify-content-center align-items-center gap-2 mb-4">
+                            {{-- Conditional Back Button --}}
+                            @if (isActiveRoute('login.choose'))
+                                <a href="{{ route('landing') }}" class="btn btn-sm btn-outline-secondary waves-effect waves-light text-nowrap"
+                                    aria-label="{{ trans('layouts/auth.back_to_landing') }}">
+                                    <i class="ri-arrow-left-line me-1"></i>
+                                    <span>{{ trans('layouts/login.back_to_landing') }}</span>
+                                </a>
+                            @elseif (isActiveRoute('login'))
+                                <a href="{{ route('login.choose') }}" class="btn btn-sm btn-outline-secondary waves-effect waves-light text-nowrap"
+                                    aria-label="{{ trans('layouts/auth.back_to_selection') }}">
+                                    <i class="ri-arrow-left-line me-1"></i>
+                                    <span>{{ trans('layouts/login.back_to_selection') }}</span>
+                                </a>
+                            @endif
+                            {{-- /Conditional Back Button --}}
 
-                            <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-twitter">
-                                <i class="tf-icons ri-twitter-fill"></i>
-                            </a>
-
-                            <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-github">
-                                <i class="tf-icons ri-github-fill"></i>
-                            </a>
-
-                            <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-google-plus">
-                                <i class="tf-icons ri-google-fill"></i>
-                            </a>
+                            {{-- Language Switcher --}}
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle waves-effect waves-light" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="ri-global-line me-1"></i>
+                                    <span>{{ LaravelLocalization::getCurrentLocaleNative() }}</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                                    @foreach (LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
+                                        <li>
+                                            <a class="dropdown-item @if (App::getLocale() == $localeCode) active @endif" href="{{ LaravelLocalization::getLocalizedURL($localeCode, null, [], true) }}">
+                                                <span class="align-middle">{{ $properties['native'] }}</span>
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                            {{-- /Language Switcher --}}
                         </div>
                     </div>
                 </div>
-                <!-- /Login -->
+                <!-- /Card -->
                 <img alt="mask" src="{{ asset('assets/img/illustrations/auth-basic-login-mask-light.png') }}"
                     class="authentication-image d-none d-lg-block"
                     data-app-light-img="illustrations/auth-basic-login-mask-light.png"
@@ -94,7 +80,7 @@
     <!-- / Sections:End -->
 
     <div class="buy-now">
-        <a href="wa.me/+201098617164" target="_blank" class="btn btn-success btn-buy-now waves-effect waves-light">Contact Us</a>
+        <a href="https://wa.me/+201098617164" target="_blank" class="btn btn-success btn-buy-now waves-effect waves-light"> <i class="ri-whatsapp-line me-1"></i>{{ trans('layouts/login.whatsapp') }}</a>
     </div>
 @endsection
 

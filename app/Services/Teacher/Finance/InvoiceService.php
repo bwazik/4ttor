@@ -139,7 +139,7 @@ class InvoiceService
                 'amount' => $studentFee->amount,
                 'balance_after' => $this->getTeacherWalletBalance($invoice->fee->teacher_id),
                 'description' => $request['description'] ?? null,
-                'date' => $request['date'],
+                'date' => now()->format('Y-m-d'),
             ]);
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/invoices.invoice')]));
@@ -188,7 +188,6 @@ class InvoiceService
                     'student_id' => $studentId,
                     'amount' => $studentFee->amount,
                     'description' => $request['description'] ?? null,
-                    'date' => $request['date'],
                 ]);
             }
 

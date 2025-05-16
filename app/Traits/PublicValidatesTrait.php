@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\Fee;
+use App\Models\Plan;
 use App\Models\Quiz;
 use App\Models\Group;
 use App\Models\Answer;
@@ -12,8 +13,9 @@ use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\Question;
 use App\Models\StudentFee;
-use App\Models\TeacherSubscription;
 use App\Models\ZoomAccount;
+use App\Models\TeacherSubscription;
+use Illuminate\Support\Facades\URL;
 use App\Traits\ServiceResponseTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -518,5 +520,48 @@ trait PublicValidatesTrait
         }
 
         return null;
+    }
+
+    protected function validateTeacherSubscription($teacherId, $planId, $excludeId = null)
+    {
+        $plan = Plan::findOrFail($planId);
+
+        if ($plan->inactive()->exists()) {
+            return $this->errorResponse(trans('toasts.validatePlanStatus'));
+        }
+
+        $existingSubscriptionQuery = TeacherSubscription::where('teacher_id', $teacherId)
+            ->where('status', 1)
+            ->where('end_date', '>=', now());
+
+        if ($excludeId !== null) {
+            $existingSubscriptionQuery->where('id', '!=', $excludeId);
+        }
+
+        if ($existingSubscriptionQuery->exists()) {
+            return $this->errorResponse(
+                isAdmin()
+                    ? trans('toasts.validateDuplicateTeacherSubscription')
+                    : trans('toasts.validateDuplicateSubscription')
+            );
+        }
+
+        return null;
+    }
+
+    protected function getFounderWalletBalance()
+    {
+        $wallet = Wallet::where('user_id', 1)->first();
+        return $wallet ? $wallet->balance : 0.00;
+    }
+
+    protected function generateSignedPayUrl($invoiceId, $type)
+    {
+        $route = $type === 'post' ? 'teacher.billing.invoices.process' : 'teacher.billing.invoices.pay';
+        return URL::temporarySignedRoute(
+            $route,
+            now()->addMinutes(10),
+            ['uuid' => $invoiceId]
+        );
     }
 }

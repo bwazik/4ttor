@@ -2,19 +2,9 @@
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Authentication Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines are used during authentication for various
-    | messages that we need to display to the user. You are free to modify
-    | these language lines according to your application's requirements.
-    |
-    */
-
-    'failed' => 'These credentials do not match our records.',
+    'failed'   => 'There’s something wrong with the information you entered. Please check your username and password.',
+    'inactive' => 'Your account is not activated. Please contact your teacher to activate it for you.',
     'password' => 'The provided password is incorrect.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
-
+    'tooManyDevices' => 'You have exceeded the number of allowed devices. Please contact support to clear a device or add another.',
 ];

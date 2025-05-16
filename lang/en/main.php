@@ -145,6 +145,7 @@ return [
     'vodafoneCash' => 'Vodafone Cash',
     'instapay' => 'Instapay',
     'wallet' => 'Wallet',
+    'balance' => 'Balance',
     'code' => 'Code',
     'start_date' => 'Start Date',
     'end_date' => 'End Date',
@@ -210,4 +211,5 @@ return [
     'mr' => 'Mr',
     'mrs' => 'Mrs',
     'showAll' => 'Show All',
+    'soon' => 'Soon',
 ];

@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-$('#datatable').on('draw.dt', function () {
+$('#invoices-datatable, #datatable').on('draw.dt', function () {
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl, {
@@ -629,7 +629,7 @@ function setupModal({ buttonId, modalId, fields = {}, onShow = null }) {
     });
 }
 
-function handleFormSubmit(formId, fields, modalId, modalType, getDatatableId) {
+function handleFormSubmit(formId, fields, modalId, modalType, getDatatableId, redirectTo = null) {
     const $form = $(formId);
     const $submitButton = $form.find('button[type="submit"]');
     const originalButtonContent = $submitButton.html();
@@ -676,6 +676,8 @@ function handleFormSubmit(formId, fields, modalId, modalType, getDatatableId) {
                     }
                     if ($(datatableId).length) {
                         refreshDataTable(datatableId);
+                    } else if (redirectTo) {
+                        window.location.href = redirectTo;
                     } else {
                         location.reload();
                     }
@@ -831,7 +833,7 @@ function fetchSingleDataByAjax(triggerSelector, urlTemplate, mappings, requestDa
         e.preventDefault();
 
         const selectedValue = $(this).val();
-        const secondSelectedValue = $(this).closest('form').find(`select[id="${secondSelectId}"]`).val();
+        const secondSelectedValue = $(this).closest('form').find(`[id="${secondSelectId}"]`).val();
 
         if (selectedValue && selectedValue.length > 0) {
             const url = urlTemplate.replace('__ID__', selectedValue).replace('__SECOND_ID__', secondSelectedValue);

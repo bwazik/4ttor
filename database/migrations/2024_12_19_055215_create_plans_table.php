@@ -18,7 +18,6 @@ return new class extends Migration
             $table->decimal('monthly_price');
             $table->decimal('term_price')->nullable();
             $table->decimal('year_price')->nullable();
-
             // Limits
             $table->integer('student_limit');
             $table->integer('parent_limit');
@@ -27,21 +26,22 @@ return new class extends Migration
             $table->integer('quiz_monthly_limit');
             $table->integer('quiz_term_limit');
             $table->integer('quiz_year_limit');
-            // $table->integer('exam_monthly_limit');
-            // $table->integer('exam_term_limit');
-            // $table->integer('exam_year_limit');
             $table->integer('assignment_monthly_limit');
             $table->integer('assignment_term_limit');
             $table->integer('assignment_year_limit');
-
+            $table->integer('resource_monthly_limit');
+            $table->integer('resource_term_limit');
+            $table->integer('resource_year_limit');
+            $table->integer('zoom_monthly_limit');
+            $table->integer('zoom_term_limit');
+            $table->integer('zoom_year_limit');
             // Reports
             $table->boolean('attendance_reports')->default(false);
             $table->boolean('financial_reports')->default(false);
             $table->boolean('performance_reports')->default(false);
-
             // Additional Features
             $table->boolean('whatsapp_messages')->default(false);
-
+            $table->boolean('instant_customer_service')->default(false);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

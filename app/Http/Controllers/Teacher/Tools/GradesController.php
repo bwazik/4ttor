@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Teacher\Platform;
+namespace App\Http\Controllers\Teacher\Tools;
 
 use App\Models\Grade;
 use App\Models\Group;
@@ -31,7 +31,7 @@ class GradesController extends Controller
             ->whereHas('teachers', fn($query) => $query->where('teacher_id', $this->teacherId))
             ->get();
 
-        return view('teacher.platform.grades.index', compact('teacher', 'grades'));
+        return view('teacher.tools.grades.index', compact('teacher', 'grades'));
     }
 
     public function getTeacherGroupsByGrade(Request $request, $gradeId)

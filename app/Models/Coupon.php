@@ -61,4 +61,9 @@ class Coupon extends Model
     {
         return $query->where('is_used', true);
     }
+
+    public function scopeUnused($query)
+    {
+        return $query->where('is_used', false);
+    }
 }

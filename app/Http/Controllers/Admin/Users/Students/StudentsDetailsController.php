@@ -6,7 +6,7 @@ use App\Models\Student;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
 use App\Services\Admin\FileUploadService;
-use App\Http\Requests\Admin\ProfilePicRequest;
+use App\Http\Requests\ProfilePicRequest;
 
 class StudentsDetailsController extends Controller
 {

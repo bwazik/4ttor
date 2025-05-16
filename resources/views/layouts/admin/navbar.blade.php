@@ -403,8 +403,8 @@
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <span class="fw-medium d-block small">{{ Auth::user()->username }}</span>
-                                    <small class="text-muted">{{ Auth::user()->email }}</small>
+                                    <span class="fw-medium d-block small">{{ Auth::user()->name }}</span>
+                                    <small class="text-muted">{{ Auth::user()->username }}</small>
                                 </div>
                             </div>
                         </a>

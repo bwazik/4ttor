@@ -40,6 +40,12 @@ class TeacherSubscription extends Model
         return $this->hasMany(Invoice::class, 'subscription_id');
     }
 
+    # Scopes
+    public function scopeActive($query)
+    {
+        return $query->where('status', 1);
+    }
+
     # Accessors
     public function getAmountAttribute()
     {

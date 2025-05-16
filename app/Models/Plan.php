@@ -29,10 +29,17 @@ class Plan extends Model
         'assignment_monthly_limit',
         'assignment_term_limit',
         'assignment_year_limit',
+        'resource_monthly_limit',
+        'resource_term_limit',
+        'resource_year_limit',
+        'zoom_monthly_limit',
+        'zoom_term_limit',
+        'zoom_year_limit',
         'attendance_reports',
         'financial_reports',
         'performance_reports',
         'whatsapp_messages',
+        'instant_customer_service',
         'is_active',
     ];
 
