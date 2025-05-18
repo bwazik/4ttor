@@ -92,9 +92,6 @@ class SubscriptionService
             }
 
             $subscription->update(['status' => 2]);
-            if ($subscription->invoices()->where('status', 1)->get()) {
-                $subscription->invoices()->where('status', 1)->update(['status' => 4]);
-            }
 
             return $this->successResponse(trans('main.canceledE', ['item' => trans('admin/teacherSubscriptions.subscription')]));
         });

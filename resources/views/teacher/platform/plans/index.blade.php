@@ -7,21 +7,22 @@
 @section('title', pageTitle('admin/plans.plans'))
 
 @section('content')
-    <div class="alert d-flex align-items-center alert-warning" role="alert">
-        <span class="alert-icon me-4 rounded-3"><i class="icon-base ri ri-error-warning-line icon-22px"></i></span>
-        <div>
-            <h6 class="alert-heading mb-1">{{ trans('admin/plans.subscription_warnings.title') }}</h6>
-            <ul class="mb-0 ps-3">
-                <li>
-                    {{ trans('admin/plans.subscription_warnings.billing') }}
-                    <a href="{{ route('teacher.billing.index') }}" class="text-warning fw-medium text-decoration-underline">({{ trans('main.clickHere') }})</a>
-                </li>
-                <li>{{ trans('admin/plans.subscription_warnings.term_period') }}</li>
-                <li>{{ trans('admin/plans.subscription_warnings.yearly_period') }}</li>
-                <li>{{ trans('admin/plans.subscription_warnings.auto_renewal') }}</li>
-            </ul>
+    <div class="alert alert-warning alert-dismissible" role="alert">
+        <h5 class="alert-heading d-flex align-items-center">
+            <span class="alert-icon rounded"><i class="icon-base ri ri-alert-line icon-md"></i></span>
+            {{ trans('admin/plans.subscription_warnings.title') }}
+        </h5>
+        <hr style="color: #fdb528 !important">
+        <div class="d-flex flex-column gap-2">
+            <p class="fw-medium mb-0">1 - {{ trans('admin/plans.subscription_warnings.trial_numbers') }}</p>
+            <p class="mb-0">2 - {{ trans('admin/plans.subscription_warnings.billing') }}<a href="{{ route('teacher.billing.index') }}" class="text-warning fw-medium text-decoration-underline">({{ trans('main.clickHere') }})</a></p>
+            <p class="mb-0">3 - {{ trans('admin/plans.subscription_warnings.term_period') }}</p>
+            <p class="mb-0">4 - {{ trans('admin/plans.subscription_warnings.yearly_period') }}</p>
+            <p class="mb-0">5 - {{ trans('admin/plans.subscription_warnings.auto_renewal') }}</p>
         </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+
     <div class="card">
         <!-- Pricing Plans -->
         <div class="pb-sm-12 pb-2 rounded-top">

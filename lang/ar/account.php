@@ -59,7 +59,6 @@ return [
     'cancelSubscription' => 'إلغاء الاشتراك',
     'subscriptionExpirationNotification' => 'هنبعتلك إشعارً تنبيهي عند انتهاء الاشتراك',
     'planPricingDescription' => 'سعر الاشتراك يشمل جميع الضرائب والرسوم. ممكن تلغي أو تغير خطتك في أي وقت.',
-    'noActiveSubscription' => 'مفيش اشتراك!',
     'noSubscriptionMessage' => 'معندكش اشتراك نشط دلوقتي. اشترك في خطة عشان تستمتع بكل المميزات.',
     'days' => 'الأيام',
     'day' => 'يوم',

@@ -3,6 +3,8 @@
 namespace App\Services\Admin\Finance;
 
 use App\Models\Plan;
+use App\Models\Invoice;
+use App\Models\Transaction;
 use App\Models\TeacherSubscription;
 use App\Traits\PublicValidatesTrait;
 use App\Traits\DatabaseTransactionTrait;
@@ -72,13 +74,36 @@ class TeacherSubscriptionService
             if ($validationResult = $this->validateTeacherSubscription($request['teacher_id'], $request['plan_id']))
                 return $validationResult;
 
-            TeacherSubscription::create([
+            $subscription = TeacherSubscription::create([
                 'teacher_id' => $request['teacher_id'],
                 'plan_id' => $request['plan_id'],
                 'period' => $request['period'],
                 'start_date' => $request['start_date'],
                 'end_date' => $request['end_date'],
                 'status' => 1,
+            ]);
+
+            if ($validationResult = $this->validateTeacherSubscriptionForInvoice($subscription->id, $request['teacher_id']))
+                return $validationResult;
+
+            $invoice = Invoice::create([
+                'type' => 1,
+                'teacher_id' => $request['teacher_id'],
+                'subscription_id' => $subscription->id,
+                'amount' => $subscription->amount,
+                'date' => now()->format('Y-m-d'),
+                'due_date' => now()->addDays(7)->format('Y-m-d'),
+                'status' => 1,
+            ]);
+
+            Transaction::create([
+                'type' => 1,
+                'teacher_id' => $request['teacher_id'],
+                'invoice_id' => $invoice->id,
+                'amount' => $subscription->amount,
+                'balance_after' => $this->getFounderWalletBalance(),
+                'description' => $request['description'] ?? null,
+                'date' => now()->format('Y-m-d'),
             ]);
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/teacherSubscriptions.teacherSubscription')]));

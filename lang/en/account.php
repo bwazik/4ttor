@@ -59,7 +59,6 @@ return [
     'cancelSubscription' => 'Cancel Subscription',
     'subscriptionExpirationNotification' => 'We will send you a notification upon Subscription expiration',
     'planPricingDescription' => 'This subscription price includes all taxes and fees. You can cancel or change your plan at any time.',
-    'noActiveSubscription' => 'No Active Subscription',
     'noSubscriptionMessage' => 'You don\'t have an active subscription. Subscribe to a plan to access all features.',
     'days' => 'Days',
     'day' => 'Day',

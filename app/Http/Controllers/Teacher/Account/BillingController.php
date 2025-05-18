@@ -166,11 +166,7 @@ class BillingController extends Controller
 
         $result = $this->billingService->processPayment($id, $request->validated());
 
-        if ($result['status'] === 'success') {
-            Cache::forget("billing:teacher:{$this->teacherId}:index");
-        }
-
-        return $this->conrtollerJsonResponse($result);
+        return $this->conrtollerJsonResponse($result, "billing:teacher:{$this->teacherId}:index");
     }
 
     public function transactions(Request $request)

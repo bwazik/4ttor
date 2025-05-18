@@ -6,6 +6,7 @@ use App\Models\Plan;
 use App\Traits\ValidatesExistence;
 use App\Models\TeacherSubscription;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
 use App\Services\Teacher\Tools\GroupService;
 
 class PlansController extends Controller
@@ -23,7 +24,7 @@ class PlansController extends Controller
 
     public function index()
     {
-        $plans = Plan::query()
+        $plans = Cache::remember('plans:index', 86400, fn() => Plan::query()
             ->active()
             ->select('id', 'name', 'description', 'monthly_price', 'term_price', 'year_price',
                 'student_limit', 'parent_limit', 'assistant_limit', 'group_limit',
@@ -33,7 +34,7 @@ class PlansController extends Controller
                 'zoom_monthly_limit', 'zoom_term_limit', 'zoom_year_limit',
                 'attendance_reports', 'financial_reports', 'performance_reports',
                 'whatsapp_messages', 'instant_customer_service')
-            ->orderBy('monthly_price')->get();
+            ->orderBy('monthly_price')->get());
 
         $subscription = TeacherSubscription::where('teacher_id', $this->teacherId)
             ->where('status', 1)

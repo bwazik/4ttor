@@ -45,11 +45,7 @@ class SubscriptionsController extends Controller
 
         $result = $this->subscriptionService->insertSubscription($validated);
 
-        if ($result['status'] === 'success') {
-            Cache::forget("billing:teacher:{$this->teacherId}:index");
-        }
-
-        return $this->conrtollerJsonResponse($result);
+        return $this->conrtollerJsonResponse($result, "billing:teacher:{$this->teacherId}:index");
     }
 
     public function cancle(Request $request)
@@ -58,10 +54,6 @@ class SubscriptionsController extends Controller
 
         $result = $this->subscriptionService->cancleSubscription($request->id);
 
-        if ($result['status'] === 'success') {
-            Cache::forget("billing:teacher:{$this->teacherId}:index");
-        }
-
-        return $this->conrtollerJsonResponse($result);
+        return $this->conrtollerJsonResponse($result, "billing:teacher:{$this->teacherId}:index");
     }
 }

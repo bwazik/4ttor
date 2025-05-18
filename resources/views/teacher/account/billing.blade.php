@@ -115,15 +115,11 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="alert alert-warning mb-6 alert-dismissible" role="alert">
-                                    <h5 class="alert-heading mb-1 d-flex align-items-center">
-                                        <span class="alert-icon rounded"><i
-                                                class="icon-base ri ri-alert-line icon-22px"></i></span>
-                                        <span>{{ trans('account.completeSubscription') }}</span>
-                                    </h5>
-                                    <p>{{ trans('account.subscriptionNotActive', ['plan' => $data['subscription']->plan->name]) }}
-                                    </p>
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                        aria-label="close"></button>
+                                    <div class="d-flex align-items-center">
+                                        <span class="alert-icon rounded me-2"><i class="icon-base ri ri-alert-line icon-22px"></i></span>
+                                        <span>{{ trans('account.subscriptionNotActive', ['plan' => $data['subscription']->plan->name]) }}</span>
+                                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="close"></button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-12 d-flex gap-4 flex-wrap">
@@ -141,13 +137,14 @@
                         <!-- Unsubscribed -->
                         <div class="row row-gap-6">
                             <div class="col-12">
-                                <div class="alert alert-info mb-6" role="alert">
-                                    <h5 class="alert-heading mb-1 d-flex align-items-center">
-                                        <span class="alert-icon rounded"><i
-                                                class="icon-base ri ri-information-line icon-22px"></i></span>
-                                        <span>{{ trans('account.noActiveSubscription') }}</span>
-                                    </h5>
-                                    <p>{{ trans('account.noSubscriptionMessage') }}</p>
+                                <div class="alert alert-warning alert-dismissible mb-6" role="alert">
+                                    <div class="d-flex align-items-center">
+                                        <span class="alert-icon rounded me-2"><i class="icon-base ri ri-alert-line icon-22px"></i></span>
+                                        <div>
+                                            <span class="mb-0">{{ trans('account.noSubscriptionMessage') }}</span>
+                                        </div>
+                                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-12 d-flex gap-4 flex-wrap">

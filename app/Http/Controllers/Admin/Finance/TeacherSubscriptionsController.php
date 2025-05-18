@@ -8,12 +8,14 @@ use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Models\TeacherSubscription;
 use App\Http\Controllers\Controller;
+use App\Traits\ServiceResponseTrait;
+use Illuminate\Support\Facades\Cache;
 use App\Services\Admin\Finance\TeacherSubscriptionService;
 use App\Http\Requests\Admin\Finance\TeacherSubscriptionsRequest;
 
 class TeacherSubscriptionsController extends Controller
 {
-    use ValidatesExistence;
+    use ValidatesExistence, ServiceResponseTrait;
 
     protected $teacherSubscriptionService;
 
@@ -43,47 +45,36 @@ class TeacherSubscriptionsController extends Controller
     {
         $result = $this->teacherSubscriptionService->insertTeacherSubscription($request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "billing:teacher:{$request->teacher_id}:index");
     }
 
     public function update(TeacherSubscriptionsRequest $request)
     {
         $result = $this->teacherSubscriptionService->updateTeacherSubscription($request->id, $request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "billing:teacher:{$request->teacher_id}:index");
     }
 
     public function delete(Request $request)
     {
         $this->validateExistence($request, 'teacher_subscriptions');
 
+        $teacherId = TeacherSubscription::where('id', $request->id)->value('teacher_id');
+
         $result = $this->teacherSubscriptionService->deleteTeacherSubscription($request->id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "billing:teacher:{$teacherId}:index");
     }
 
     public function deleteSelected(Request $request)
     {
         $this->validateExistence($request, 'teacher_subscriptions');
 
+        $teacherIds = TeacherSubscription::whereIn('id', $request->ids)->pluck('teacher_id')->unique()->toArray();
+        $cacheKeys = array_map(fn($id) => "billing:teacher:{$id}:index", $teacherIds);
+
         $result = $this->teacherSubscriptionService->deleteSelectedTeacherSubscriptions($request->ids);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, $cacheKeys);
     }
 }

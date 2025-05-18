@@ -2,7 +2,9 @@
 
 namespace App\Services\Admin\Finance;
 
+use App\Models\Invoice;
 use App\Models\StudentFee;
+use App\Models\Transaction;
 use App\Traits\PublicValidatesTrait;
 use App\Traits\DatabaseTransactionTrait;
 use App\Traits\PreventDeletionIfRelated;
@@ -69,11 +71,35 @@ class StudentFeeService
             if ($validationResult = $this->validateStudentFee($request['student_id'], $request['fee_id']))
                 return $validationResult;
 
-            StudentFee::create([
+            $studentFee = StudentFee::create([
                 'student_id' => $request['student_id'],
                 'fee_id' => $request['fee_id'],
                 'discount' => $request['discount'] ?? 0.00,
                 'is_exempted' => $request['is_exempted'] ?? false,
+            ]);
+
+            if ($validationResult = $this->validateStudentFeeForInvoice($studentFee->id, $request['student_id']))
+                return $validationResult;
+
+            $invoice = Invoice::create([
+                'type' => 2,
+                'student_id' => $request['student_id'],
+                'student_fee_id' => $studentFee->id,
+                'fee_id' => $studentFee->fee_id,
+                'amount' => $studentFee->amount,
+                'date' => now()->format('Y-m-d'),
+                'due_date' => now()->addDays(7)->format('Y-m-d'),
+                'status' => 1,
+            ]);
+
+            Transaction::create([
+                'type' => 1,
+                'student_id' => $request['student_id'],
+                'invoice_id' => $invoice->id,
+                'amount' => $studentFee->amount,
+                'balance_after' => $this->getTeacherWalletBalance($invoice->fee->teacher_id),
+                'description' => $request['description'] ?? null,
+                'date' => now()->format('Y-m-d'),
             ]);
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/studentFees.studentFee')]));

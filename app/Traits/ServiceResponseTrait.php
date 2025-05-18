@@ -2,6 +2,8 @@
 
 namespace App\Traits;
 
+use Illuminate\Support\Facades\Cache;
+
 trait ServiceResponseTrait
 {
     /**
@@ -64,9 +66,18 @@ trait ServiceResponseTrait
     }
 
 
-    protected function conrtollerJsonResponse(array $result)
+    protected function conrtollerJsonResponse(array $result, $cache = null)
     {
         if ($result['status'] === 'success') {
+            if ($cache !== null) {
+                if (is_array($cache)) {
+                    foreach ($cache as $cacheKey) {
+                        Cache::forget($cacheKey);
+                    }
+                } else {
+                    Cache::forget($cache);
+                }
+            }
             return response()->json(['success' => $result['message']], 200);
         }
 

@@ -44,10 +44,11 @@ return [
     'pay_now' => 'Pay Now',
     'terms_of_services' => 'By continuing, you accept to our Terms of Services and Privacy Policy. Please note that payments are non-refundable.',
     'subscription_warnings' => [
-        'title' => 'Important Information Before Subscription',
-        'billing' => 'After subscription, visit the invoices page to complete your payment',
-        'term_period' => 'Term subscription duration is 3.5 months (Second Term)',
-        'yearly_period' => 'Yearly subscription duration is 9.5 months (Academic Year)',
-        'auto_renewal' => 'Subscription will automatically renew at the end of each period unless cancelled',
+        'title' => 'Important Information Before Subscription.',
+        'trial_numbers' => 'All plan numbers (students, assignments, exams, etc.) are trial numbers and may be adjusted based on teacher feedback during the first month.',
+        'billing' => 'After subscription, visit the invoices page to complete your payment.',
+        'term_period' => 'Term subscription duration is 3.5 months (Second Term).',
+        'yearly_period' => 'Yearly subscription duration is 9.5 months (Academic Year).',
+        'auto_renewal' => 'Subscription will automatically renew at the end of each period unless cancelled.',
     ],
 ];

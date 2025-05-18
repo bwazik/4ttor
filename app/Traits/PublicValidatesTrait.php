@@ -555,6 +555,13 @@ trait PublicValidatesTrait
         return $wallet ? $wallet->balance : 0.00;
     }
 
+
+    protected function getTeacherWalletBalance($teacherId)
+    {
+        $wallet = Wallet::where('teacher_id', $teacherId)->first();
+        return $wallet ? $wallet->balance : 0.00;
+    }
+    
     protected function generateSignedPayUrl($invoiceId, $type)
     {
         $route = $type === 'post' ? 'teacher.billing.invoices.process' : 'teacher.billing.invoices.pay';

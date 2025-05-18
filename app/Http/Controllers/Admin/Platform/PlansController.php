@@ -6,12 +6,14 @@ use App\Models\Plan;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
+use App\Traits\PublicValidatesTrait;
+use Illuminate\Support\Facades\Cache;
 use App\Services\Admin\Platform\PlanService;
 use App\Http\Requests\Admin\Platform\PlansRequest;
 
 class PlansController extends Controller
 {
-    use ValidatesExistence;
+    use ValidatesExistence, PublicValidatesTrait;
 
     protected $planService;
 
@@ -35,22 +37,14 @@ class PlansController extends Controller
     {
         $result = $this->planService->insertPlan($request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "plans:index");
     }
 
     public function update(PlansRequest $request)
     {
         $result = $this->planService->updatePlan($request->id, $request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "plans:index");
     }
 
     public function delete(Request $request)
@@ -59,11 +53,7 @@ class PlansController extends Controller
 
         $result = $this->planService->deletePlan($request->id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "plans:index");
     }
 
     public function deleteSelected(Request $request)
@@ -72,10 +62,6 @@ class PlansController extends Controller
 
         $result = $this->planService->deleteSelectedPlans($request->ids);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "plans:index");
     }
 }

@@ -376,12 +376,6 @@ class InvoiceService
         });
     }
 
-    protected function getTeacherWalletBalance($teacherId)
-    {
-        $wallet = Wallet::where('teacher_id', $teacherId)->first();
-        return $wallet ? $wallet->balance : 0.00;
-    }
-
     public function checkDependenciesForSingleDeletion($invoice)
     {
         return $this->checkForSingleDependencies($invoice, $this->relationships, $this->transModelKey);

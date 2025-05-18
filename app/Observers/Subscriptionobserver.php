@@ -23,6 +23,10 @@ class Subscriptionobserver
         if ($subscription->wasChanged('status') && $subscription->status == 2) {
             Teacher::where('id', $subscription->teacher_id)
                 ->update(['plan_id' => null]);
+                
+            if ($subscription->invoices()->where('status', 1)->get()) {
+                $subscription->invoices()->where('status', 1)->update(['status' => 4]);
+            }
         }
     }
 
