@@ -6,12 +6,14 @@ use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Models\TeacherSubscription;
 use App\Http\Controllers\Controller;
+use App\Traits\ServiceResponseTrait;
+use Illuminate\Support\Facades\Cache;
 use App\Services\Teacher\Account\SubscriptionService;
 
 
 class SubscriptionsController extends Controller
 {
-    use ValidatesExistence;
+    use ValidatesExistence, ServiceResponseTrait;
 
     protected $subscriptionService;
     protected $teacherId;
@@ -44,10 +46,10 @@ class SubscriptionsController extends Controller
         $result = $this->subscriptionService->insertSubscription($validated);
 
         if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
+            Cache::forget("billing:teacher:{$this->teacherId}:index");
         }
 
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function cancle(Request $request)
@@ -57,9 +59,9 @@ class SubscriptionsController extends Controller
         $result = $this->subscriptionService->cancleSubscription($request->id);
 
         if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
+            Cache::forget("billing:teacher:{$this->teacherId}:index");
         }
 
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 }

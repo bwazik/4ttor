@@ -7,6 +7,21 @@
 @section('title', pageTitle('admin/plans.plans'))
 
 @section('content')
+    <div class="alert d-flex align-items-center alert-warning" role="alert">
+        <span class="alert-icon me-4 rounded-3"><i class="icon-base ri ri-error-warning-line icon-22px"></i></span>
+        <div>
+            <h6 class="alert-heading mb-1">{{ trans('admin/plans.subscription_warnings.title') }}</h6>
+            <ul class="mb-0 ps-3">
+                <li>
+                    {{ trans('admin/plans.subscription_warnings.billing') }}
+                    <a href="{{ route('teacher.billing.index') }}" class="text-warning fw-medium text-decoration-underline">({{ trans('main.clickHere') }})</a>
+                </li>
+                <li>{{ trans('admin/plans.subscription_warnings.term_period') }}</li>
+                <li>{{ trans('admin/plans.subscription_warnings.yearly_period') }}</li>
+                <li>{{ trans('admin/plans.subscription_warnings.auto_renewal') }}</li>
+            </ul>
+        </div>
+    </div>
     <div class="card">
         <!-- Pricing Plans -->
         <div class="pb-sm-12 pb-2 rounded-top">
@@ -22,12 +37,12 @@
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2"
                             value="term">
-                        <label class="form-check-label" for="inlineRadio2">{{ trans('main.termly') }}</label>
+                        <label class="form-check-label" for="inlineRadio2">{{ trans('main.termly') }} (3.5 {{ trans('main.months') }})</label>
                     </div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3"
                             value="yearly">
-                        <label class="form-check-label" for="inlineRadio3">{{ trans('main.yearly') }}</label>
+                        <label class="form-check-label" for="inlineRadio3">{{ trans('main.yearly') }} (9.5 {{ trans('main.months') }})</label>
                     </div>
                     <div class="mt-n5 ms-n5 ml-2 mb-8 d-none d-sm-flex align-items-center gap-1">
                         <i class="ri-corner-left-down-fill ri-24px text-muted scaleX-n1-rtl"></i>

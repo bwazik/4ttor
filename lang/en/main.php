@@ -212,4 +212,6 @@ return [
     'mrs' => 'Mrs',
     'showAll' => 'Show All',
     'soon' => 'Soon',
+    'months' => 'Months',
+    'clickHere' => 'Click Here',
 ];

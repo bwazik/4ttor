@@ -4,7 +4,7 @@
 
 @endsection
 
-@section('title', pageTitle('admin/plans.plans'))
+@section('title', pageTitle('admin/coupons.coupons'))
 
 @section('content')
     <div class="row">

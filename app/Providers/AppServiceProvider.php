@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Models\Invoice;
 use App\Observers\Invoiceobserver;
+use App\Models\TeacherSubscription;
+use App\Observers\Subscriptionobserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        TeacherSubscription::observe(Subscriptionobserver::class);
         Invoice::observe(Invoiceobserver::class);
     }
 }

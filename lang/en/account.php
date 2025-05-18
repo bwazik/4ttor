@@ -65,6 +65,7 @@ return [
     'day' => 'Day',
     'of' => 'of',
     'days_remaining_until_update' => ':days days remaining until you need to renew your plan subscription',
+    'payment' => 'Payment',
 
     // Coupons
     'redeemCoupon' => 'Redeem Coupon',

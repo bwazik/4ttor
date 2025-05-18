@@ -9,9 +9,10 @@ use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Models\TeacherSubscription;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\Finance\PaymentsRequest;
-use App\Services\Teacher\Account\BillingService;
 use App\Traits\PublicValidatesTrait;
+use Illuminate\Support\Facades\Cache;
+use App\Services\Teacher\Account\BillingService;
+use App\Http\Requests\Admin\Finance\PaymentsRequest;
 
 class BillingController extends Controller
 {
@@ -28,50 +29,51 @@ class BillingController extends Controller
 
     public function index()
     {
-        $subscription = TeacherSubscription::where('teacher_id', $this->teacherId)
-            ->active()
-            ->where('end_date', '>=', now())
-            ->with('plan')
-            ->first();
+        $cacheKey = "billing:teacher:{$this->teacherId}:index";
+        $ttl = 3600; // 1 hour
 
-        $invoice = $subscription ? Invoice::where('subscription_id', $subscription->id)
-            ->subscription()
-            ->where('teacher_id', $this->teacherId)
-            ->whereNull('student_id')
-            ->whereNull('student_fee_id')
-            ->whereNull('fee_id')
-            ->select('id', 'uuid', 'status')
-            ->first() : null;
+        $data = Cache::remember($cacheKey, $ttl, function () {
+            $subscription = TeacherSubscription::where('teacher_id', $this->teacherId)
+                ->active()
+                ->where('end_date', '>=', now())
+                ->with('plan')
+                ->first();
 
-        $usage = null;
-        if ($subscription) {
-            $start = Carbon::parse($subscription->start_date)->startOfDay();
-            $end = Carbon::parse($subscription->end_date)->startOfDay();
-            $now = now()->startOfDay();
+            $invoice = $subscription ? Invoice::where('subscription_id', $subscription->id)
+                ->subscription()
+                ->where('teacher_id', $this->teacherId)
+                ->whereNull('student_id')
+                ->whereNull('student_fee_id')
+                ->whereNull('fee_id')
+                ->select('id', 'uuid', 'status')
+                ->first() : null;
 
-            $totalDays = $start->diffInDays($end);
-            $usedDays = $now->lessThan($start) ? 0 : $start->diffInDays($now);
-            $remainingDays = $now->greaterThanOrEqualTo($end) ? 0 : max(0, $now->diffInDays($end));
-            $progress = 0;
+            $usage = null;
+            if ($subscription) {
+                $start = Carbon::parse($subscription->start_date)->startOfDay();
+                $end = Carbon::parse($subscription->end_date)->startOfDay();
+                $now = now()->startOfDay();
 
-            if ($subscription->status == 1) {
-                if ($totalDays > 0) {
-                    if ($now->lessThan($start)) {
-                        $progress = 0; // Not started
-                    } elseif ($now->greaterThanOrEqualTo($end)) {
-                        $progress = 100; // Expired
+                $totalDays = $start->diffInDays($end);
+                $usedDays = $now->lessThan($start) ? 0 : $start->diffInDays($now);
+                $remainingDays = $now->greaterThanOrEqualTo($end) ? 0 : max(0, $now->diffInDays($end));
+                $progress = 0;
+
+                if ($subscription->status == 1 && $totalDays > 0) {
+                    $progress = $now->lessThan($start) ? 0 : ($now->greaterThanOrEqualTo($end) ? 100 : round(($usedDays / $totalDays) * 100, 2));
+                    if ($now->greaterThanOrEqualTo($end)) {
                         $usedDays = $totalDays;
                         $remainingDays = 0;
-                    } else {
-                        $progress = round(($usedDays / $totalDays) * 100, 2);
                     }
                 }
+
+                $usage = compact('usedDays', 'totalDays', 'remainingDays', 'progress');
             }
 
-            $usage = compact('usedDays', 'totalDays', 'remainingDays', 'progress');
-        }
+            return compact('subscription', 'invoice', 'usage');
+        });
 
-        return view('teacher.account.billing', compact('subscription', 'invoice', 'usage'));
+        return view('teacher.account.billing', compact('data'));
     }
 
     public function invoices(Request $request)
@@ -165,10 +167,10 @@ class BillingController extends Controller
         $result = $this->billingService->processPayment($id, $request->validated());
 
         if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
+            Cache::forget("billing:teacher:{$this->teacherId}:index");
         }
 
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function transactions(Request $request)

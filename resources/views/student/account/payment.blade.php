@@ -13,7 +13,7 @@
     </style>
 @endsection
 
-@section('title', pageTitle('admin/plans.plans'))
+@section('title', pageTitle('account.payment'))
 
 @section('content')
     <div class="card px-3">

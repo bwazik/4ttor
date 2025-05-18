@@ -15,6 +15,7 @@ use App\Services\SessionService;
 use App\Http\Controllers\Controller;
 use App\Traits\ServiceResponseTrait;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use App\Http\Requests\ProfilePicRequest;
 use App\Traits\DatabaseTransactionTrait;
 use App\Services\Admin\FileUploadService;
@@ -57,40 +58,58 @@ class AccountController extends Controller
     public function editPersonalInfo()
     {
         $model = $this->mapping['model'];
+        $cacheKey = "account:{$this->guard}:{$this->userId}:personal";
+        $ttl = 3600; // 1 hour
 
-        if ($this->guard === 'teacher') {
-            $user = $model::query()->select('id', 'username', 'name', 'phone', 'email', 'subject_id', 'plan_id')->findOrFail($this->userId);
+        $data = Cache::remember($cacheKey, $ttl, function () use ($model) {
+            if ($this->guard === 'teacher') {
+                $user = $model::query()
+                    ->with('grades')
+                    ->select('id', 'username', 'name', 'phone', 'email', 'subject_id', 'plan_id')
+                    ->findOrFail($this->userId);
 
-            $data = [
-                'subjects' => Subject::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray(),
-                'grades' => Grade::query()->select('id', 'name')->orderBy('id')->pluck('name', 'id')->toArray(),
-            ];
+                $subjects = Cache::remember('subjects', 86400, fn() => Subject::query()
+                    ->select('id', 'name')
+                    ->orderBy('id')
+                    ->pluck('name', 'id')
+                    ->toArray());
 
-            $gradeIds = $user->grades->pluck('id')->toArray();
-            $user->grades = implode(',', $gradeIds);
+                $grades = Cache::remember('grades', 86400, fn() => Grade::query()
+                    ->select('id', 'name')
+                    ->orderBy('id')
+                    ->pluck('name', 'id')
+                    ->toArray());
 
-            $plan = Plan::find($user->plan_id);
-            $currentStudents = $user->students()->count();
-            $currentGroups = $user->groups()->count();
-            $data['remainingStudents'] = $plan ? max(0, $plan->student_limit - $currentStudents) : 0;
-            $data['remainingGroups'] = $plan ? max(0, $plan->group_limit - $currentGroups) : 0;
+                $gradeIds = $user->grades->pluck('id')->toArray();
 
-            $data['teacher'] = $user;
-        } elseif($this->guard === 'student') {
-            $user = $model::query()->select('id', 'username', 'name', 'phone', 'email', 'gender', 'birth_date', 'grade_id', 'parent_id')->findOrFail($this->userId);
+                $plan = Plan::find($user->plan_id);
+                $currentStudents = $user->students()->count();
+                $currentGroups = $user->groups()->count();
 
-            $data = [
-                'teachers' => $user->teachers->mapWithKeys(fn($teacher) => [$teacher->uuid => $teacher->name]),
-                'groups' => $user->groups->mapWithKeys(fn($group) => [$group->uuid => $group->name . ' - ' . $group->teacher->name]),
-            ];
+                return [
+                    'subjects' => $subjects,
+                    'grades' => $grades,
+                    'remainingStudents' => $plan ? max(0, $plan->student_limit - $currentStudents) : 0,
+                    'remainingGroups' => $plan ? max(0, $plan->group_limit - $currentGroups) : 0,
+                    'teacher' => $user->setAttribute('grades', implode(',', $gradeIds)),
+                ];
+            } elseif($this->guard === 'student') {
+                $user = $model::query()
+                    ->with(['grade', 'parent', 'teachers', 'groups.teacher'])
+                    ->select('id', 'username', 'name', 'phone', 'email', 'gender', 'birth_date', 'grade_id', 'parent_id')
+                    ->findOrFail($this->userId);
 
-            $groupIds = $user->groups->pluck('uuid')->toArray();
-            $teacherIds = $user->teachers->pluck('uuid')->toArray();
-            $user->groups = implode(',', $groupIds);
-            $user->teachers = implode(',', $teacherIds);
+                $groupIds = $user->groups->pluck('uuid')->toArray();
+                $teacherIds = $user->teachers->pluck('uuid')->toArray();
 
-            $data['student'] = $user;
-        }
+                return [
+                    'teachers' => $user->teachers->mapWithKeys(fn($teacher) => [$teacher->uuid => $teacher->name]),
+                    'groups' => $user->groups->mapWithKeys(fn($group) => [$group->uuid => $group->name . ' - ' . $group->teacher->name]),
+                    'student' => $user->setAttribute('groups', implode(',', $groupIds))
+                        ->setAttribute('teachers', implode(',', $teacherIds)),
+                ];
+            }
+        });
 
         return view("{$this->mapping['view_prefix']}.personal", compact('data'));
     }
@@ -99,12 +118,20 @@ class AccountController extends Controller
     {
         $result = $this->profilePicService->updateProfilePic($request, $this->mapping['model'], $this->userId, $this->mapping['profile_pic_path']);
 
+        if ($result['status'] === 'success') {
+            Cache::forget("account:{$this->guard}:{$this->userId}:personal");
+        }
+
         return $this->conrtollerJsonResponse($result);
     }
 
     public function updatePersonalInfo(PersonalDataRequest $request)
     {
         $result = $this->accountService->updatePersonalInfo($this->guard, $this->userId, $request->validated());
+
+        if ($result['status'] === 'success') {
+            Cache::forget("account:{$this->guard}:{$this->userId}:personal");
+        }
 
         return $this->conrtollerJsonResponse($result);
     }

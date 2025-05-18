@@ -48,7 +48,6 @@ return [
     'operatingSystem' => 'نظام التشغيل',
     'online' => 'أونلاين',
 
-    // Recent Devices
     // Billing
     'billing' => 'الفواتير والإشتراك',
     'currentPlan' => 'الخطة الحالية',
@@ -66,6 +65,7 @@ return [
     'day' => 'يوم',
     'of' => 'من',
     'days_remaining_until_update' => ':days أيام متبقية لحد متحتاج تجدد إشتراك الخطة',
+    'payment' => 'الدفع',
 
     // Coupons
     'redeemCoupon' => 'إسترداد كوبون',

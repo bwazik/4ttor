@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Teacher\Platform;
 
 use App\Models\Plan;
-use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Models\TeacherSubscription;
 use App\Http\Controllers\Controller;

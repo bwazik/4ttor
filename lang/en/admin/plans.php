@@ -11,7 +11,7 @@ return [
     'plans_header' => 'Plans & Subscriptions',
     'plans_description' => 'All plans include advanced tools and features to boost your product. Choose the best plan to fit your needs.',
     'discount' => 'Save up to 10% on termly plans and 15% on yearly plans',
-    'popular' => 'Most Popular',
+    'popular' => 'Best Seller',
     'monthly_price' => 'Monthly Price',
     'term_price' => 'Term Price',
     'year_price' => 'Year Price',
@@ -43,4 +43,11 @@ return [
     'order_summary' => 'Order Summary',
     'pay_now' => 'Pay Now',
     'terms_of_services' => 'By continuing, you accept to our Terms of Services and Privacy Policy. Please note that payments are non-refundable.',
+    'subscription_warnings' => [
+        'title' => 'Important Information Before Subscription',
+        'billing' => 'After subscription, visit the invoices page to complete your payment',
+        'term_period' => 'Term subscription duration is 3.5 months (Second Term)',
+        'yearly_period' => 'Yearly subscription duration is 9.5 months (Academic Year)',
+        'auto_renewal' => 'Subscription will automatically renew at the end of each period unless cancelled',
+    ],
 ];
