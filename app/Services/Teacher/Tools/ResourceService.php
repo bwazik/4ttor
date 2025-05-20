@@ -39,7 +39,7 @@ class ResourceService
             ]);
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/resources.resource')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function updateResource($id, array $request)
@@ -49,7 +49,7 @@ class ResourceService
             if ($validationResult = $this->validateTeacherGrade($request['grade_id'], $this->teacherId))
                 return $validationResult;
 
-            $resource = Resource::findOrFail($id);
+            $resource = Resource::where('teacher_id', $this->teacherId)->findOrFail($id);
             $resource->update([
                 'title' => ['ar' => $request['title_ar'], 'en' => $request['title_en']],
                 'grade_id' => $request['grade_id'],
@@ -59,14 +59,14 @@ class ResourceService
             ]);
 
             return $this->successResponse(trans('main.edited', ['item' => trans('admin/resources.resource')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteResource($id): array
     {
         return $this->executeTransaction(function () use ($id)
         {
-            $resource = Resource::select('id', 'title')->findOrFail($id);
+            $resource = Resource::where('teacher_id', $this->teacherId)->select('id', 'title')->findOrFail($id);
 
             if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($resource)) {
                 return $dependencyCheck;
@@ -77,7 +77,7 @@ class ResourceService
             $resource->delete();
 
             return $this->successResponse(trans('main.deleted', ['item' => trans('admin/resources.resource')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function checkDependenciesForSingleDeletion($resource)

@@ -115,6 +115,7 @@ class GroupsController extends Controller
     {
         $group = Group::select('id', 'uuid', 'name', 'teacher_id')
             ->uuid($uuid)
+            ->where('teacher_id', $this->teacherId)
             ->firstOrFail();
 
         $lessonsQuery = Lesson::query()->with(['group'])

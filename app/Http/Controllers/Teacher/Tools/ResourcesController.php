@@ -12,10 +12,11 @@ use App\Http\Controllers\Controller;
 use App\Services\Admin\FileUploadService;
 use App\Services\Teacher\Tools\ResourceService;
 use App\Http\Requests\Admin\Tools\ResourcesRequest;
+use App\Traits\ServiceResponseTrait;
 
 class ResourcesController extends Controller
 {
-    use ValidatesExistence;
+    use ValidatesExistence, ServiceResponseTrait;
 
     protected $teacherId;
     protected $resourceService;
@@ -103,11 +104,7 @@ class ResourcesController extends Controller
 
         $result = $this->resourceService->insertResource($request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function update(ResourcesRequest $request)
@@ -116,11 +113,7 @@ class ResourcesController extends Controller
 
         $result = $this->resourceService->updateResource($id, $request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function delete(Request $request)
@@ -132,11 +125,7 @@ class ResourcesController extends Controller
 
         $result = $this->resourceService->deleteResource($request->id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function details($uuid)
@@ -160,11 +149,7 @@ class ResourcesController extends Controller
 
         $result = $this->fileUploadService->uploadFile($request, 'resource', $id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function downloadFile($uuid)
@@ -189,10 +174,6 @@ class ResourcesController extends Controller
 
         $result = $this->fileUploadService->deleteFile('resource', $request->id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 }

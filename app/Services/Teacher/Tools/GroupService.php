@@ -91,7 +91,7 @@ class GroupService
     {
         return $this->executeTransaction(function () use ($id, $request)
         {
-            $group = Group::findOrFail($id);
+            $group = Group::where('teacher_id', $this->teacherId)->findOrFail($id);
 
             if ($validationResult = $this->validateTeacherGrade($request['grade_id'], $this->teacherId))
                 return $validationResult;
@@ -106,17 +106,17 @@ class GroupService
             ]);
 
             return $this->successResponse(trans('main.edited', ['item' => trans('admin/groups.group')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteGroup($id): array
     {
         return $this->executeTransaction(function () use ($id)
         {
-            Group::findOrFail($id)->delete();
+            Group::where('teacher_id', $this->teacherId)->findOrFail($id)->delete();
 
             return $this->successResponse(trans('main.deleted', ['item' => trans('admin/groups.group')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteSelectedGroups($ids)
@@ -126,10 +126,10 @@ class GroupService
 
         return $this->executeTransaction(function () use ($ids)
         {
-            Group::whereIn('id', $ids)->delete();
+            Group::where('teacher_id', $this->teacherId)->whereIn('id', $ids)->delete();
 
             return $this->successResponse(trans('main.deletedSelected', ['item' => strtolower(trans('admin/groups.groups'))]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function getTeacherGroupsByGradeForDatatable($groupsQuery)

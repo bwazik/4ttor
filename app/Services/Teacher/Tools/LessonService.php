@@ -72,7 +72,7 @@ class LessonService
     {
         return $this->executeTransaction(function () use ($request)
         {
-            $groupId = Group::uuid($request['group_id'])->firstOrFail('id')->id;
+            $groupId = Group::uuid($request['group_id'])->where('teacher_id', $this->teacherId)->firstOrFail('id')->id;
 
             Lesson::create([
                 'title' => ['ar' => $request['title_ar'], 'en' => $request['title_en']],
@@ -83,15 +83,15 @@ class LessonService
             ]);
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/lessons.lesson')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function updateLesson($id, array $request)
     {
         return $this->executeTransaction(function () use ($id, $request)
         {
-            $groupId = Group::uuid($request['group_id'])->firstOrFail('id')->id;
-            $lesson = Lesson::findOrFail($id);
+            $groupId = Group::uuid($request['group_id'])->where('teacher_id', $this->teacherId)->firstOrFail('id')->id;
+            $lesson = Lesson::whereHas('group', fn($query) => $query->where('teacher_id', $this->teacherId))->findOrFail($id);
 
             $lesson->update([
                 'title' => ['ar' => $request['title_ar'], 'en' => $request['title_en']],
@@ -102,14 +102,14 @@ class LessonService
             ]);
 
             return $this->successResponse(trans('main.edited', ['item' => trans('admin/lessons.lesson')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteLesson($id): array
     {
         return $this->executeTransaction(function () use ($id)
         {
-            $lesson = Lesson::select('id', 'title')->findOrFail($id);
+            $lesson = Lesson::whereHas('group', fn($query) => $query->where('teacher_id', $this->teacherId))->select('id', 'title')->findOrFail($id);
 
             if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($lesson)) {
                 return $dependencyCheck;
@@ -118,7 +118,7 @@ class LessonService
             $lesson->delete();
 
             return $this->successResponse(trans('main.deleted', ['item' => trans('admin/lessons.lesson')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteSelectedLessons($ids)
@@ -128,16 +128,16 @@ class LessonService
 
         return $this->executeTransaction(function () use ($ids)
         {
-            $lessons = Lesson::whereIn('id', $ids)->select('id', 'title')->orderBy('id')->get();
+            $lessons = Lesson::whereHas('group', fn($query) => $query->where('teacher_id', $this->teacherId))->whereIn('id', $ids)->select('id', 'title')->orderBy('id')->get();
 
             if ($dependencyCheck = $this->checkDependenciesForMultipleDeletion($lessons)) {
                 return $dependencyCheck;
             }
 
-            Lesson::whereIn('id', $ids)->delete();
+            Lesson::whereHas('group', fn($query) => $query->where('teacher_id', $this->teacherId))->whereIn('id', $ids)->delete();
 
             return $this->successResponse(trans('main.deletedSelected', ['item' => strtolower(trans('admin/lessons.lessons'))]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function checkDependenciesForSingleDeletion($lesson)

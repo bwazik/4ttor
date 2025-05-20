@@ -92,7 +92,7 @@ class AssistantService
     {
         return $this->executeTransaction(function () use ($id, $request)
         {
-            $assistant = Assistant::findOrFail($id);
+            $assistant = Assistant::where('teacher_id', $this->teacherId)->findOrFail($id);
 
             $this->processPassword($request);
 
@@ -106,17 +106,17 @@ class AssistantService
             ]);
 
             return $this->successResponse(trans('main.edited', ['item' => trans('admin/assistants.assistant')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteAssistant($id): array
     {
         return $this->executeTransaction(function () use ($id)
         {
-            Assistant::findOrFail($id)->delete();
+            Assistant::where('teacher_id', $this->teacherId)->findOrFail($id)->delete();
 
             return $this->successResponse(trans('main.deleted', ['item' => trans('admin/assistants.assistant')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteSelectedAssistants($ids)
@@ -126,9 +126,9 @@ class AssistantService
 
         return $this->executeTransaction(function () use ($ids)
         {
-            Assistant::whereIn('id', $ids)->delete();
+            Assistant::where('teacher_id', $this->teacherId)->whereIn('id', $ids)->delete();
 
             return $this->successResponse(trans('main.deletedSelected', ['item' => trans('admin/assistants.assistant')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 }

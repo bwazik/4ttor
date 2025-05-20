@@ -303,6 +303,8 @@ class InvoiceService
                 'transactions' => fn($query) => $query->whereIn('type', [1, 2, 3]),
                 'fee:id,teacher_id',
             ])
+            ->whereHas('student', fn($query) => $query->whereHas('teachers', fn($q) => $q->where('teacher_id', $this->teacherId)))
+            ->whereHas('fee', fn($query) => $query->where('teacher_id', $this->teacherId))
             ->withTrashed()
             ->findOrFail($id);
 
@@ -328,10 +330,10 @@ class InvoiceService
                 $wallet->update(['balance' => $newBalance]);
             }
 
-            $invoice->forceDelete();
+            $invoice->delete();
 
             return $this->successResponse(trans('main.deleted', ['item' => trans('admin/invoices.invoice')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function cancelInvoice($id): array

@@ -89,7 +89,7 @@ class FeeService
             if ($validationResult = $this->validateTeacherGrade($request['grade_id'], $this->teacherId))
                 return $validationResult;
 
-            $fee = Fee::findOrFail($id);
+            $fee = Fee::where('teacher_id', $this->teacherId)->findOrFail($id);
 
             $fee->update([
                 'name' => ['en' => $request['name_en'], 'ar' => $request['name_ar']],
@@ -99,14 +99,14 @@ class FeeService
             ]);
 
             return $this->successResponse(trans('main.edited', ['item' => trans('admin/fees.fee')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteFee($id): array
     {
         return $this->executeTransaction(function () use ($id)
         {
-            $fee = Fee::select('id', 'name')->findOrFail($id);
+            $fee = Fee::where('teacher_id', $this->teacherId)->select('id', 'name')->findOrFail($id);
 
             if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($fee))
                 return $dependencyCheck;
@@ -114,7 +114,7 @@ class FeeService
             $fee->delete();
 
             return $this->successResponse(trans('main.deleted', ['item' => trans('admin/fees.fee')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteSelectedFees($ids)
@@ -124,16 +124,16 @@ class FeeService
 
         return $this->executeTransaction(function () use ($ids)
         {
-            $fees = Fee::whereIn('id', $ids)->select('id', 'name')->orderBy('id')->get();
+            $fees = Fee::where('teacher_id', $this->teacherId)->whereIn('id', $ids)->select('id', 'name')->orderBy('id')->get();
 
             if ($dependencyCheck = $this->checkDependenciesForMultipleDeletion($fees)) {
                 return $dependencyCheck;
             }
 
-            Fee::whereIn('id', $ids)->delete();
+            Fee::where('teacher_id', $this->teacherId)->whereIn('id', $ids)->delete();
 
             return $this->successResponse(trans('main.deletedSelected', ['item' => trans('admin/fees.fee')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function checkDependenciesForSingleDeletion($fee)

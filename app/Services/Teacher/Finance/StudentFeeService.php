@@ -87,7 +87,7 @@ class StudentFeeService
             ]);
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/studentFees.studentFee')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function updateStudentFee($id, array $request)
@@ -109,14 +109,16 @@ class StudentFeeService
             ]);
 
             return $this->successResponse(trans('main.edited', ['item' => trans('admin/studentFees.studentFee')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteStudentFee($id): array
     {
         return $this->executeTransaction(function () use ($id)
         {
-            $studentFee = StudentFee::select('id')->findOrFail($id);
+            $studentFee = StudentFee::whereHas('student', fn($query) => $query->whereHas('teachers', fn($q) => $q->where('teacher_id', $this->teacherId)))
+                ->whereHas('fee', fn($query) => $query->where('teacher_id', $this->teacherId))
+                ->select('id')->findOrFail($id);
 
             if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($studentFee))
                 return $dependencyCheck;
@@ -124,7 +126,7 @@ class StudentFeeService
             $studentFee->delete();
 
             return $this->successResponse(trans('main.deleted', ['item' => trans('admin/studentFees.studentFee')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteSelectedStudentFees($ids)
@@ -134,16 +136,20 @@ class StudentFeeService
 
         return $this->executeTransaction(function () use ($ids)
         {
-            $studentFees = StudentFee::whereIn('id', $ids)->select('id')->orderBy('id')->get();
+            $studentFees = StudentFee::whereHas('student', fn($query) => $query->whereHas('teachers', fn($q) => $q->where('teacher_id', $this->teacherId)))
+                ->whereHas('fee', fn($query) => $query->where('teacher_id', $this->teacherId))
+                ->whereIn('id', $ids)->select('id')->orderBy('id')->get();
 
             if ($dependencyCheck = $this->checkDependenciesForMultipleDeletion($studentFees)) {
                 return $dependencyCheck;
             }
 
-            StudentFee::whereIn('id', $ids)->delete();
+            StudentFee::whereHas('student', fn($query) => $query->whereHas('teachers', fn($q) => $q->where('teacher_id', $this->teacherId)))
+                ->whereHas('fee', fn($query) => $query->where('teacher_id', $this->teacherId))
+                ->whereIn('id', $ids)->delete();
 
             return $this->successResponse(trans('main.deletedSelected', ['item' => trans('admin/studentFees.studentFee')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function checkDependenciesForSingleDeletion($studentFee)

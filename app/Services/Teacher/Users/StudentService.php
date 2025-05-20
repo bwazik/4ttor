@@ -89,7 +89,7 @@ class StudentService
     {
         return $this->executeTransaction(function () use ($request)
         {
-            $parentId = !empty($request['parent_id']) ? MyParent::uuid($request['parent_id'])->value('id') : null;
+            $parentId = !empty($request['parent_id']) ? MyParent::uuid($request['parent_id'])->whereHas('students.teachers', fn($q) => $q->where('teachers.id', $this->teacherId))->value('id') : null;
             $groupIds = !empty($request['groups']) ? Group::whereIn('uuid', $request['groups'])->pluck('id')->toArray() : [];
 
             if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $groupIds, $request['grade_id'], true))
@@ -118,13 +118,14 @@ class StudentService
     {
         return $this->executeTransaction(function () use ($id, $request)
         {
-            $parentId = !empty($request['parent_id']) ? MyParent::uuid($request['parent_id'])->value('id') : null;
+            $parentId = !empty($request['parent_id']) ? MyParent::uuid($request['parent_id'])->whereHas('students.teachers', fn($q) => $q->where('teachers.id', $this->teacherId))->value('id') : null;
             $groupIds = !empty($request['groups']) ? Group::whereIn('uuid', $request['groups'])->pluck('id')->toArray() : [];
 
             if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $groupIds, $request['grade_id'], true))
                 return $validationResult;
 
-            $student = Student::findOrFail($id);
+            $student = Student::whereHas('teachers', fn($query) => $query->where('teacher_id', $this->teacherId))
+                ->findOrFail($id);
 
             $this->processPassword($request);
 
@@ -145,17 +146,18 @@ class StudentService
             $student->groups()->sync($groupIds ?? []);
 
             return $this->successResponse(trans('main.edited', ['item' => trans('admin/students.student')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteStudent($id): array
     {
         return $this->executeTransaction(function () use ($id)
         {
-            Student::findOrFail($id)->delete();
+            Student::whereHas('teachers', fn($query) => $query->where('teacher_id', $this->teacherId))
+                ->findOrFail($id)->delete();
 
             return $this->successResponse(trans('main.deleted', ['item' => trans('admin/students.student')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteSelectedStudents($ids)
@@ -165,9 +167,10 @@ class StudentService
 
         return $this->executeTransaction(function () use ($ids)
         {
-            Student::whereIn('id', $ids)->delete();
+            Student::whereHas('teachers', fn($query) => $query->where('teacher_id', $this->teacherId))
+                ->whereIn('id', $ids)->delete();
 
             return $this->successResponse(trans('main.deletedSelected', ['item' => trans('admin/students.student')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 }

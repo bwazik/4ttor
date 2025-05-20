@@ -99,7 +99,7 @@ class QuizService
             $quiz->groups()->attach($groupIds);
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/quizzes.quiz')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function updateQuiz($id, array $request): array
@@ -111,7 +111,7 @@ class QuizService
             if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $groupIds, $request['grade_id'], true))
                 return $validationResult;
 
-            $quiz = Quiz::findOrFail($id);
+            $quiz = Quiz::where('teacher_id', $this->teacherId)->findOrFail($id);
             $quiz->update([
                 'name' => ['en' => $request['name_en'], 'ar' => $request['name_ar']],
                 'grade_id' => $request['grade_id'],
@@ -123,17 +123,17 @@ class QuizService
             $quiz->groups()->sync($groupIds ?? []);
 
             return $this->successResponse(trans('main.edited', ['item' => trans('admin/quizzes.quiz')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteQuiz($id): array
     {
         return $this->executeTransaction(function () use ($id)
         {
-            Quiz::findOrFail($id)->delete();
+            Quiz::where('teacher_id', $this->teacherId)->findOrFail($id)->delete();
 
             return $this->successResponse(trans('main.deleted', ['item' => trans('admin/quizzes.quiz')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteSelectedQuizzes($ids)
@@ -143,9 +143,9 @@ class QuizService
 
         return $this->executeTransaction(function () use ($ids)
         {
-            Quiz::whereIn('id', $ids)->delete();
+            Quiz::where('teacher_id', $this->teacherId)->whereIn('id', $ids)->delete();
 
             return $this->successResponse(trans('main.deletedSelected', ['item' => trans('admin/quizzes.quiz')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 }

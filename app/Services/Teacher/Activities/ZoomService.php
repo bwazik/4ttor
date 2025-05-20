@@ -106,7 +106,7 @@ class ZoomService
             dispatch(new HandleZoomMeetingJob(HandleZoomMeetingJob::TYPE_CREATE, ['meeting_data' => $meetingData, 'zoom_id' => $zoom->id]));
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/zooms.zoom')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function updateZoom($id, $meeting_id, array $request): array
@@ -129,7 +129,7 @@ class ZoomService
             dispatch(new HandleZoomMeetingJob(HandleZoomMeetingJob::TYPE_UPDATE,
             ['meeting_id' => $meeting_id, 'meeting_data' => $meetingData]));
 
-            $zoom = Zoom::findOrFail($id);
+            $zoom = Zoom::where('teacher_id', $this->teacherId)->findOrFail($id);
             $zoom->update([
                 'grade_id' => $request['grade_id'],
                 'group_id' => $groupId,
@@ -139,7 +139,7 @@ class ZoomService
             ]);
 
             return $this->successResponse(trans('main.edited', ['item' => trans('admin/zooms.zoom')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteZoom($id, $meeting_id): array
@@ -150,10 +150,10 @@ class ZoomService
                 dispatch(new HandleZoomMeetingJob(HandleZoomMeetingJob::TYPE_DELETE, ['meeting_id' => $meeting_id]));
             }
 
-            Zoom::findOrFail($id)->delete();
+            Zoom::where('teacher_id', $this->teacherId)->findOrFail($id)->delete();
 
             return $this->successResponse(trans('main.deleted', ['item' => trans('admin/zooms.zoom')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteSelectedZooms($ids)
@@ -163,7 +163,7 @@ class ZoomService
 
         return $this->executeTransaction(function () use ($ids)
         {
-            $meetings = Zoom::whereIn('id', $ids)->get();
+            $meetings = Zoom::where('teacher_id', $this->teacherId)->whereIn('id', $ids)->get();
 
             foreach($meetings as $meeting)
             {
@@ -178,7 +178,7 @@ class ZoomService
             }
 
             return $this->successResponse(trans('main.deletedSelected', ['item' => trans('admin/zooms.zoom')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     private function prepareMeetingData(array $request, bool $includeSettings = true, $groupId): array

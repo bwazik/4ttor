@@ -104,7 +104,7 @@ class ParentService
     {
         return $this->executeTransaction(function () use ($id, $request)
         {
-            $parent = MyParent::findOrFail($id);
+            $parent = MyParent::whereHas('students.teachers', fn($q) => $q->where('teachers.id', $this->teacherId))->findOrFail($id);
 
             $this->processPassword($request);
 
@@ -125,17 +125,17 @@ class ParentService
             $this->syncStudentParentRelation($studentIds, $parent->id, isAdmin());
 
             return $this->successResponse(trans('main.edited', ['item' => trans('admin/parents.parent')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteParent($id): array
     {
         return $this->executeTransaction(function () use ($id)
         {
-            MyParent::findOrFail($id)->delete();
+            MyParent::whereHas('students.teachers', fn($q) => $q->where('teachers.id', $this->teacherId))->findOrFail($id)->delete();
 
             return $this->successResponse(trans('main.deleted', ['item' => trans('admin/parents.parent')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteSelectedParents($ids)
@@ -145,9 +145,9 @@ class ParentService
 
         return $this->executeTransaction(function () use ($ids)
         {
-            MyParent::whereIn('id', $ids)->delete();
+            MyParent::whereHas('students.teachers', fn($q) => $q->where('teachers.id', $this->teacherId))->whereIn('id', $ids)->delete();
 
             return $this->successResponse(trans('main.deletedSelected', ['item' => trans('admin/parents.parent')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 }

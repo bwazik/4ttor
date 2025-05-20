@@ -100,7 +100,7 @@ class AssignmentService
             $assignment->groups()->attach($groupIds);
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/assignments.assignment')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function updateAssignment($id, array $request): array
@@ -112,7 +112,7 @@ class AssignmentService
             if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $groupIds, $request['grade_id'], true))
                 return $validationResult;
 
-            $assignment = Assignment::findOrFail($id);
+            $assignment = Assignment::where('teacher_id', $this->teacherId)->findOrFail($id);
             $assignment->update([
                 'grade_id' => $request['grade_id'],
                 'title' => ['en' => $request['title_en'], 'ar' => $request['title_ar']],
@@ -124,14 +124,14 @@ class AssignmentService
             $assignment->groups()->sync($groupIds ?? []);
 
             return $this->successResponse(trans('main.edited', ['item' => trans('admin/assignments.assignment')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteAssignment($id): array
     {
         return $this->executeTransaction(function () use ($id)
         {
-            $assignment = Assignment::findOrFail($id);
+            $assignment = Assignment::where('teacher_id', $this->teacherId)->findOrFail($id);
 
             $this->fileUploadService->deleteRelatedFiles($assignment, 'assignmentFiles');
             $this->fileUploadService->deleteRelatedFiles($assignment, 'assignmentSubmissions');
@@ -139,7 +139,7 @@ class AssignmentService
             $assignment->delete();
 
             return $this->successResponse(trans('main.deleted', ['item' => trans('admin/assignments.assignment')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 
     public function deleteSelectedAssignments($ids)
@@ -149,7 +149,7 @@ class AssignmentService
 
         return $this->executeTransaction(function () use ($ids)
         {
-            $assignments = Assignment::whereIn('id', $ids)->get();
+            $assignments = Assignment::where('teacher_id', $this->teacherId)->whereIn('id', $ids)->get();
 
             foreach ($assignments as $assignment) {
                 $this->fileUploadService->deleteRelatedFiles($assignment, 'assignmentFiles');
@@ -159,6 +159,6 @@ class AssignmentService
             }
 
             return $this->successResponse(trans('main.deletedSelected', ['item' => trans('admin/assignments.assignments')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 }

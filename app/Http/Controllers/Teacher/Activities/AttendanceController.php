@@ -34,9 +34,7 @@ class AttendanceController extends Controller
 
     public function getStudentsByFilter(StudentSearchRequest $request)
     {
-        if (!$this->planLimitService->hasFeature('attendance_reports')) {
-            return response()->json(['error' => trans('toasts.featureNotAvailable')], 422);
-        }
+
 
         $result = $this->attendanceService->getStudentsByFilter($request->validated());
 
@@ -56,9 +54,6 @@ class AttendanceController extends Controller
 
     public function insert(AttendanceRequest $request)
     {
-        if (!$this->planLimitService->hasFeature('attendance_reports')) {
-            return response()->json(['error' => trans('toasts.featureNotAvailable')], 422);
-        }
 
         $result = $this->attendanceService->insertAttendance($request->validated());
 

@@ -24,7 +24,9 @@ class AttendanceService
     public function getStudentsByFilter(array $request)
     {
         $groupId = Group::uuid($request['group_id'])->firstOrFail('id')->id;
-        $lesson = Lesson::uuid($request['lesson_id'])->firstOrFail(['id', 'date']);
+        $lesson = Lesson::uuid($request['lesson_id'])
+            ->whereHas('group', fn($query) => $query->where('teacher_id', $this->teacherId))
+            ->firstOrFail(['id', 'date']);
 
         if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $groupId, $request['grade_id'], true))
             return $validationResult;
@@ -97,7 +99,9 @@ class AttendanceService
         {
             $gradeId = $request['grade_id'];
             $groupId = Group::uuid($request['group_id'])->firstOrFail('id')->id;
-            $lesson = Lesson::uuid($request['lesson_id'])->firstOrFail(['id', 'date']);
+            $lesson = Lesson::uuid($request['lesson_id'])
+                ->whereHas('group', fn($query) => $query->where('teacher_id', $this->teacherId))
+                ->firstOrFail(['id', 'date']);
             $attendanceData = $request['attendance'];
 
             if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $groupId, $request['grade_id'], true))
@@ -126,6 +130,6 @@ class AttendanceService
             }
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/attendance.attendance')]));
-        });
+        }, trans('toasts.ownershipError'));
     }
 }

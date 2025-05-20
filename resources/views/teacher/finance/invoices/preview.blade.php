@@ -1,4 +1,4 @@
-@extends('layouts.admin.master')
+@extends('layouts.teacher.master')
 
 @section('page-css')
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/app-invoice.css') }}">

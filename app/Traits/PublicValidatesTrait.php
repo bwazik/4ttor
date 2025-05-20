@@ -25,8 +25,15 @@ trait PublicValidatesTrait
 {
     use ServiceResponseTrait;
 
+    protected $teacherId;
     protected $questionsLimit = 50;
     protected $answersLimit = 5;
+
+    public function __construct()
+    {
+        $teacher = auth()->guard('teacher')->user();
+        $this->teacherId = $teacher ? $teacher->id : null;
+    }
 
     protected function validateTeacherGrade($gradeId, $teacherId)
     {
@@ -101,7 +108,7 @@ trait PublicValidatesTrait
         return null;
     }
 
-    protected function syncStudentParentRelation(array $newStudentIds, int $parentId, bool $isAdmin = false): void
+    protected function syncStudentParentRelation(array $newStudentIds, int $parentId, bool $isAdmin = false)
     {
         $existingStudentsQuery = Student::where('parent_id', $parentId);
 
@@ -561,7 +568,7 @@ trait PublicValidatesTrait
         $wallet = Wallet::where('teacher_id', $teacherId)->first();
         return $wallet ? $wallet->balance : 0.00;
     }
-    
+
     protected function generateSignedPayUrl($invoiceId, $type)
     {
         $route = $type === 'post' ? 'teacher.billing.invoices.process' : 'teacher.billing.invoices.pay';
