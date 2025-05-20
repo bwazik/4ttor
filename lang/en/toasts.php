@@ -59,4 +59,6 @@ return [
     'passwordsMustMatch' => 'The password confirmation does not match',
     'invalidCurrentPassword' => 'Current password is invalid. Please try again.',
     'passwordUpdated' => 'Password is updated successfully',
+    'limitReached' => 'You have reached the limit for this action. Please upgrade your plan.',
+    'featureNotAvailable' => 'The current plan does not allow this action. Please upgrade your plan.',
 ];

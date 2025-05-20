@@ -119,6 +119,11 @@ class Teacher extends Authenticatable
         return $this->hasMany(Assignment::class, 'teacher_id');
     }
 
+    public function resources()
+    {
+        return $this->hasMany(Resource::class, 'teacher_id');
+    }
+
     public function teacherSubscriptions()
     {
         return $this->hasMany(TeacherSubscription::class, 'teacher_id');

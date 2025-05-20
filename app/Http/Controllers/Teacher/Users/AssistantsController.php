@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Teacher\Users;
 
 use App\Models\Assistant;
 use Illuminate\Http\Request;
+use App\Services\PlanLimitService;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
 use App\Traits\ServiceResponseTrait;
@@ -15,13 +16,15 @@ class AssistantsController extends Controller
 {
     use ValidatesExistence, ServiceResponseTrait;
 
-    protected $assistantService;
     protected $teacherId;
+    protected $assistantService;
+    protected $planLimitService;
 
     public function __construct(AssistantService $assistantService)
     {
-        $this->assistantService = $assistantService;
         $this->teacherId = auth()->guard('teacher')->user()->id;
+        $this->assistantService = $assistantService;
+        $this->planLimitService = new PlanLimitService($this->teacherId);
     }
 
     public function index(Request $request)
@@ -50,6 +53,10 @@ class AssistantsController extends Controller
 
     public function insert(AssistantsRequest $request)
     {
+        if (!$this->planLimitService->canPerformAction('assistants')) {
+            return response()->json(['error' => trans('toasts.limitReached')], 422);
+        }
+
         $result = $this->assistantService->insertAssistant($request->validated());
 
         return $this->conrtollerJsonResponse($result, "assistants:teacher:{$this->teacherId}:stats");

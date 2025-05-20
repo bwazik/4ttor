@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Teacher\Users;
 use App\Models\Student;
 use App\Models\MyParent;
 use Illuminate\Http\Request;
+use App\Services\PlanLimitService;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
 use App\Traits\ServiceResponseTrait;
@@ -16,13 +17,15 @@ class ParentsController extends Controller
 {
     use ValidatesExistence, ServiceResponseTrait;
 
-    protected $parentService;
     protected $teacherId;
+    protected $parentService;
+    protected $planLimitService;
 
     public function __construct(ParentService $parentService)
     {
-        $this->parentService = $parentService;
         $this->teacherId = auth()->guard('teacher')->user()->id;
+        $this->parentService = $parentService;
+        $this->planLimitService = new PlanLimitService($this->teacherId);
     }
 
     public function index(Request $request)
@@ -57,6 +60,10 @@ class ParentsController extends Controller
 
     public function insert(ParentsRequest $request)
     {
+        if (!$this->planLimitService->canPerformAction('parents')) {
+            return response()->json(['error' => trans('toasts.limitReached')], 422);
+        }
+
         $result = $this->parentService->insertParent($request->validated());
 
         return $this->conrtollerJsonResponse($result, "parents:teacher:{$this->teacherId}:stats");

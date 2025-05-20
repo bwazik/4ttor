@@ -6,6 +6,7 @@ use App\Models\Grade;
 use App\Models\Group;
 use App\Models\Lesson;
 use Illuminate\Http\Request;
+use App\Services\PlanLimitService;
 use App\Traits\ValidatesExistence;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -19,15 +20,17 @@ class GroupsController extends Controller
 {
     use ValidatesExistence, ServiceResponseTrait;
 
+    protected $teacherId;
     protected $groupService;
     protected $lessonService;
-    protected $teacherId;
+    protected $planLimitService;
 
     public function __construct(GroupService $groupService, LessonService $lessonService)
     {
+        $this->teacherId = auth()->guard('teacher')->user()->id;
         $this->groupService = $groupService;
         $this->lessonService = $lessonService;
-        $this->teacherId = auth()->guard('teacher')->user()->id;
+        $this->planLimitService = new PlanLimitService($this->teacherId);
     }
 
     public function index(Request $request)
@@ -66,6 +69,10 @@ class GroupsController extends Controller
 
     public function insert(GroupsRequest $request)
     {
+        if (!$this->planLimitService->canPerformAction('groups')) {
+            return response()->json(['error' => trans('toasts.limitReached')], 422);
+        }
+
         $result = $this->groupService->insertGroup($request->validated());
 
         return $this->conrtollerJsonResponse($result, "groups:teacher:{$this->teacherId}:stats");

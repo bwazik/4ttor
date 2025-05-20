@@ -13,19 +13,22 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
 use App\Services\Teacher\Users\StudentService;
 use App\Http\Requests\Admin\Users\StudentsRequest;
+use App\Services\PlanLimitService;
 use App\Traits\ServiceResponseTrait;
 
 class StudentsController extends Controller
 {
     use ValidatesExistence, ServiceResponseTrait;
 
-    protected $studentService;
     protected $teacherId;
+    protected $studentService;
+    protected $planLimitService;
 
     public function __construct(StudentService $studentService)
     {
-        $this->studentService = $studentService;
         $this->teacherId = auth()->guard('teacher')->user()->id;
+        $this->studentService = $studentService;
+        $this->planLimitService = new PlanLimitService($this->teacherId);
     }
 
     public function index(Request $request)
@@ -79,6 +82,10 @@ class StudentsController extends Controller
 
     public function insert(StudentsRequest $request)
     {
+        if (!$this->planLimitService->canPerformAction('students')) {
+            return response()->json(['error' => trans('toasts.limitReached')], 422);
+        }
+
         $result = $this->studentService->insertStudent($request->validated());
 
         return $this->conrtollerJsonResponse($result, "students:teacher:{$this->teacherId}:stats");

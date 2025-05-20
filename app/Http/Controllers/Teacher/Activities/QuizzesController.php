@@ -6,23 +6,26 @@ use App\Models\Quiz;
 use App\Models\Grade;
 use App\Models\Group;
 use Illuminate\Http\Request;
+use App\Services\PlanLimitService;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
+use App\Traits\ServiceResponseTrait;
 use App\Services\Teacher\Activities\QuizService;
 use App\Http\Requests\Admin\Activities\QuizzesRequest;
-use App\Traits\ServiceResponseTrait;
 
 class QuizzesController extends Controller
 {
     use ValidatesExistence, ServiceResponseTrait;
 
-    protected $quizService;
     protected $teacherId;
+    protected $quizService;
+    protected $planLimitService;
 
     public function __construct(QuizService $quizService)
     {
         $this->quizService = $quizService;
         $this->teacherId = auth()->guard('teacher')->user()->id;
+        $this->planLimitService = new PlanLimitService($this->teacherId);
     }
 
     public function index(Request $request)
@@ -54,6 +57,10 @@ class QuizzesController extends Controller
 
     public function insert(QuizzesRequest $request)
     {
+        if (!$this->planLimitService->canPerformAction('quizzes')) {
+            return response()->json(['error' => trans('toasts.limitReached')], 422);
+        }
+
         $result = $this->quizService->insertQuiz($request->validated());
 
         return $this->conrtollerJsonResponse($result);

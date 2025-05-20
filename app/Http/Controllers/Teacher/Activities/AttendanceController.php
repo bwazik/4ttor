@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Teacher\Activities;
 
 use App\Models\Grade;
+use App\Services\PlanLimitService;
 use App\Http\Controllers\Controller;
 use App\Services\Teacher\Activities\AttendanceService;
 use App\Http\Requests\Admin\Activities\AttendanceRequest;
@@ -10,13 +11,14 @@ use App\Http\Requests\Admin\Activities\StudentSearchRequest;
 
 class AttendanceController extends Controller
 {
-    protected $attendanceService;
     protected $teacherId;
-
+    protected $attendanceService;
+    protected $planLimitService;
     public function __construct(AttendanceService $attendanceService)
     {
-        $this->attendanceService = $attendanceService;
         $this->teacherId = auth()->guard('teacher')->user()->id;
+        $this->attendanceService = $attendanceService;
+        $this->planLimitService = new PlanLimitService($this->teacherId);
     }
 
     public function index()
@@ -32,6 +34,10 @@ class AttendanceController extends Controller
 
     public function getStudentsByFilter(StudentSearchRequest $request)
     {
+        if (!$this->planLimitService->hasFeature('attendance_reports')) {
+            return response()->json(['error' => trans('toasts.featureNotAvailable')], 422);
+        }
+
         $result = $this->attendanceService->getStudentsByFilter($request->validated());
 
         if ($request->ajax()) {
@@ -50,6 +56,10 @@ class AttendanceController extends Controller
 
     public function insert(AttendanceRequest $request)
     {
+        if (!$this->planLimitService->hasFeature('attendance_reports')) {
+            return response()->json(['error' => trans('toasts.featureNotAvailable')], 422);
+        }
+
         $result = $this->attendanceService->insertAttendance($request->validated());
 
         if ($result['status'] === 'success') {

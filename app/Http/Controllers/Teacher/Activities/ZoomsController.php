@@ -6,23 +6,26 @@ use App\Models\Zoom;
 use App\Models\Grade;
 use App\Models\Group;
 use Illuminate\Http\Request;
+use App\Services\PlanLimitService;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
+use App\Traits\ServiceResponseTrait;
 use App\Services\Teacher\Activities\ZoomService;
 use App\Http\Requests\Admin\Activities\ZoomsRequest;
-use App\Traits\ServiceResponseTrait;
 
 class ZoomsController extends Controller
 {
     use ValidatesExistence, ServiceResponseTrait;
 
-    protected $zoomService;
     protected $teacherId;
+    protected $zoomService;
+    protected $planLimitService;
 
     public function __construct(ZoomService $zoomService)
     {
-        $this->zoomService = $zoomService;
         $this->teacherId = auth()->guard('teacher')->user()->id;
+        $this->zoomService = $zoomService;
+        $this->planLimitService = new PlanLimitService($this->teacherId);
     }
 
     public function index(Request $request)
@@ -55,6 +58,10 @@ class ZoomsController extends Controller
 
     public function insert(ZoomsRequest $request)
     {
+        if (!$this->planLimitService->canPerformAction('zooms')) {
+            return response()->json(['error' => trans('toasts.limitReached')], 422);
+        }
+
         $result = $this->zoomService->insertZoom($request->validated());
 
         return $this->conrtollerJsonResponse($result);

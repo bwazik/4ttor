@@ -6,6 +6,7 @@ use App\Models\Grade;
 use App\Models\Teacher;
 use App\Models\Resource;
 use Illuminate\Http\Request;
+use App\Services\PlanLimitService;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
 use App\Services\Admin\FileUploadService;
@@ -16,15 +17,16 @@ class ResourcesController extends Controller
 {
     use ValidatesExistence;
 
+    protected $teacherId;
     protected $resourceService;
     protected $fileUploadService;
-    protected $teacherId;
-
+    protected $planLimitService;
     public function __construct(ResourceService $resourceService, FileUploadService $fileUploadService)
     {
+        $this->teacherId = auth()->guard('teacher')->user()->id;
         $this->resourceService = $resourceService;
         $this->fileUploadService = $fileUploadService;
-        $this->teacherId = auth()->guard('teacher')->user()->id;
+        $this->planLimitService = new PlanLimitService($this->teacherId);
     }
 
     public function index(Request $request)
@@ -95,6 +97,10 @@ class ResourcesController extends Controller
 
     public function insert(ResourcesRequest $request)
     {
+        if (!$this->planLimitService->canPerformAction('resources')) {
+            return response()->json(['error' => trans('toasts.limitReached')], 422);
+        }
+
         $result = $this->resourceService->insertResource($request->validated());
 
         if ($result['status'] === 'success') {

@@ -6,6 +6,7 @@ use App\Models\Grade;
 use App\Models\Group;
 use App\Models\Assignment;
 use Illuminate\Http\Request;
+use App\Services\PlanLimitService;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
 use App\Traits\ServiceResponseTrait;
@@ -17,15 +18,16 @@ class AssignmentsController extends Controller
 {
     use ValidatesExistence, ServiceResponseTrait;
 
+    protected $teacherId;
     protected $assignmentService;
     protected $fileUploadService;
-    protected $teacherId;
-
+    protected $planLimitService;
     public function __construct(AssignmentService $assignmentService, FileUploadService $fileUploadService)
     {
+        $this->teacherId = auth()->guard('teacher')->user()->id;
         $this->assignmentService = $assignmentService;
         $this->fileUploadService = $fileUploadService;
-        $this->teacherId = auth()->guard('teacher')->user()->id;
+        $this->planLimitService = new PlanLimitService($this->teacherId);
     }
 
     public function index(Request $request)
@@ -57,6 +59,10 @@ class AssignmentsController extends Controller
 
     public function insert(AssignmentsRequest $request)
     {
+        if (!$this->planLimitService->canPerformAction('assignments')) {
+            return response()->json(['error' => trans('toasts.limitReached')], 422);
+        }
+
         $result = $this->assignmentService->insertAssignment($request->validated());
 
         return $this->conrtollerJsonResponse($result);
