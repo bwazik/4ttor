@@ -64,7 +64,7 @@
                                                 {{ $data['usage']['totalDays'] }} {{ trans('account.day') }}</h6>
                                         </div>
                                         <div class="progress rounded mb-1 progress-thin">
-                                            <div class="progress-bar rounded" role="progressbar"
+                                            <div class="progress-bar rounded {{ $data['usage']['colorClass'] }}" role="progressbar"
                                                 style="width: {{ $data['usage']['progress'] }}%"
                                                 aria-valuenow="{{ $data['usage']['progress'] }}" aria-valuemin="0"
                                                 aria-valuemax="100">

@@ -58,6 +58,7 @@ class BillingController extends Controller
                 $usedDays = $now->lessThan($start) ? 0 : $start->diffInDays($now);
                 $remainingDays = $now->greaterThanOrEqualTo($end) ? 0 : max(0, $now->diffInDays($end));
                 $progress = 0;
+                $colorClass = 'bg-primary';
 
                 if ($subscription->status == 1 && $totalDays > 0) {
                     $progress = $now->lessThan($start) ? 0 : ($now->greaterThanOrEqualTo($end) ? 100 : round(($usedDays / $totalDays) * 100, 2));
@@ -65,9 +66,12 @@ class BillingController extends Controller
                         $usedDays = $totalDays;
                         $remainingDays = 0;
                     }
+                    $remainingPercentage = 100 - $progress;
+                    $colorClass = $remainingPercentage > 50 ? 'bg-primary' :
+                                ($remainingPercentage > 25 ? 'bg-warning' : 'bg-danger');
                 }
 
-                $usage = compact('usedDays', 'totalDays', 'remainingDays', 'progress');
+                $usage = compact('usedDays', 'totalDays', 'remainingDays', 'progress', 'colorClass');
             }
 
             return compact('subscription', 'invoice', 'usage');

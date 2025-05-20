@@ -27,7 +27,7 @@ class TeacherSubscriptionService
             ->editColumn('plan_id', fn($row) => $row->plan_id ? $row->plan->name : '-')
             ->editColumn('start_date', fn($row) => formatDate($row->start_date))
             ->editColumn('end_date', fn($row) => formatDate($row->end_date))
-            ->addColumn('amount', fn($row) => formatCurrency($row->amount) . ' ' . trans('main.currency'))
+            ->addColumn('amount', fn($row) => $row->amount . ' ' . trans('main.currency'))
             ->editColumn('status', fn($row) => formatSubscriptionStatus($row->status))
             ->addColumn('actions', fn($row) => $this->generateActionButtons($row))
             ->filterColumn('teacher_id', fn($query, $keyword) => filterByRelation($query, 'teacher', 'name', $keyword))

@@ -24,7 +24,7 @@ class StudentFeeService
             ->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
             ->editColumn('student_id', fn($row) => formatRelation($row->student_id, $row->student, 'name', 'admin.students.details'))
             ->editColumn('fee_id', fn($row) => $row->fee_id ? $row->fee->name : '-')
-            ->addColumn('amount', fn($row) => formatCurrency($row->amount) . ' ' . trans('main.currency'))
+            ->addColumn('amount', fn($row) => $row->amount . ' ' . trans('main.currency'))
             ->editColumn('discount', fn($row) => number_format($row->discount, 0) . '%')
             ->editColumn('is_exempted', fn($row) => formatExemptedStatus($row->is_exempted))
             ->addColumn('actions', fn($row) => $this->generateActionButtons($row))
