@@ -26,6 +26,7 @@ class Quiz extends Model
     }
 
     protected $fillable = [
+        'uuid',
         'teacher_id',
         'grade_id',
         'name',

@@ -7,13 +7,14 @@ use App\Models\Question;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
+use App\Traits\PublicValidatesTrait;
+use App\Traits\ServiceResponseTrait;
 use App\Services\Teacher\Activities\AnswerService;
 use App\Http\Requests\Admin\Activities\AnswersRequest;
-use App\Traits\PublicValidatesTrait;
 
 class AnswersController extends Controller
 {
-    use ValidatesExistence, PublicValidatesTrait;
+    use ValidatesExistence, PublicValidatesTrait, ServiceResponseTrait;
 
     protected $answerService;
     protected $teacherId;
@@ -27,7 +28,7 @@ class AnswersController extends Controller
     public function index(Request $request, $questionId)
     {
         $question = Question::where('id', $questionId)->select('id', 'quiz_id')->first();
-        
+
         if (!$question) {
             return response()->json(['error' => trans('notfound')], 404);
         }
@@ -46,22 +47,14 @@ class AnswersController extends Controller
     {
         $result = $this->answerService->insertAnswer($request->validated(), $questionId);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function update(AnswersRequest $request)
     {
         $result = $this->answerService->updateAnswer($request->id, $request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function delete(Request $request)
@@ -70,10 +63,6 @@ class AnswersController extends Controller
 
         $result = $this->answerService->deleteAnswer($request->id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 }

@@ -10,10 +10,11 @@ use App\Services\Teacher\Finance\StudentFeeService;
 use App\Http\Requests\Admin\Finance\StudentFeesRequest;
 use App\Models\Fee;
 use App\Models\Student;
+use App\Traits\ServiceResponseTrait;
 
 class StudentFeesController extends Controller
 {
-    use ValidatesExistence;
+    use ValidatesExistence, ServiceResponseTrait;
 
     protected $studentFeeService;
     protected $teacherId;
@@ -56,11 +57,7 @@ class StudentFeesController extends Controller
     {
         $result = $this->studentFeeService->insertStudentFee($request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function update(StudentFeesRequest $request)
@@ -69,11 +66,7 @@ class StudentFeesController extends Controller
 
         $result = $this->studentFeeService->updateStudentFee($id, $request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function delete(Request $request)
@@ -85,11 +78,7 @@ class StudentFeesController extends Controller
 
         $result = $this->studentFeeService->deleteStudentFee($request->id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function deleteSelected(Request $request)
@@ -101,10 +90,6 @@ class StudentFeesController extends Controller
 
         $result = $this->studentFeeService->deleteSelectedStudentFees($request->ids);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 }

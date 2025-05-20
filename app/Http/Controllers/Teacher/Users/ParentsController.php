@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers\Teacher\Users;
 
+use App\Models\Student;
 use App\Models\MyParent;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\Users\ParentsRequest;
-use App\Models\Student;
+use App\Traits\ServiceResponseTrait;
+use Illuminate\Support\Facades\Cache;
 use App\Services\Teacher\Users\ParentService;
+use App\Http\Requests\Admin\Users\ParentsRequest;
 
 class ParentsController extends Controller
 {
-    use ValidatesExistence;
+    use ValidatesExistence, ServiceResponseTrait;
 
     protected $parentService;
     protected $teacherId;
@@ -26,7 +28,7 @@ class ParentsController extends Controller
     public function index(Request $request)
     {
         $parentsQuery = MyParent::query()
-            ->select('id', 'username', 'name', 'phone', 'email', 'gender', 'is_active')
+            ->select('id', 'uuid', 'username', 'name', 'phone', 'email', 'gender', 'is_active')
             ->whereHas('students.teachers', fn($query) => $query->where('teachers.id', $this->teacherId));
 
         if ($request->ajax()) {
@@ -35,17 +37,19 @@ class ParentsController extends Controller
 
         $baseStatsQuery = MyParent::whereHas('students.teachers', fn($q) => $q->where('teachers.id', $this->teacherId));
 
-        $pageStatistics = [
-            'totalParents' => (clone $baseStatsQuery)->count(),
-            'activeParents' => (clone $baseStatsQuery)->active()->count(),
-            'inactiveParents' => (clone $baseStatsQuery)->inactive()->count(),
-            'archivedParents' => (clone $baseStatsQuery)->onlyTrashed()->count(),
-        ];
+        $pageStatistics = Cache::remember("parents:teacher:{$this->teacherId}:stats", 3600, function () use ($baseStatsQuery) {
+            return [
+                'totalParents' => (clone $baseStatsQuery)->count(),
+                'activeParents' => (clone $baseStatsQuery)->active()->count(),
+                'inactiveParents' => (clone $baseStatsQuery)->inactive()->count(),
+                'archivedParents' => (clone $baseStatsQuery)->onlyTrashed()->count(),
+            ];
+        });
 
         $students = Student::whereHas('teachers', fn($query) => $query->where('teacher_id', $this->teacherId))
-            ->select('id', 'name')
+            ->select('id', 'uuid', 'name')
             ->orderBy('id')
-            ->pluck('name', 'id')
+            ->pluck('name', 'uuid')
             ->toArray();
 
         return view('teacher.users.parents.index', compact('pageStatistics', 'students'));
@@ -55,47 +59,39 @@ class ParentsController extends Controller
     {
         $result = $this->parentService->insertParent($request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "parents:teacher:{$this->teacherId}:stats");
     }
 
     public function update(ParentsRequest $request)
     {
-        $result = $this->parentService->updateParent($request->id, $request->validated());
+        $id = MyParent::uuid($request->id)->value('id');
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
+        $result = $this->parentService->updateParent($id, $request->validated());
 
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "parents:teacher:{$this->teacherId}:stats");
     }
 
     public function delete(Request $request)
     {
+        $id = MyParent::uuid($request->id)->value('id');
+        $request->merge(['id' => $id]);
+
         $this->validateExistence($request, 'parents');
 
         $result = $this->parentService->deleteParent($request->id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "parents:teacher:{$this->teacherId}:stats");
     }
 
     public function deleteSelected(Request $request)
     {
+        $ids = MyParent::whereIn('uuid', $request->ids ?? [])->pluck('id')->toArray();
+        !empty($ids) ? $request->merge(['ids' => $ids]) : null;
+
         $this->validateExistence($request, 'parents');
 
         $result = $this->parentService->deleteSelectedParents($request->ids);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "parents:teacher:{$this->teacherId}:stats");
     }
 }

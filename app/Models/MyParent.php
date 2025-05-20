@@ -27,6 +27,7 @@ class MyParent extends Authenticatable
     }
 
     protected $fillable = [
+        'uuid',
         'username',
         'password',
         'name',

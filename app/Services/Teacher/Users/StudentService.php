@@ -2,11 +2,13 @@
 
 namespace App\Services\Teacher\Users;
 
+use App\Models\Group;
 use App\Models\Student;
-use Illuminate\Support\Facades\Hash;
-use App\Traits\PreventDeletionIfRelated;
-use App\Traits\DatabaseTransactionTrait;
+use App\Models\MyParent;
 use App\Traits\PublicValidatesTrait;
+use Illuminate\Support\Facades\Hash;
+use App\Traits\DatabaseTransactionTrait;
+use App\Traits\PreventDeletionIfRelated;
 
 class StudentService
 {
@@ -22,7 +24,7 @@ class StudentService
     {
         return datatables()->eloquent($studentsQuery)
             ->addIndexColumn()
-            ->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
+            ->addColumn('selectbox', fn($row) => generateSelectbox($row->uuid))
             ->addColumn('details', fn($row) => generateDetailsColumn($row->name, $row->profile_pic, 'storage/profiles/students', $row->email))
             ->editColumn('grade_id', fn($row) => formatRelation($row->grade_id, $row->grade, 'name'))
             ->editColumn('parent_id', fn($row) => formatRelation($row->parent_id, $row->parent, 'name'))
@@ -38,7 +40,7 @@ class StudentService
 
     private function generateActionButtons($row)
     {
-        $groupIds = $row->groups->pluck('id')->toArray();
+        $groupIds = $row->groups->pluck('uuid')->toArray();
         $groups = implode(',', $groupIds);
 
         return
@@ -54,7 +56,7 @@ class StudentService
                     '<li>' .
                         '<a href="javascript:;" class="dropdown-item text-danger" ' .
                             'id="delete-button" ' .
-                            'data-id="' . $row->id . '" ' .
+                            'data-id="' . $row->uuid . '" ' .
                             'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
                             'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
                             'data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
@@ -66,7 +68,7 @@ class StudentService
             '<button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light" ' .
                 'tabindex="0" type="button" data-bs-toggle="modal" data-bs-target="#edit-modal" ' .
                 'id="edit-button" ' .
-                'data-id="' . $row->id . '" ' .
+                'data-id="' . $row->uuid . '" ' .
                 'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
                 'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
                 'data-username="' . $row->username . '" ' .
@@ -76,7 +78,7 @@ class StudentService
                 'data-birth_date="' . $row->birth_date . '" ' .
                 'data-gender="' . $row->gender . '" ' .
                 'data-grade_id="' . $row->grade_id . '" ' .
-                'data-parent_id="' . $row->parent_id . '" ' .
+                'data-parent_id="' . ($row->parent ? $row->parent->uuid : '') . '" ' .
                 'data-groups="' . $groups . '" ' .
                 'data-is_active="' . ($row->is_active ? '1' : '0') . '">' .
                 '<i class="ri-edit-box-line ri-20px"></i>' .
@@ -87,7 +89,10 @@ class StudentService
     {
         return $this->executeTransaction(function () use ($request)
         {
-            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $request['groups'], $request['grade_id'], true))
+            $parentId = !empty($request['parent_id']) ? MyParent::uuid($request['parent_id'])->value('id') : null;
+            $groupIds = !empty($request['groups']) ? Group::whereIn('uuid', $request['groups'])->pluck('id')->toArray() : [];
+
+            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $groupIds, $request['grade_id'], true))
                 return $validationResult;
 
             $student = Student::create([
@@ -99,11 +104,11 @@ class StudentService
                 'birth_date' => $request['birth_date'],
                 'gender' => $request['gender'],
                 'grade_id' => $request['grade_id'],
-                'parent_id' => $request['parent_id'] ?? null,
+                'parent_id' => $parentId,
             ]);
 
             $student->teachers()->attach($this->teacherId);
-            $student->groups()->attach($request['groups']);
+            $student->groups()->attach($groupIds);
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/students.student')]));
         });
@@ -113,7 +118,10 @@ class StudentService
     {
         return $this->executeTransaction(function () use ($id, $request)
         {
-            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $request['groups'], $request['grade_id'], true))
+            $parentId = !empty($request['parent_id']) ? MyParent::uuid($request['parent_id'])->value('id') : null;
+            $groupIds = !empty($request['groups']) ? Group::whereIn('uuid', $request['groups'])->pluck('id')->toArray() : [];
+
+            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $groupIds, $request['grade_id'], true))
                 return $validationResult;
 
             $student = Student::findOrFail($id);
@@ -129,12 +137,12 @@ class StudentService
                 'birth_date' => $request['birth_date'],
                 'gender' => $request['gender'],
                 'grade_id' => $request['grade_id'],
-                'parent_id' => $request['parent_id'] ?? null,
+                'parent_id' => $parentId,
                 'is_active' => $request['is_active'],
             ]);
 
             $student->teachers()->sync($this->teacherId ?? []);
-            $student->groups()->sync($request['groups'] ?? []);
+            $student->groups()->sync($groupIds ?? []);
 
             return $this->successResponse(trans('main.edited', ['item' => trans('admin/students.student')]));
         });

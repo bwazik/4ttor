@@ -8,12 +8,13 @@ use App\Models\Teacher;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
+use App\Traits\ServiceResponseTrait;
 use App\Services\Admin\Platform\GradeService;
 use App\Http\Requests\Admin\Platform\GradesRequest;
 
 class GradesController extends Controller
 {
-    use ValidatesExistence;
+    use ValidatesExistence, ServiceResponseTrait;
 
     protected $gradeService;
 
@@ -39,22 +40,14 @@ class GradesController extends Controller
     {
         $result = $this->gradeService->insertGrade($request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "grades");
     }
 
     public function update(GradesRequest $request)
     {
         $result = $this->gradeService->updateGrade($request->id, $request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "grades");
     }
 
     public function delete(Request $request)
@@ -63,11 +56,7 @@ class GradesController extends Controller
 
         $result = $this->gradeService->deleteGrade($request->id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "grades");
     }
 
     public function deleteSelected(Request $request)
@@ -76,11 +65,7 @@ class GradesController extends Controller
 
         $result = $this->gradeService->deleteSelectedGrades($request->ids);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "grades");
     }
 
     public function getGradeTeachers($id)

@@ -8,13 +8,14 @@ use App\Models\Assignment;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
+use App\Traits\ServiceResponseTrait;
 use App\Services\Admin\FileUploadService;
 use App\Services\Teacher\Activities\AssignmentService;
 use App\Http\Requests\Admin\Activities\AssignmentsRequest;
 
 class AssignmentsController extends Controller
 {
-    use ValidatesExistence;
+    use ValidatesExistence, ServiceResponseTrait;
 
     protected $assignmentService;
     protected $fileUploadService;
@@ -29,7 +30,7 @@ class AssignmentsController extends Controller
 
     public function index(Request $request)
     {
-        $assignmentsQuery = Assignment::query()
+        $assignmentsQuery = Assignment::query()->with(['grade:id,name'])
             ->select('id', 'uuid', 'grade_id', 'title', 'description', 'deadline', 'score')
             ->where('teacher_id', $this->teacherId);
 
@@ -44,12 +45,12 @@ class AssignmentsController extends Controller
             ->toArray();
 
         $groups = Group::query()
-            ->select('id', 'name', 'grade_id')
+            ->select('id', 'uuid', 'name', 'grade_id')
             ->where('teacher_id', $this->teacherId)
             ->with('grade:id,name')
             ->orderBy('grade_id')
             ->get()
-            ->mapWithKeys(fn($group) => [$group->id => $group->name . ' - ' . $group->grade->name]);
+            ->mapWithKeys(fn($group) => [$group->uuid => $group->name . ' - ' . $group->grade->name]);
 
         return view('teacher.activities.assignments.index', compact('grades', 'groups'));
     }
@@ -58,11 +59,7 @@ class AssignmentsController extends Controller
     {
         $result = $this->assignmentService->insertAssignment($request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function update(AssignmentsRequest $request)
@@ -71,11 +68,7 @@ class AssignmentsController extends Controller
 
         $result = $this->assignmentService->updateAssignment($id, $request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function delete(Request $request)
@@ -87,11 +80,7 @@ class AssignmentsController extends Controller
 
         $result = $this->assignmentService->deleteAssignment($request->id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function deleteSelected(Request $request)
@@ -103,11 +92,7 @@ class AssignmentsController extends Controller
 
         $result = $this->assignmentService->deleteSelectedAssignments($request->ids);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function details($uuid)
@@ -131,11 +116,7 @@ class AssignmentsController extends Controller
 
         $result = $this->fileUploadService->uploadFile($request, 'assignment', $id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function downloadFile($fileId)
@@ -155,10 +136,6 @@ class AssignmentsController extends Controller
 
         $result = $this->fileUploadService->deleteFile('assignment', $request->id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 }

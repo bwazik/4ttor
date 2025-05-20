@@ -118,22 +118,14 @@ class AccountController extends Controller
     {
         $result = $this->profilePicService->updateProfilePic($request, $this->mapping['model'], $this->userId, $this->mapping['profile_pic_path']);
 
-        if ($result['status'] === 'success') {
-            Cache::forget("account:{$this->guard}:{$this->userId}:personal");
-        }
-
-        return $this->conrtollerJsonResponse($result);
+        return $this->conrtollerJsonResponse($result, "account:{$this->guard}:{$this->userId}:personal");
     }
 
     public function updatePersonalInfo(PersonalDataRequest $request)
     {
         $result = $this->accountService->updatePersonalInfo($this->guard, $this->userId, $request->validated());
 
-        if ($result['status'] === 'success') {
-            Cache::forget("account:{$this->guard}:{$this->userId}:personal");
-        }
-
-        return $this->conrtollerJsonResponse($result);
+        return $this->conrtollerJsonResponse($result, "account:{$this->guard}:{$this->userId}:personal");
     }
 
     public function securityIndex()

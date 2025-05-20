@@ -6,12 +6,14 @@ use App\Models\Assistant;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\Users\AssistantsRequest;
+use App\Traits\ServiceResponseTrait;
+use Illuminate\Support\Facades\Cache;
 use App\Services\Teacher\Users\AssistantService;
+use App\Http\Requests\Admin\Users\AssistantsRequest;
 
 class AssistantsController extends Controller
 {
-    use ValidatesExistence;
+    use ValidatesExistence, ServiceResponseTrait;
 
     protected $assistantService;
     protected $teacherId;
@@ -25,7 +27,7 @@ class AssistantsController extends Controller
     public function index(Request $request)
     {
         $assistantsQuery = Assistant::query()
-            ->select('id', 'username', 'name', 'phone', 'email', 'is_active', 'profile_pic')
+            ->select('id', 'uuid', 'username', 'name', 'phone', 'email', 'is_active', 'profile_pic')
             ->where('teacher_id', $this->teacherId);
 
         if ($request->ajax()) {
@@ -34,12 +36,14 @@ class AssistantsController extends Controller
 
         $baseStatsQuery = Assistant::where('teacher_id', $this->teacherId);
 
-        $pageStatistics = [
-            'totalAssistants' => (clone $baseStatsQuery)->count(),
-            'activeAssistants' => (clone $baseStatsQuery)->active()->count(),
-            'inactiveAssistants' => (clone $baseStatsQuery)->inactive()->count(),
-            'archivedAssistants' => (clone $baseStatsQuery)->onlyTrashed()->count(),
-        ];
+        $pageStatistics = Cache::remember("assistants:teacher:{$this->teacherId}:stats", 3600, function () use ($baseStatsQuery) {
+            return [
+                'totalAssistants' => (clone $baseStatsQuery)->count(),
+                'activeAssistants' => (clone $baseStatsQuery)->active()->count(),
+                'inactiveAssistants' => (clone $baseStatsQuery)->inactive()->count(),
+                'archivedAssistants' => (clone $baseStatsQuery)->onlyTrashed()->count(),
+            ];
+        });
 
         return view('teacher.users.assistants.index', compact('pageStatistics'));
     }
@@ -48,48 +52,40 @@ class AssistantsController extends Controller
     {
         $result = $this->assistantService->insertAssistant($request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "assistants:teacher:{$this->teacherId}:stats");
     }
 
     public function update(AssistantsRequest $request)
     {
-        $result = $this->assistantService->updateAssistant($request->id, $request->validated());
+        $id = Assistant::uuid($request->id)->value('id');
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
+        $result = $this->assistantService->updateAssistant($id, $request->validated());
 
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "assistants:teacher:{$this->teacherId}:stats");
     }
 
     public function delete(Request $request)
     {
+        $id = Assistant::uuid($request->id)->value('id');
+        $request->merge(['id' => $id]);
+
         $this->validateExistence($request, 'assistants');
 
         $result = $this->assistantService->deleteAssistant($request->id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "assistants:teacher:{$this->teacherId}:stats");
     }
 
 
     public function deleteSelected(Request $request)
     {
+        $ids = Assistant::whereIn('uuid', $request->ids ?? [])->pluck('id')->toArray();
+        !empty($ids) ? $request->merge(['ids' => $ids]) : null;
+
         $this->validateExistence($request, 'assistants');
 
         $result = $this->assistantService->deleteSelectedAssistants($request->ids);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "assistants:teacher:{$this->teacherId}:stats");
     }
 }

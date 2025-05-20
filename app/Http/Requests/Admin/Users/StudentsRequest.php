@@ -28,15 +28,19 @@ class StudentsRequest extends FormRequest
             'birth_date' => 'nullable|date|date_format:Y-m-d',
             'gender' => 'required|integer|in:1,2',
             'grade_id' => 'required|integer|exists:grades,id',
-            'parent_id' => 'nullable|integer|exists:parents,id',
             'is_active' => 'nullable|boolean',
-            'groups' => 'required|array|min:1',
-            'groups.*' => 'required|integer|exists:groups,id',
         ];
 
         if (isAdmin()) {
             $rules['teachers'] = 'required|array|min:1';
             $rules['teachers.*'] = 'integer|exists:teachers,id';
+            $rules['parent_id'] = 'nullable|integer|exists:parents,id';
+            $rules['groups'] = 'required|array|min:1';
+            $rules['groups.*'] = 'required|integer|exists:groups,id';
+        } else {
+            $rules['parent_id'] = 'nullable|string|uuid|exists:parents,uuid';
+            $rules['groups'] = 'required|array|min:1';
+            $rules['groups.*'] = 'required|string|uuid|exists:groups,uuid';
         }
 
         return $rules;
@@ -54,13 +58,23 @@ class StudentsRequest extends FormRequest
                         $validator->errors()->add('teachers', 'One of the selected grades is invalid.');
                     }
                 }
-            } elseif($this->groups) {
-                foreach ($this->groups as $group_id) {
-                    if (!is_numeric($group_id) || (int)$group_id != $group_id) {
-                        $validator->errors()->add('groups', 'Each group ID must be an integer.');
+            }
+
+            if ($this->groups) {
+                if (isAdmin()) {
+                    foreach ($this->groups as $group_id) {
+                        if (!is_numeric($group_id) || (int)$group_id != $group_id) {
+                            $validator->errors()->add('groups', 'Each group ID must be an integer.');
+                        }
+                        if (!Group::where('id', $group_id)->exists()) {
+                            $validator->errors()->add('groups', 'One of the selected groups is invalid.');
+                        }
                     }
-                    if (!Group::where('id', $group_id)->exists()) {
-                        $validator->errors()->add('groups', 'One of the selected groups is invalid.');
+                } else {
+                    foreach ($this->groups as $group_uuid) {
+                        if (!Group::where('uuid', $group_uuid)->exists()) {
+                            $validator->errors()->add('groups', 'One of the selected groups is invalid.');
+                        }
                     }
                 }
             }

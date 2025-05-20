@@ -2,6 +2,7 @@
 
 namespace App\Services\Teacher\Activities;
 
+use App\Models\Group;
 use App\Models\Assignment;
 use App\Traits\PublicValidatesTrait;
 use App\Traits\DatabaseTransactionTrait;
@@ -38,7 +39,7 @@ class AssignmentService
 
     private function generateActionButtons($row)
     {
-        $groupIds = $row->groups->pluck('id')->toArray();
+        $groupIds = $row->groups->pluck('uuid')->toArray();
         $groups = implode(',', $groupIds);
 
         return
@@ -82,7 +83,9 @@ class AssignmentService
     {
         return $this->executeTransaction(function () use ($request)
         {
-            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $request['groups'], $request['grade_id'], true))
+            $groupIds = Group::whereIn('uuid', $request['groups'])->pluck('id')->toArray();
+
+            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $groupIds, $request['grade_id'], true))
                 return $validationResult;
 
             $assignment = Assignment::create([
@@ -94,7 +97,7 @@ class AssignmentService
                 'description' => $request['description'],
             ]);
 
-            $assignment->groups()->attach($request['groups']);
+            $assignment->groups()->attach($groupIds);
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/assignments.assignment')]));
         });
@@ -104,7 +107,9 @@ class AssignmentService
     {
         return $this->executeTransaction(function () use ($id, $request)
         {
-            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $request['groups'], $request['grade_id'], true))
+            $groupIds = Group::whereIn('uuid', $request['groups'])->pluck('id')->toArray();
+
+            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $groupIds, $request['grade_id'], true))
                 return $validationResult;
 
             $assignment = Assignment::findOrFail($id);
@@ -116,7 +121,7 @@ class AssignmentService
                 'description' => $request['description'],
             ]);
 
-            $assignment->groups()->sync($request['groups'] ?? []);
+            $assignment->groups()->sync($groupIds ?? []);
 
             return $this->successResponse(trans('main.edited', ['item' => trans('admin/assignments.assignment')]));
         });

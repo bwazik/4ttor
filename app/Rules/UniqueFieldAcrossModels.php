@@ -47,7 +47,12 @@ class UniqueFieldAcrossModels implements ValidationRule
 
             // Exclude the current record from the check (for update operations)
             if ($this->exceptModelId) {
-                $query->where('id', '!=', $this->exceptModelId);
+                // Check if the identifier is a UUID or numeric ID
+                if (is_numeric($this->exceptModelId)) {
+                    $query->where('id', '!=', $this->exceptModelId);
+                } else {
+                    $query->where('uuid', '!=', $this->exceptModelId);
+                }
             }
 
             // If the field value exists, fail validation

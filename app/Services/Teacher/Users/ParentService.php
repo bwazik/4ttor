@@ -2,6 +2,7 @@
 
 namespace App\Services\Teacher\Users;
 
+use App\Models\Student;
 use App\Models\MyParent;
 use App\Traits\PublicValidatesTrait;
 use Illuminate\Support\Facades\Hash;
@@ -23,7 +24,7 @@ class ParentService
     {
         return datatables()->eloquent($parentsQuery)
             ->addIndexColumn()
-            ->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
+            ->addColumn('selectbox', fn($row) => generateSelectbox($row->uuid))
             ->editColumn('name', fn($row) => $row->name)
             ->editColumn('is_active', fn($row) => formatActiveStatus($row->is_active))
             ->addColumn('actions', fn($row) => $this->generateActionButtons($row))
@@ -34,7 +35,7 @@ class ParentService
 
     private function generateActionButtons($row)
     {
-        $studentIds = $row->students->pluck('id')->toArray();
+        $studentIds = $row->students->pluck('uuid')->toArray();
         $students = implode(',', $studentIds);
 
         return
@@ -50,7 +51,7 @@ class ParentService
                     '<li>' .
                         '<a href="javascript:;" class="dropdown-item text-danger" ' .
                             'id="delete-button" ' .
-                            'data-id="' . $row->id . '" ' .
+                            'data-id="' . $row->uuid . '" ' .
                             'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
                             'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
                             'data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
@@ -62,7 +63,7 @@ class ParentService
             '<button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light" ' .
                 'tabindex="0" type="button" data-bs-toggle="modal" data-bs-target="#edit-modal" ' .
                 'id="edit-button" ' .
-                'data-id="' . $row->id . '" ' .
+                'data-id="' . $row->uuid . '" ' .
                 'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
                 'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
                 'data-username="' . $row->username . '" ' .
@@ -89,7 +90,11 @@ class ParentService
                 'gender' => $request['gender'],
             ]);
 
-            $this->syncStudentParentRelation($request['students'] ?? [], $parent->id, isAdmin());
+            $studentIds = !empty($request['students'])
+                ? Student::whereIn('uuid', $request['students'])->pluck('id')->toArray()
+                : [];
+
+            $this->syncStudentParentRelation($studentIds, $parent->id, isAdmin());
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/parents.parent')]));
         });
@@ -113,7 +118,11 @@ class ParentService
                 'is_active' => $request['is_active'],
             ]);
 
-            $this->syncStudentParentRelation($request['students'] ?? [], $parent->id, isAdmin());
+            $studentIds = !empty($request['students'])
+                ? Student::whereIn('uuid', $request['students'])->pluck('id')->toArray()
+                : [];
+
+            $this->syncStudentParentRelation($studentIds, $parent->id, isAdmin());
 
             return $this->successResponse(trans('main.edited', ['item' => trans('admin/parents.parent')]));
         });
@@ -123,8 +132,7 @@ class ParentService
     {
         return $this->executeTransaction(function () use ($id)
         {
-            $parent = MyParent::findOrFail($id);
-            $parent->delete();
+            MyParent::findOrFail($id)->delete();
 
             return $this->successResponse(trans('main.deleted', ['item' => trans('admin/parents.parent')]));
         });

@@ -22,7 +22,7 @@ class GroupService
     {
         return datatables()->eloquent($groupsQuery)
             ->addIndexColumn()
-            ->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
+            ->addColumn('selectbox', fn($row) => generateSelectbox($row->uuid))
             ->editColumn('name', fn($row) => $row->name)
             ->addColumn('lessons', fn($row) => formatSpanUrl(route('teacher.groups.lessons', $row->uuid), trans('admin/groups.lessonsLink')))
             ->editColumn('grade_id', fn($row) => $row->grade_id ? $row->grade->name : '-')
@@ -45,7 +45,7 @@ class GroupService
                         'tabindex="0" type="button" ' .
                         'data-bs-toggle="offcanvas" data-bs-target="#edit-modal" ' .
                         'id="edit-button" ' .
-                        'data-id="' . $row->id . '" ' .
+                        'data-id="' . $row->uuid . '" ' .
                         'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
                         'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
                         'data-is_active="' . ($row->is_active ? '1' : '0') . '" ' .
@@ -58,7 +58,7 @@ class GroupService
                 '</span>' .
                 '<button class="btn btn-sm btn-icon btn-text-danger rounded-pill text-body waves-effect waves-light me-1" ' .
                     'id="delete-button" ' .
-                    'data-id="' . $row->id . '" ' .
+                    'data-id="' . $row->uuid . '" ' .
                     'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
                     'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
                     'data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .

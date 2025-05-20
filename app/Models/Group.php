@@ -27,6 +27,7 @@ class Group extends Model
     }
 
     protected $fillable = [
+        'uuid',
         'name',
         'teacher_id',
         'grade_id',

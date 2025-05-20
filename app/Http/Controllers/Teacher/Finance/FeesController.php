@@ -9,10 +9,11 @@ use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
 use App\Services\Teacher\Finance\FeeService;
 use App\Http\Requests\Admin\Finance\FeesRequest;
+use App\Traits\ServiceResponseTrait;
 
 class FeesController extends Controller
 {
-    use ValidatesExistence;
+    use ValidatesExistence, ServiceResponseTrait;
 
     protected $feeService;
     protected $teacherId;
@@ -25,7 +26,7 @@ class FeesController extends Controller
 
     public function index(Request $request)
     {
-        $feesQuery = Fee::query()->with(['grade'])
+        $feesQuery = Fee::query()->with(['grade:id,name'])
             ->select('id', 'uuid', 'name', 'amount', 'grade_id', 'frequency')
             ->where('teacher_id', $this->teacherId);
 
@@ -47,11 +48,7 @@ class FeesController extends Controller
     {
         $result = $this->feeService->insertFee($request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function update(FeesRequest $request)
@@ -60,11 +57,7 @@ class FeesController extends Controller
 
         $result = $this->feeService->updateFee($id, $request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function delete(Request $request)
@@ -76,11 +69,7 @@ class FeesController extends Controller
 
         $result = $this->feeService->deleteFee($request->id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function deleteSelected(Request $request)
@@ -92,11 +81,7 @@ class FeesController extends Controller
 
         $result = $this->feeService->deleteSelectedFees($request->ids);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
 }

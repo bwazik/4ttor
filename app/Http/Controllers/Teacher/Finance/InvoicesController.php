@@ -8,13 +8,14 @@ use App\Models\StudentFee;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
+use App\Traits\ServiceResponseTrait;
 use App\Services\Teacher\Finance\InvoiceService;
 use App\Http\Requests\Admin\Finance\InvoicesRequest;
 use App\Http\Requests\Admin\Finance\PaymentsRequest;
 
 class InvoicesController extends Controller
 {
-    use ValidatesExistence;
+    use ValidatesExistence, ServiceResponseTrait;
 
     protected $invoiceService;
     protected $teacherId;
@@ -121,11 +122,7 @@ class InvoicesController extends Controller
     {
         $result = $this->invoiceService->insertInvoice($request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function edit($uuid)
@@ -184,11 +181,7 @@ class InvoicesController extends Controller
 
         $result = $this->invoiceService->updateInvoice($id, $request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function payment(PaymentsRequest $request, $uuid)
@@ -197,11 +190,7 @@ class InvoicesController extends Controller
 
         $result = $this->invoiceService->payInvoice($id, $request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function refund(PaymentsRequest $request, $uuid)
@@ -210,11 +199,7 @@ class InvoicesController extends Controller
 
         $result = $this->invoiceService->refundInvoice($id, $request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function delete(Request $request)
@@ -226,11 +211,7 @@ class InvoicesController extends Controller
 
         $result = $this->invoiceService->deleteInvoice($request->id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function cancel(Request $request)
@@ -242,10 +223,6 @@ class InvoicesController extends Controller
 
         $result = $this->invoiceService->cancelInvoice($request->id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 }

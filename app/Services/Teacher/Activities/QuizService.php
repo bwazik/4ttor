@@ -4,9 +4,10 @@ namespace App\Services\Teacher\Activities;
 
 use Carbon\Carbon;
 use App\Models\Quiz;
-use App\Traits\PreventDeletionIfRelated;
-use App\Traits\DatabaseTransactionTrait;
+use App\Models\Group;
 use App\Traits\PublicValidatesTrait;
+use App\Traits\DatabaseTransactionTrait;
+use App\Traits\PreventDeletionIfRelated;
 
 class QuizService
 {
@@ -23,7 +24,7 @@ class QuizService
     {
         return datatables()->eloquent($quizzesQuery)
             ->addIndexColumn()
-            ->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
+            ->addColumn('selectbox', fn($row) => generateSelectbox($row->uuid))
             ->editColumn('name', fn($row) => $row->name)
             ->editColumn('grade_id', fn($row) => formatRelation($row->grade_id, $row->grade, 'name'))
             ->addColumn('duration', fn($row) => formatDuration($row->duration))
@@ -37,7 +38,7 @@ class QuizService
 
     private function generateActionButtons($row)
     {
-        $groupIds = $row->groups->pluck('id')->toArray();
+        $groupIds = $row->groups->pluck('uuid')->toArray();
         $groups = implode(',', $groupIds);
 
         return
@@ -53,10 +54,10 @@ class QuizService
                     '<li>' .
                         '<a href="javascript:;" class="dropdown-item text-danger" ' .
                             'id="delete-button" ' .
-                            'data-id="' . $row->id . '" ' .
+                            'data-id="' . $row->uuid . '" ' .
                             'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
                             'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
-                            'data-bs-target="#delete-modal" data-bs-toggle="offcanvas" data-bs-dismiss="modal">' .
+                            'data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
                             trans('main.delete') .
                         '</a>' .
                     '</li>' .
@@ -65,7 +66,7 @@ class QuizService
             '<button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light" ' .
                 'tabindex="0" type="button" data-bs-toggle="offcanvas" data-bs-target="#edit-modal" ' .
                 'id="edit-button" ' .
-                'data-id="' . $row->id . '" ' .
+                'data-id="' . $row->uuid . '" ' .
                 'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
                 'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
                 'data-grade_id="' . $row->grade_id . '" ' .
@@ -81,7 +82,9 @@ class QuizService
     {
         return $this->executeTransaction(function () use ($request)
         {
-            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $request['groups'], $request['grade_id'], true))
+            $groupIds = Group::whereIn('uuid', $request['groups'])->pluck('id')->toArray();
+
+            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $groupIds, $request['grade_id'], true))
                 return $validationResult;
 
             $quiz = Quiz::create([
@@ -93,7 +96,7 @@ class QuizService
                 'end_time' => Carbon::parse($request['start_time'])->addMinutes((int) $request['duration']),
             ]);
 
-            $quiz->groups()->attach($request['groups']);
+            $quiz->groups()->attach($groupIds);
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/quizzes.quiz')]));
         });
@@ -103,7 +106,9 @@ class QuizService
     {
         return $this->executeTransaction(function () use ($id, $request)
         {
-            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $request['groups'], $request['grade_id'], true))
+            $groupIds = Group::whereIn('uuid', $request['groups'])->pluck('id')->toArray();
+
+            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $groupIds, $request['grade_id'], true))
                 return $validationResult;
 
             $quiz = Quiz::findOrFail($id);
@@ -115,7 +120,7 @@ class QuizService
                 'end_time' => Carbon::parse($request['start_time'])->addMinutes((int) $request['duration']),
             ]);
 
-            $quiz->groups()->sync($request['groups'] ?? []);
+            $quiz->groups()->sync($groupIds ?? []);
 
             return $this->successResponse(trans('main.edited', ['item' => trans('admin/quizzes.quiz')]));
         });

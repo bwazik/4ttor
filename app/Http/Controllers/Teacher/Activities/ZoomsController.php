@@ -10,10 +10,11 @@ use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
 use App\Services\Teacher\Activities\ZoomService;
 use App\Http\Requests\Admin\Activities\ZoomsRequest;
+use App\Traits\ServiceResponseTrait;
 
 class ZoomsController extends Controller
 {
-    use ValidatesExistence;
+    use ValidatesExistence, ServiceResponseTrait;
 
     protected $zoomService;
     protected $teacherId;
@@ -26,8 +27,8 @@ class ZoomsController extends Controller
 
     public function index(Request $request)
     {
-        $zoomsQuery = Zoom::query()
-            ->select('id', 'grade_id', 'group_id', 'meeting_id', 'topic', 'duration', 'start_time', 'start_url', 'join_url', 'created_at', 'updated_at')
+        $zoomsQuery = Zoom::query()->with(['grade:id,name', 'group:id,uuid,name'])
+            ->select('id', 'uuid', 'grade_id', 'group_id', 'meeting_id', 'topic', 'duration', 'start_time', 'start_url', 'join_url', 'created_at', 'updated_at')
             ->where('teacher_id', $this->teacherId);
 
         if ($request->ajax()) {
@@ -41,12 +42,12 @@ class ZoomsController extends Controller
             ->toArray();
 
         $groups = Group::query()
-            ->select('id', 'name', 'grade_id')
+            ->select('id', 'uuid', 'name', 'grade_id')
             ->where('teacher_id', $this->teacherId)
             ->with('grade:id,name')
             ->orderBy('grade_id')
             ->get()
-            ->mapWithKeys(fn($group) => [$group->id => $group->name . ' - ' . $group->grade->name]);
+            ->mapWithKeys(fn($group) => [$group->uuid => $group->name . ' - ' . $group->grade->name]);
 
 
         return view('teacher.activities.zooms.index', compact('grades', 'groups'));
@@ -56,47 +57,39 @@ class ZoomsController extends Controller
     {
         $result = $this->zoomService->insertZoom($request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function update(ZoomsRequest $request)
     {
-        $result = $this->zoomService->updateZoom($request->id, $request->meeting_id, $request->validated());
+        $id = Zoom::uuid($request->id)->value('id');
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
+        $result = $this->zoomService->updateZoom($id, $request->meeting_id, $request->validated());
 
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function delete(Request $request)
     {
+        $id = Zoom::uuid($request->id)->value('id');
+        $request->merge(['id' => $id]);
+
         $this->validateExistence($request, 'zooms');
 
         $result = $this->zoomService->deleteZoom($request->id, $request->meeting_id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function deleteSelected(Request $request)
     {
+        $ids = Zoom::whereIn('uuid', $request->ids ?? [])->pluck('id')->toArray();
+        !empty($ids) ? $request->merge(['ids' => $ids]) : null;
+
         $this->validateExistence($request, 'zooms');
 
         $result = $this->zoomService->deleteSelectedZooms($request->ids);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 }

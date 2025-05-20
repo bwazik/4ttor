@@ -9,13 +9,15 @@ use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Traits\ServiceResponseTrait;
+use Illuminate\Support\Facades\Cache;
 use App\Services\Teacher\Tools\GroupService;
 use App\Services\Teacher\Tools\LessonService;
 use App\Http\Requests\Admin\Tools\GroupsRequest;
 
 class GroupsController extends Controller
 {
-    use ValidatesExistence;
+    use ValidatesExistence, ServiceResponseTrait;
 
     protected $groupService;
     protected $lessonService;
@@ -30,7 +32,7 @@ class GroupsController extends Controller
 
     public function index(Request $request)
     {
-        $groupsQuery = Group::query()->with(['grade'])
+        $groupsQuery = Group::query()->with(['grade:id,name'])
             ->select('id', 'uuid', 'name', 'grade_id', 'day_1', 'day_2', 'time', 'is_active', 'created_at', 'updated_at')
             ->where('teacher_id', $this->teacherId);
 
@@ -40,16 +42,18 @@ class GroupsController extends Controller
 
         $baseStatsQuery = Group::where('teacher_id', $this->teacherId);
 
-        $pageStatistics = [
-            'totalGroups' => (clone $baseStatsQuery)->count(),
-            'activeGroups' => (clone $baseStatsQuery)->active()->count(),
-            'inactiveGroups' => (clone $baseStatsQuery)->inactive()->count(),
-            'topGrade' => (clone $baseStatsQuery)->select('grade_id', DB::raw('COUNT(*) as group_count'))
-                ->groupBy('grade_id')
-                ->orderByDesc('group_count')
-                ->with('grade:id,name')
-                ->first(),
-        ];
+        $pageStatistics = Cache::remember("groups:teacher:{$this->teacherId}:stats", 3600, function () use ($baseStatsQuery) {
+            return [
+                'totalGroups' => (clone $baseStatsQuery)->count(),
+                'activeGroups' => (clone $baseStatsQuery)->active()->count(),
+                'inactiveGroups' => (clone $baseStatsQuery)->inactive()->count(),
+                'topGrade' => (clone $baseStatsQuery)->select('grade_id', DB::raw('COUNT(*) as group_count'))
+                    ->groupBy('grade_id')
+                    ->orderByDesc('group_count')
+                    ->with('grade:id,name')
+                    ->first(),
+            ];
+        });
 
         $grades = Grade::whereHas('teachers', fn($query) => $query->where('teacher_id', $this->teacherId))
             ->select('id', 'name')
@@ -64,48 +68,40 @@ class GroupsController extends Controller
     {
         $result = $this->groupService->insertGroup($request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "groups:teacher:{$this->teacherId}:stats");
     }
 
     public function update(GroupsRequest $request)
     {
-        $result = $this->groupService->updateGroup($request->id, $request->validated());
+        $id = Group::uuid($request->id)->value('id');
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
+        $result = $this->groupService->updateGroup($id, $request->validated());
 
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "groups:teacher:{$this->teacherId}:stats");
     }
 
     public function delete(Request $request)
     {
+        $id = Group::uuid($request->id)->value('id');
+        $request->merge(['id' => $id]);
+
         $this->validateExistence($request, 'groups');
 
         $result = $this->groupService->deleteGroup($request->id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "groups:teacher:{$this->teacherId}:stats");
     }
 
     public function deleteSelected(Request $request)
     {
+        $ids = Group::whereIn('uuid', $request->ids ?? [])->pluck('id')->toArray();
+        !empty($ids) ? $request->merge(['ids' => $ids]) : null;
+
         $this->validateExistence($request, 'groups');
 
         $result = $this->groupService->deleteSelectedGroups($request->ids);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "groups:teacher:{$this->teacherId}:stats");
     }
 
     public function lessons(Request $request, $uuid)

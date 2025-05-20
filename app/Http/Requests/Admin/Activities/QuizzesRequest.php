@@ -17,14 +17,17 @@ class QuizzesRequest extends FormRequest
             'name_ar' => 'required|min:3|max:100',
             'name_en' => 'required|min:3|max:100',
             'grade_id' => 'required|integer|exists:grades,id',
-            'groups' => 'required|array|min:1',
-            'groups.*' => 'required|integer|exists:groups,id',
             'duration' => 'required|integer|min:1|max:180',
             'start_time' => 'required|date|after_or_equal:now|date_format:Y-m-d H:i',
         ];
 
         if (isAdmin()) {
             $rules['teacher_id'] = 'required|integer|exists:teachers,id';
+            $rules['groups'] = 'required|array|min:1';
+            $rules['groups.*'] = 'required|integer|exists:groups,id';
+        } else {
+            $rules['groups'] = 'required|array|min:1';
+            $rules['groups.*'] = 'required|string|uuid|exists:groups,uuid';
         }
 
         return $rules;

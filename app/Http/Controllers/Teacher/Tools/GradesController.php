@@ -25,13 +25,11 @@ class GradesController extends Controller
 
     public function index()
     {
-        $teacher = Teacher::select('id', 'name')->findOrFail($this->teacherId);
-
         $grades = Grade::query()->select('id', 'name')->orderBy('id')
             ->whereHas('teachers', fn($query) => $query->where('teacher_id', $this->teacherId))
             ->get();
 
-        return view('teacher.tools.grades.index', compact('teacher', 'grades'));
+        return view('teacher.tools.grades.index', compact('grades'));
     }
 
     public function getTeacherGroupsByGrade(Request $request, $gradeId)

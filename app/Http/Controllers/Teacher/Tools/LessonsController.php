@@ -32,7 +32,7 @@ class LessonsController extends Controller
 
     public function index(Request $request)
     {
-        $lessonsQuery = Lesson::query()->with(['group'])
+        $lessonsQuery = Lesson::query()->with(['group:id,uuid,name'])
             ->select('id', 'uuid', 'title', 'group_id', 'date', 'time', 'status')
             ->whereHas('group', fn($query) => $query->where('teacher_id', $this->teacherId));
 
@@ -61,11 +61,7 @@ class LessonsController extends Controller
     {
         $result = $this->lessonService->insertLesson($request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function update(LessonsRequest $request)
@@ -74,11 +70,7 @@ class LessonsController extends Controller
 
         $result = $this->lessonService->updateLesson($id, $request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function delete(Request $request)
@@ -90,11 +82,7 @@ class LessonsController extends Controller
 
         $result = $this->lessonService->deleteLesson($request->id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function deleteSelected(Request $request)
@@ -106,11 +94,7 @@ class LessonsController extends Controller
 
         $result = $this->lessonService->deleteSelectedLessons($request->ids);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function attendances(Request $request, $uuid)

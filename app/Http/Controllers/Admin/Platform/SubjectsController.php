@@ -6,12 +6,13 @@ use App\Models\Subject;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
+use App\Traits\ServiceResponseTrait;
 use App\Services\Admin\Platform\SubjectService;
 use App\Http\Requests\Admin\Platform\SubjectsRequest;
 
 class SubjectsController extends Controller
 {
-    use ValidatesExistence;
+    use ValidatesExistence, ServiceResponseTrait;
 
     protected $subjectService;
 
@@ -35,22 +36,14 @@ class SubjectsController extends Controller
     {
         $result = $this->subjectService->insertSubject($request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "subjects");
     }
 
     public function update(SubjectsRequest $request)
     {
         $result = $this->subjectService->updateSubject($request->id, $request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "subjects");
     }
 
     public function delete(Request $request)
@@ -59,11 +52,7 @@ class SubjectsController extends Controller
 
         $result = $this->subjectService->deleteSubject($request->id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "subjects");
     }
 
     public function deleteSelected(Request $request)
@@ -72,10 +61,6 @@ class SubjectsController extends Controller
 
         $result = $this->subjectService->deleteSelectedSubjects($request->ids);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "subjects");
     }
 }

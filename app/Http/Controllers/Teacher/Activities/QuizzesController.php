@@ -10,10 +10,11 @@ use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
 use App\Services\Teacher\Activities\QuizService;
 use App\Http\Requests\Admin\Activities\QuizzesRequest;
+use App\Traits\ServiceResponseTrait;
 
 class QuizzesController extends Controller
 {
-    use ValidatesExistence;
+    use ValidatesExistence, ServiceResponseTrait;
 
     protected $quizService;
     protected $teacherId;
@@ -26,7 +27,7 @@ class QuizzesController extends Controller
 
     public function index(Request $request)
     {
-        $quizzesQuery = Quiz::query()
+        $quizzesQuery = Quiz::query()->with(['grade:id,name'])
             ->select('id', 'uuid', 'grade_id', 'name', 'duration', 'start_time', 'end_time')
             ->where('teacher_id', $this->teacherId);
 
@@ -41,12 +42,12 @@ class QuizzesController extends Controller
             ->toArray();
 
         $groups = Group::query()
-            ->select('id', 'name', 'grade_id')
+            ->select('id', 'uuid', 'name', 'grade_id')
             ->where('teacher_id', $this->teacherId)
             ->with('grade:id,name')
             ->orderBy('grade_id')
             ->get()
-            ->mapWithKeys(fn($group) => [$group->id => $group->name . ' - ' . $group->grade->name]);
+            ->mapWithKeys(fn($group) => [$group->uuid => $group->name . ' - ' . $group->grade->name]);
 
         return view('teacher.activities.quizzes.index', compact('grades', 'groups'));
     }
@@ -55,47 +56,39 @@ class QuizzesController extends Controller
     {
         $result = $this->quizService->insertQuiz($request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function update(QuizzesRequest $request)
     {
-        $result = $this->quizService->updateQuiz($request->id, $request->validated());
+        $id = Quiz::uuid($request->id)->value('id');
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
+        $result = $this->quizService->updateQuiz($id, $request->validated());
 
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function delete(Request $request)
     {
+        $id = Quiz::uuid($request->id)->value('id');
+        $request->merge(['id' => $id]);
+
         $this->validateExistence($request, 'quizzes');
 
         $result = $this->quizService->deleteQuiz($request->id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function deleteSelected(Request $request)
     {
+        $ids = Quiz::whereIn('uuid', $request->ids ?? [])->pluck('id')->toArray();
+        !empty($ids) ? $request->merge(['ids' => $ids]) : null;
+
         $this->validateExistence($request, 'quizzes');
 
         $result = $this->quizService->deleteSelectedQuizzes($request->ids);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 }

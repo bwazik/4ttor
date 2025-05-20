@@ -28,7 +28,7 @@ class ZoomService
     {
         return datatables()->eloquent($zoomsQuery)
             ->addIndexColumn()
-            ->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
+            ->addColumn('selectbox', fn($row) => generateSelectbox($row->uuid))
             ->editColumn('topic', fn($row) => $row->topic)
             ->editColumn('grade_id', fn($row) => formatRelation($row->grade_id, $row->grade, 'name'))
             ->editColumn('group_id', fn($row) => formatRelation($row->group_id, $row->group, 'name'))
@@ -51,12 +51,12 @@ class ZoomService
                         'tabindex="0" type="button" ' .
                         'data-bs-toggle="offcanvas" data-bs-target="#edit-modal" ' .
                         'id="edit-button" ' .
-                        'data-id="' . $row->id . '" ' .
+                        'data-id="' . $row->uuid . '" ' .
                         'data-meeting_id="' . $row->meeting_id . '" ' .
                         'data-topic_ar="' . $row->getTranslation('topic', 'ar') . '" ' .
                         'data-topic_en="' . $row->getTranslation('topic', 'en') . '" ' .
                         'data-grade_id="' . $row->grade_id . '" ' .
-                        'data-group_id="' . $row->group_id . '" ' .
+                        'data-group_id="' . $row->group->uuid . '" ' .
                         'data-duration="' . $row->duration . '" ' .
                         'data-start_time="' . humanFormat($row->start_time) . '">' .
                         '<i class="ri-edit-box-line ri-20px"></i>' .
@@ -64,7 +64,7 @@ class ZoomService
                 '</span>' .
                 '<button class="btn btn-sm btn-icon btn-text-danger rounded-pill text-body waves-effect waves-light me-1" ' .
                     'id="delete-button" ' .
-                    'data-id="' . $row->id . '" ' .
+                    'data-id="' . $row->uuid . '" ' .
                     'data-topic_ar="' . $row->getTranslation('topic', 'ar') . '" ' .
                     'data-topic_en="' . $row->getTranslation('topic', 'en') . '" ' .
                     'data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
@@ -77,7 +77,9 @@ class ZoomService
     {
         return $this->executeTransaction(function () use ($request)
         {
-            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $request['group_id'], $request['grade_id'], true))
+            $groupId = Group::uuid($request['group_id'])->firstOrFail('id')->id;
+
+            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $groupId, $request['grade_id'], true))
                 return $validationResult;
 
             if (!$this->hasZoomAccount($this->teacherId)) {
@@ -86,12 +88,12 @@ class ZoomService
 
             $this->configureZoomAPI($this->teacherId);
 
-            $meetingData = $this->prepareMeetingData($request);
+            $meetingData = $this->prepareMeetingData($request, true, $groupId);
 
             $zoom = Zoom::create([
                 'teacher_id' => $this->teacherId,
                 'grade_id' => $request['grade_id'],
-                'group_id' => $request['group_id'],
+                'group_id' => $groupId,
                 'meeting_id' => null,
                 'topic' => ['en' => $request['topic_en'], 'ar' => $request['topic_ar']],
                 'duration' => $request['duration'],
@@ -111,7 +113,9 @@ class ZoomService
     {
         return $this->executeTransaction(function () use ($id, $meeting_id, $request)
         {
-            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $request['group_id'], $request['grade_id'], true))
+            $groupId = Group::uuid($request['group_id'])->firstOrFail('id')->id;
+
+            if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $groupId, $request['grade_id'], true))
                 return $validationResult;
 
             if (!$this->hasZoomAccount($this->teacherId)) {
@@ -120,7 +124,7 @@ class ZoomService
 
             $this->configureZoomAPI($this->teacherId);
 
-            $meetingData = $this->prepareMeetingData($request, false);
+            $meetingData = $this->prepareMeetingData($request, false, $groupId);
 
             dispatch(new HandleZoomMeetingJob(HandleZoomMeetingJob::TYPE_UPDATE,
             ['meeting_id' => $meeting_id, 'meeting_data' => $meetingData]));
@@ -128,7 +132,7 @@ class ZoomService
             $zoom = Zoom::findOrFail($id);
             $zoom->update([
                 'grade_id' => $request['grade_id'],
-                'group_id' => $request['group_id'],
+                'group_id' => $groupId,
                 'topic' => ['en' => $request['topic_en'], 'ar' => $request['topic_ar']],
                 'duration' => $request['duration'],
                 'start_time' =>  $request['start_time'],
@@ -177,10 +181,10 @@ class ZoomService
         });
     }
 
-    private function prepareMeetingData(array $request, bool $includeSettings = true): array
+    private function prepareMeetingData(array $request, bool $includeSettings = true, $groupId): array
     {
         $grade = Grade::where('id', $request['grade_id'])->pluck('name')->first();
-        $group = Group::where('id', $request['group_id'])->pluck('name')->first();
+        $group = Group::where('id', $groupId)->pluck('name')->first();
         $teacher = Teacher::where('id', $this->teacherId)->pluck('name')->first();
         $start_time = Carbon::parse($request['start_time'])->setTimezone('UTC')->format('Y-m-d\TH:i:s\Z');
 

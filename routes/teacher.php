@@ -147,41 +147,35 @@ Route::group(
 
             # Start Users Managment
                 # Assistants
-                Route::prefix('assistants')->name('assistants.')->group(function() {
-                    Route::controller(AssistantsController::class)->group(function() {
-                        Route::get('/', 'index')->name('index');
-                        Route::middleware('throttle:10,1')->group(function() {
-                            Route::post('insert', 'insert')->name('insert');
-                            Route::post('update', 'update')->name('update');
-                            Route::post('delete', 'delete')->name('delete');
-                            Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
-                        });
+                Route::prefix('assistants')->controller(AssistantsController::class)->name('assistants.')->group(function() {
+                    Route::get('/', 'index')->name('index');
+                    Route::middleware('throttle:10,1')->group(function() {
+                        Route::post('insert', 'insert')->name('insert');
+                        Route::post('update', 'update')->name('update');
+                        Route::post('delete', 'delete')->name('delete');
+                        Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
                     });
                 });
 
                 # Students
-                Route::prefix('students')->name('students.')->group(function() {
-                    Route::controller(StudentsController::class)->group(function() {
-                        Route::get('/', 'index')->name('index');
-                        Route::middleware('throttle:10,1')->group(function() {
-                            Route::post('insert', 'insert')->name('insert');
-                            Route::post('update', 'update')->name('update');
-                            Route::post('delete', 'delete')->name('delete');
-                            Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
-                        });
+                Route::prefix('students')->controller(StudentsController::class)->name('students.')->group(function() {
+                    Route::get('/', 'index')->name('index');
+                    Route::middleware('throttle:10,1')->group(function() {
+                        Route::post('insert', 'insert')->name('insert');
+                        Route::post('update', 'update')->name('update');
+                        Route::post('delete', 'delete')->name('delete');
+                        Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
                     });
                 });
 
                 # Parents
-                Route::prefix('parents')->name('parents.')->group(function() {
-                    Route::controller(ParentsController::class)->group(function() {
-                        Route::get('/', 'index')->name('index');
-                        Route::middleware('throttle:10,1')->group(function() {
-                            Route::post('insert', 'insert')->name('insert');
-                            Route::post('update', 'update')->name('update');
-                            Route::post('delete', 'delete')->name('delete');
-                            Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
-                        });
+                Route::prefix('parents')->controller(ParentsController::class)->name('parents.')->group(function() {
+                    Route::get('/', 'index')->name('index');
+                    Route::middleware('throttle:10,1')->group(function() {
+                        Route::post('insert', 'insert')->name('insert');
+                        Route::post('update', 'update')->name('update');
+                        Route::post('delete', 'delete')->name('delete');
+                        Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
                     });
                 });
             # End Users Managment
