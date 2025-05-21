@@ -61,4 +61,9 @@ return [
     'passwordUpdated' => 'Password is updated successfully',
     'limitReached' => 'You have reached the limit for this action. Please upgrade your plan.',
     'featureNotAvailable' => 'The current plan does not allow this action. Please upgrade your plan.',
+    'noParentFoundForStudent' => 'No parent found for this student. Please contact your teacher.',
+
+
+
+
 ];

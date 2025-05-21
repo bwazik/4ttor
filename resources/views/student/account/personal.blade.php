@@ -51,7 +51,7 @@
                             <x-basic-input context="modal" type="number" name="phone" label="{{ trans('main.phone') }}" placeholder="{{ $data['student']->phone }}" value="{{ $data['student']->phone }}" disabled />
                             <x-basic-input context="modal" type="email" name="email" label="{{ trans('main.email') }}" placeholder="{{ $data['student']->email }}" value="{{ $data['student']->email }}" />
                             <x-basic-input context="modal" type="text" name="birth_date" classes="flatpickr-date" label="{{ trans('main.birth_date') }}" placeholder="YYYY-MM-DD" value="{{ $data['student']->birth_date }}"/>
-                            <x-basic-input context="modal" type="text" name="gender" label="{{ trans('main.gender') }}" placeholder="{{ $data['student']->parent->gender == 1 ? trans('main.male') : trans('main.female') }}" value="{{ $data['student']->parent->gender == 1 ? trans('main.male') : trans('main.female') }}" disabled />
+                            <x-basic-input context="modal" type="text" name="gender" label="{{ trans('main.gender') }}" placeholder="{{ $data['student']->gender == 1 ? trans('main.male') : trans('main.female') }}" value="{{ $data['student']->gender == 1 ? trans('main.male') : trans('main.female') }}" disabled />
                             <x-select-input context="modal" name="teachers" label="{{ trans('main.teachers') }}" :options="$data['teachers']" multiple disabled />
                             <x-select-input context="modal" name="groups" label="{{ trans('main.groups') }}" :options="$data['groups']" multiple disabled />
                         </div>
@@ -68,13 +68,17 @@
             <div class="card mb-6">
                 <h5 class="card-header">معلومات ولي الأمر</h5>
                 <div class="card-body pt-0">
-                    <div class="row mt-1 g-5">
-                        <x-basic-input context="modal" type="text" name="name_ar" label="{{ trans('main.realName_ar') }}" placeholder="{{ $data['student']->parent->getTranslation('name', 'ar') }}" value="{{ $data['student']->parent->getTranslation('name', 'ar') }}" readonly />
-                        <x-basic-input context="modal" type="text" name="name_en" label="{{ trans('main.realName_en') }}" placeholder="{{ $data['student']->parent->getTranslation('name', 'en') }}" value="{{ $data['student']->parent->getTranslation('name', 'en') }}" readonly />
-                        <x-basic-input context="modal" type="number" name="phone" label="{{ trans('main.phone') }}" placeholder="{{ $data['student']->parent->phone }}" value="{{ $data['student']->parent->phone }}" readonly />
-                        <x-basic-input context="modal" type="email" name="email" label="{{ trans('main.email') }}" placeholder="{{ $data['student']->parent->email ?? 'N/A' }}" value="{{ $data['student']->parent->email ?? 'N/A' }}" readonly/>
-                        <x-basic-input divClasses="col-12" type="text" name="gender" label="{{ trans('main.gender') }}" placeholder="{{ $data['student']->parent->gender == 1 ? trans('main.male') : trans('main.female') }}" value="{{ $data['student']->parent->gender == 1 ? trans('main.male') : trans('main.female') }}" readonly />
-                    </div>
+                    @if($data['student']->parent)
+                        <div class="row mt-1 g-5">
+                            <x-basic-input context="modal" type="text" name="name_ar" label="{{ trans('main.realName_ar') }}" placeholder="{{ $data['student']->parent->getTranslation('name', 'ar') }}" value="{{ $data['student']->parent->getTranslation('name', 'ar') }}" readonly />
+                            <x-basic-input context="modal" type="text" name="name_en" label="{{ trans('main.realName_en') }}" placeholder="{{ $data['student']->parent->getTranslation('name', 'en') }}" value="{{ $data['student']->parent->getTranslation('name', 'en') }}" readonly />
+                            <x-basic-input context="modal" type="number" name="phone" label="{{ trans('main.phone') }}" placeholder="{{ $data['student']->parent->phone }}" value="{{ $data['student']->parent->phone }}" readonly />
+                            <x-basic-input context="modal" type="email" name="email" label="{{ trans('main.email') }}" placeholder="{{ $data['student']->parent->email ?? 'N/A' }}" value="{{ $data['student']->parent->email ?? 'N/A' }}" readonly/>
+                            <x-basic-input divClasses="col-12" type="text" name="gender" label="{{ trans('main.gender') }}" placeholder="{{ $data['student']->parent->gender == 1 ? trans('main.male') : trans('main.female') }}" value="{{ $data['student']->parent->gender == 1 ? trans('main.male') : trans('main.female') }}" readonly />
+                        </div>
+                    @else
+                        {{ trans('toasts.noParentFoundForStudent') }}
+                    @endif
                 </div>
             </div>
             <!-- Parent Data -->
