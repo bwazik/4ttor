@@ -55,14 +55,14 @@ class QuizService
                             'data-id="' . $row->id . '" ' .
                             'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
                             'data-name_en="' . $row->getTranslation('name', 'en') . '" ' .
-                            'data-bs-target="#delete-modal" data-bs-toggle="offcanvas" data-bs-dismiss="modal">' .
+                            'data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
                             trans('main.delete') .
                         '</a>' .
                     '</li>' .
                 '</ul>' .
             '</div>' .
             '<button class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light" ' .
-                'tabindex="0" type="button" data-bs-toggle="offcanvas" data-bs-target="#edit-modal" ' .
+                'tabindex="0" type="button" data-bs-toggle="modal" data-bs-target="#edit-modal" ' .
                 'id="edit-button" ' .
                 'data-id="' . $row->id . '" ' .
                 'data-name_ar="' . $row->getTranslation('name', 'ar') . '" ' .
@@ -71,8 +71,13 @@ class QuizService
                 'data-grade_id="' . $row->grade_id . '" ' .
                 'data-groups="' . $groups . '" ' .
                 'data-duration="' . $row->duration . '" ' .
+                'data-quiz_mode="' . $row->quiz_mode . '" ' .
                 'data-start_time="' . humanFormat($row->start_time) . '" ' .
-                'data-end_time="' . humanFormat($row->end_time) . '">' .
+                'data-end_time="' . humanFormat($row->end_time) . '" ' .
+                'data-randomize_questions="' . $row->randomize_questions . '" ' .
+                'data-randomize_answers="' . $row->randomize_answers . '" ' .
+                'data-show_result="' . $row->show_result . '" ' .
+                'data-allow_review="' . $row->allow_review . '">' .
                 '<i class="ri-edit-box-line ri-20px"></i>' .
             '</button>';
     }
@@ -89,8 +94,13 @@ class QuizService
                 'teacher_id' => $request['teacher_id'],
                 'grade_id' => $request['grade_id'],
                 'duration' => $request['duration'],
+                'quiz_mode' => $request['quiz_mode'],
                 'start_time' => $request['start_time'],
-                'end_time' => Carbon::parse($request['start_time'])->addMinutes((int) $request['duration']),
+                'end_time' => $request['end_time'],
+                'randomize_questions' => $request['randomize_questions'] ?? 0,
+                'randomize_answers' => $request['randomize_answers'] ?? 0,
+                'show_result' => $request['show_result'] ?? 0,
+                'allow_review' => $request['allow_review'] ?? 0,
             ]);
 
             $quiz->groups()->attach($request['groups']);
@@ -113,7 +123,11 @@ class QuizService
                 'grade_id' => $request['grade_id'],
                 'duration' => $request['duration'],
                 'start_time' => $request['start_time'],
-                'end_time' => Carbon::parse($request['start_time'])->addMinutes((int) $request['duration']),
+                'end_time' => $request['end_time'],
+                'randomize_questions' => $request['randomize_questions'] ?? 0,
+                'randomize_answers' => $request['randomize_answers'] ?? 0,
+                'show_result' => $request['show_result'] ?? 0,
+                'allow_review' => $request['allow_review'] ?? 0,
             ]);
 
             $quiz->groups()->sync($request['groups'] ?? []);

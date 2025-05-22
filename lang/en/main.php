@@ -214,4 +214,6 @@ return [
     'soon' => 'Soon',
     'months' => 'Months',
     'clickHere' => 'Click Here',
+    'yes' => 'Yes',
+    'no' => 'No',
 ];

@@ -9,7 +9,7 @@
 @section('content')
     <!-- DataTable with Buttons -->
     <x-datatable datatableTitle="{{ trans('main.datatableTitle', ['item' => trans('admin/quizzes.quizzes')]) }}"
-        dataToggle="offcanvas" deleteButton addButton="{{ trans('main.addItem', ['item' => trans('admin/quizzes.quiz')]) }}">
+        dataToggle="modal" deleteButton addButton="{{ trans('main.addItem', ['item' => trans('admin/quizzes.quiz')]) }}">
         <th></th>
         <th class="dt-checkboxes-cell dt-checkboxes-select-all"><input type="checkbox" id="select-all" class="form-check-input"></th>
         <th>#</th>
@@ -47,6 +47,11 @@
             fields: {
                 grade_id: () => '',
                 groups: () => '',
+                quiz_mode: () => 1,
+                randomize_questions: () => 1,
+                randomize_answers: () => 1,
+                show_result: () => 1,
+                allow_review: () => 1,
             }
         });
         // Setup edit modal
@@ -60,7 +65,13 @@
                 grade_id: button => button.data('grade_id'),
                 groups: button => button.data('groups'),
                 duration: button => button.data('duration'),
+                quiz_mode: button => button.data('quiz_mode'),
                 start_time: button => button.data('start_time'),
+                end_time: button => button.data('end_time'),
+                randomize_questions: button => button.data('randomize_questions'),
+                randomize_answers: button => button.data('randomize_answers'),
+                show_result: button => button.data('show_result'),
+                allow_review: button => button.data('allow_review'),
             }
         });
         // Setup delete modal
@@ -73,9 +84,11 @@
             }
         });
 
-        let fields = ['name_ar', 'name_en', 'grade_id', 'duration', 'start_time', 'end_time'];
-        handleFormSubmit('#add-form', fields, '#add-modal', 'offcanvas', '#datatable');
-        handleFormSubmit('#edit-form', fields, '#edit-modal', 'offcanvas', '#datatable');
+        let fields = ['name_ar', 'name_en', 'grade_id',
+            'duration', 'quiz_mode', 'start_time', 'end_time',
+            'randomize_questions', 'randomize_answers', 'show_result', 'allow_review'];
+        handleFormSubmit('#add-form', fields, '#add-modal', 'modal', '#datatable');
+        handleFormSubmit('#edit-form', fields, '#edit-modal', 'modal', '#datatable');
         handleDeletionFormSubmit('#delete-form', '#delete-modal', '#datatable')
         handleDeletionFormSubmit('#delete-selected-form', '#delete-selected-modal', '#datatable')
         fetchMultipleDataByAjax('#add-form #grade_id', "{{ route('teacher.fetch.grade.groups', '__ID__') }}", '#add-form #groups', 'grade_id', 'GET');

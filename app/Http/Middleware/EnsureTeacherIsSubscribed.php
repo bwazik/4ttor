@@ -14,33 +14,59 @@ class EnsureTeacherIsSubscribed
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::guard('teacher')->check()) {
-            $teacher = Auth::guard('teacher')->user();
+        if (!Auth::guard('teacher')->check()) {
+            return Redirect::route('login');
+        }
 
-            $allowedRoutes = [
-                'teacher.plans.index',
-            ];
+        $teacher = Auth::guard('teacher')->user();
+        $allowedRoutes = [
+            // Plans
+            'teacher.plans.index',
+            'teacher.fetch.plans.data',
 
-            if (in_array($request->route()->getName(), $allowedRoutes)) {
+            // Billing & Subscriptions
+            'teacher.billing.index',
+            'teacher.billing.transactions',
+            'teacher.billing.invoices',
+            'teacher.billing.invoices.print',
+            'teacher.billing.invoices.preview',
+            'teacher.billing.invoices.pay',
+            'teacher.billing.invoices.process',
+            'teacher.subscriptions.index',
+            'teacher.subscriptions.insert',
+            'teacher.subscriptions.cancle',
+
+            // Account Management
+            'teacher.account.personal.edit',
+            'teacher.account.updateProfilePic',
+            'teacher.account.personal.update',
+            'teacher.account.security.index',
+            'teacher.account.password.update',
+            'teacher.account.coupons.index',
+            'teacher.account.coupons.redeem',
+        ];
+
+        if (in_array($request->route()->getName(), $allowedRoutes)) {
+            return $next($request);
+        }
+
+        if (is_null($teacher->plan_id)) {
+            return Redirect::route('teacher.plans.index');
+        }
+
+        $activeSubscription = TeacherSubscription::where('teacher_id', $teacher->id)
+            ->where('status', 1)
+            ->where('end_date', '>=', now())
+            ->first();
+
+        if ($activeSubscription) {
+            $paidInvoice = Invoice::where('subscription_id', $activeSubscription->id)
+                ->subscription()
+                ->paid()
+                ->exists();
+
+            if ($paidInvoice) {
                 return $next($request);
-            }
-
-            if (is_null($teacher->plan_id)) {
-                return Redirect::route('teacher.plans.index');
-            }
-
-            $activeSubscription = TeacherSubscription::where('teacher_id', $teacher->id)
-                ->where('status', 1)
-                ->where('end_date', '>=', now())
-                ->first();
-
-            if ($activeSubscription) {
-                $paidInvoice = Invoice::where('subscription_id', $activeSubscription->id)
-                    ->subscription()->paid()->exists();
-
-                if ($paidInvoice) {
-                    return $next($request);
-                }
             }
         }
 

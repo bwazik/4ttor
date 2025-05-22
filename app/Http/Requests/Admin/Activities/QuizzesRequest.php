@@ -18,7 +18,13 @@ class QuizzesRequest extends FormRequest
             'name_en' => 'required|min:3|max:100',
             'grade_id' => 'required|integer|exists:grades,id',
             'duration' => 'required|integer|min:1|max:180',
+            'quiz_mode' => 'required|in:1,2',
             'start_time' => 'required|date|after_or_equal:now|date_format:Y-m-d H:i',
+            'end_time' => 'required|date|after:start_time|date_format:Y-m-d H:i',
+            'randomize_questions' => 'nullable|boolean',
+            'randomize_answers' => 'nullable|boolean',
+            'show_result' => 'nullable|boolean',
+            'allow_review' => 'nullable|boolean',
         ];
 
         if (isAdmin()) {

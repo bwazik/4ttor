@@ -26,7 +26,8 @@ class QuizzesController extends Controller
     public function index(Request $request)
     {
         $quizzesQuery = Quiz::query()
-            ->select('id', 'teacher_id', 'grade_id', 'name', 'duration', 'start_time', 'end_time');
+            ->select('id', 'teacher_id', 'grade_id', 'name', 'duration', 'quiz_mode', 'start_time', 'end_time',
+                'randomize_questions', 'randomize_answers', 'show_result', 'allow_review');
 
         if ($request->ajax()) {
             return $this->quizService->getQuizzesForDatatable($quizzesQuery);
@@ -44,7 +45,7 @@ class QuizzesController extends Controller
                 $teacherName = $group->teacher->name ?? 'N/A';
                 return [$group->id => $group->name . ' - ' . $gradeName . ' - ' . $teacherName];
             });
-            
+
         return view('admin.activities.quizzes.index', compact('teachers', 'grades', 'groups'));
     }
 

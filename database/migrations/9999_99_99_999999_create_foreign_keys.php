@@ -162,6 +162,17 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });
+        Schema::table('student_quiz_order', function (Blueprint $table) {
+            $table->foreign('student_id')->references('id')->on('students')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('quiz_id')->references('id')->on('quizzes')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('question_id')->references('id')->on('questions')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+        });
         Schema::table('student_violations', function (Blueprint $table) {
             $table->foreign('student_id')->references('id')->on('students')
                 ->onDelete('cascade')
@@ -372,6 +383,11 @@ return new class extends Migration
         Schema::table('student_results', function (Blueprint $table) {
             $table->dropForeign('student_results_student_id_foreign');
             $table->dropForeign('student_results_quiz_id_foreign');
+        });
+        Schema::table('student_quiz_order', function (Blueprint $table) {
+            $table->dropForeign('student_quiz_order_student_id_foreign');
+            $table->dropForeign('student_quiz_order_quiz_id_foreign');
+            $table->dropForeign('student_quiz_order_question_id_foreign');
         });
         Schema::table('student_violations', function (Blueprint $table) {
             $table->dropForeign('student_violations_student_id_foreign');

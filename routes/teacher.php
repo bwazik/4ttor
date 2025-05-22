@@ -298,12 +298,6 @@ Route::group(
                     Route::get('/', 'index')->name('index');
                 });
             # End Finance Managment
-
-
-            # Start Account Managment
-
-
-            # End Account Managment
         });
     });
 });

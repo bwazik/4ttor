@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('student_results', function (Blueprint $table) {
             $table->increments('id');
+            $table->uuid('uuid')->unique();
             $table->integer('student_id')->unsigned();
             $table->integer('quiz_id')->unsigned();
             $table->decimal('total_score', 5, 2)->default(0.00);

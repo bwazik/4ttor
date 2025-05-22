@@ -31,7 +31,8 @@ class QuizzesController extends Controller
     public function index(Request $request)
     {
         $quizzesQuery = Quiz::query()->with(['grade:id,name'])
-            ->select('id', 'uuid', 'grade_id', 'name', 'duration', 'start_time', 'end_time')
+            ->select('id', 'uuid', 'grade_id', 'name', 'duration', 'quiz_mode', 'start_time', 'end_time',
+                    'randomize_questions', 'randomize_answers', 'show_result', 'allow_review')
             ->where('teacher_id', $this->teacherId);
 
         if ($request->ajax()) {

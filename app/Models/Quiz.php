@@ -31,13 +31,13 @@ class Quiz extends Model
         'grade_id',
         'name',
         'duration',
-        'exam_mode', // 1 => fixed, 2 => flexible
+        'quiz_mode', // 1 => fixed, 2 => flexible
         'start_time',
         'end_time',
         'randomize_questions',
         'randomize_answers',
         'show_result',
-        'show_answers',
+        'allow_review',
     ];
 
     protected $hidden = [
