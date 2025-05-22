@@ -18,6 +18,8 @@ return new class extends Migration
             $table->boolean('is_correct')->default(false);
             $table->decimal('score', 5, 2);
             $table->timestamps();
+
+            $table->index('question_id');
         });
     }
 

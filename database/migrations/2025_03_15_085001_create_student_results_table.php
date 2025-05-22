@@ -15,10 +15,11 @@ return new class extends Migration
             $table->increments('id');
             $table->integer('student_id')->unsigned();
             $table->integer('quiz_id')->unsigned();
-            $table->decimal('total_score', 5, 2);
-            $table->integer('attempt_number')->default(1);
+            $table->decimal('total_score', 5, 2)->default(0.00);
+            $table->decimal('percentage', 5, 2)->default(0.00);
             $table->timestamp('started_at')->nullable();
-            $table->timestamp('completed_at')->useCurrent();
+            $table->timestamp('completed_at')->nullable();
+            $table->tinyInteger('status')->default(1)->comment('1 => in progress, 2 => completed, 3 => failed');
             $table->timestamps();
 
             $table->index(['student_id', 'quiz_id']);

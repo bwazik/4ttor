@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('violation_type');
             $table->timestamp('detected_at')->useCurrent();
             $table->timestamps();
+
+            $table->index(['student_id', 'quiz_id']);
         });
     }
 

@@ -16,6 +16,8 @@ return new class extends Migration
             $table->integer('quiz_id')->unsigned();
             $table->text('question_text');
             $table->timestamps();
+
+            $table->index('quiz_id');
         });
     }
 

@@ -11,17 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('student_answers', function (Blueprint $table) {
+        Schema::create('student_quiz_order', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('student_id')->unsigned();
             $table->integer('quiz_id')->unsigned();
             $table->integer('question_id')->unsigned();
-            $table->integer('answer_id')->unsigned()->nullable();
-            $table->timestamp('answered_at')->useCurrent();
+            $table->integer('display_order')->comment('Order shown to student (1, 2, 3, ...)');
+            $table->json('answer_order')->nullable()->comment('Array of answer_id order for this question');
             $table->timestamps();
-
-            $table->index(['quiz_id', 'answer_id']);
-            $table->unique(['student_id', 'question_id']);
+            $table->unique(['student_id', 'quiz_id', 'question_id']);
+            $table->index(['student_id', 'quiz_id']);
         });
     }
 
@@ -30,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('student_answers');
+        Schema::dropIfExists('student_quiz_order');
     }
 };

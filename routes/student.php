@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccountController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
+use App\Http\Controllers\Student\Activities\QuizzesController;
+
 Route::group(
     [
         'prefix' => LaravelLocalization::setLocale() . '/student',
@@ -25,6 +27,13 @@ Route::group(
             Route::post('security/password/update', 'updatePassword')->name('password.update')->middleware('throttle:5,1');
             Route::get('coupons', 'getCoupons')->name('coupons.index');
             Route::post('coupons/redeem', 'redeemCoupon')->name('coupons.redeem')->middleware('throttle:5,1');
+        });
+
+        # Quizzes
+        Route::prefix('quizzes')->controller(QuizzesController::class)->name('quizzes.')->group(function() {
+            Route::get('/', 'index')->name('index');
+            Route::get('/{uuid}/notices', 'notices')->name('notices');
+            Route::get('/{uuid}/take', 'take')->name('take');
         });
     });
 });
