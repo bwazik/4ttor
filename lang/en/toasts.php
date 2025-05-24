@@ -62,8 +62,14 @@ return [
     'limitReached' => 'You have reached the limit for this action. Please upgrade your plan.',
     'featureNotAvailable' => 'The current plan does not allow this action. Please upgrade your plan.',
     'noParentFoundForStudent' => 'No parent found for this student. Please contact your teacher.',
-
-
+    'quizNotAvailable' => 'Quiz is not available at the moment. Check the scheduled time or contact your teacher for any inquiries.',
+    'quizAlreadyCompleted' => 'You have already completed this quiz. Contact your teacher if you have any questions.',
+    'quizTimeExpired' => 'The allocated time for this quiz has expired. Contact your teacher if you have any questions.',
+    'quizNoQuestions' => 'This quiz has no questions. Contact your teacher if you have any questions.',
+    'questionNotAccessible' => 'This question is not accessible. You must answer questions in sequence.',
+    'quizCompleted' => 'You have completed the quiz. Contact your teacher if you have any questions.',
+    'quizNoQuestionsRemaining' => 'No questions remaining in this quiz. Contact your teacher if you have any questions.',
+    'reviewNotAvailable' => 'This quiz is not available for review. Contact your teacher if you have any questions.',
 
 
 ];

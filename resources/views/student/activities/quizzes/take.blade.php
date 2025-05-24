@@ -43,6 +43,10 @@
                         @endforeach
                     </div>
                 </div>
+                <div class="card-footer">
+                    <small class="text-body-secondary text-muted">{{ trans('main.mr') }}/{{ trans('main.mrs') }}:
+                        {{ $quiz->teacher->name }}</small>
+                </div>
             </div>
         </div>
         <div class="col-lg-9 col-md-12">
@@ -94,9 +98,12 @@
                                 <span class="align-middle d-sm-inline-block d-none">{{ trans('main.previous') }}</span>
                             </button>
                             <button id="next-button" type="submit"
-                                class="btn btn-primary btn-next waves-effect waves-light">
-                                <span class="align-middle d-sm-inline-block d-none me-sm-1">{{ trans('main.next') }}</span>
-                                <i class="icon-base ri ri-arrow-left-line icon-16px"></i>
+                                class="btn {{ $currentOrder >= $quiz->questions_count ? 'btn-success' : 'btn-primary' }} btn-next waves-effect waves-light">
+                                <span class="align-middle d-sm-inline-block d-none me-sm-1">
+                                    {{ $currentOrder >= $quiz->questions_count ? trans('admin/quizzes.submit') : trans('main.next') }}
+                                </span>
+                                <i
+                                    class="icon-base ri {{ $currentOrder >= $quiz->questions_count ? 'ri-check-line' : 'ri-arrow-left-line' }} icon-16px"></i>
                             </button>
                         </div>
                     </form>
@@ -165,15 +172,49 @@
                     `<i class="ri-loader-4-line ri-spin ri-20px me-1"></i> ${window.translations.processing}...`
                 );
 
+                let currentOrder = parseInt($("#current_order").val());
                 let nextOrder = parseInt($("#current_order").val()) + 1;
+                let totalQuestions = {{ $quiz->questions_count }};
                 let nextUrl =
                     '{{ route('student.quizzes.take', [$quiz->uuid, ':order']) }}'.replace(
                         ":order",
                         nextOrder
                     );
 
+                // Check for unanswered questions
+                let unansweredOrders = [];
+                $(".question-nav").each(function() {
+                    let $this = $(this);
+                    let order = $this.data("order");
+                    if ($this.hasClass("bg-label-secondary")) {
+                        unansweredOrders.push(order);
+                    }
+                });
+                // If current question is unanswered, add it
                 if (!$('input[name="answer_id"]:checked').length) {
-                    showAlert("{{ trans('main.warning') }}", "{{ trans('admin/quizzes.noAnswerSelected') }}", "warning", "{{ trans('admin/quizzes.confirmButtonText') }}").then((result) => {
+                    unansweredOrders.push(currentOrder);
+                }
+
+                if (currentOrder >= totalQuestions) {
+                    if (unansweredOrders.length > 0) {
+                        showAlert(
+                            "{{ trans('main.warning') }}",
+                            "{{ trans('admin/quizzes.unansweredQuestions') }}",
+                            "warning",
+                            "{{ trans('main.submit') }}"
+                        ).then(() => {
+                            resetButtonState($submitButton, originalButtonContent);
+                            resetButtonState($prevButton, originalPrevButtonContent);
+                        });
+                        return;
+                    }
+                } else if (!$('input[name="answer_id"]:checked').length) {
+                    showAlert(
+                        "{{ trans('main.warning') }}",
+                        "{{ trans('admin/quizzes.noAnswerSelected') }}",
+                        "warning",
+                        "{{ trans('admin/quizzes.confirmButtonText') }}"
+                    ).then((result) => {
                         if (result.isConfirmed) {
                             loadQuestion(nextUrl, nextOrder, true);
                             resetButtonState($submitButton, originalButtonContent);
@@ -196,9 +237,12 @@
                     contentType: false,
                     data: formData,
                     success: function(response) {
+                        console.log(response);
                         if (response.success) {
                             if (response.is_last) {
-                                toastr.success(response.success);
+                                showAlert("{{ trans('main.shattor') }}", response.success,
+                                    "success",
+                                    "{{ trans('main.submit') }}");
                                 setTimeout(() => {
                                     window.location.href =
                                         '{{ route('student.quizzes.index') }}';
@@ -213,7 +257,8 @@
                                 loadQuestion(nextUrl, response.next_order, true);
                             }
                         } else if (response.error) {
-                            toastr.error(response.error || errorMessage);
+                            showAlert("{{ trans('main.error') }}", response.error || errorMessage,
+                                "error", "{{ trans('admin/quizzes.confirmButtonText') }}");
                             if (response.redirect) {
                                 setTimeout(() => {
                                     window.location.href = response.redirect;
@@ -224,6 +269,7 @@
                         }
                     },
                     error: function(xhr) {
+                        console.log(xhr);
                         if (xhr.status === 429) {
                             toastr.error(tooManyRequestsMessage);
                         } else if (xhr.responseJSON) {
@@ -232,7 +278,9 @@
                                     toastr.error(val[0]);
                                 });
                             } else if (xhr.responseJSON.error) {
-                                toastr.error(xhr.responseJSON.error);
+                                showAlert("{{ trans('main.error') }}", xhr.responseJSON.error,
+                                    "error",
+                                    "{{ trans('main.submit') }}");
                                 if (xhr.responseJSON.redirect) {
                                     setTimeout(() => {
                                         window.location.href = xhr.responseJSON.redirect;
@@ -299,7 +347,8 @@
                                 toastr.error(val[0]);
                             });
                         } else if (xhr.responseJSON.error) {
-                            toastr.error(xhr.responseJSON.error);
+                            showAlert("{{ trans('main.error') }}", xhr.responseJSON.error, "error",
+                                "{{ trans('main.submit') }}");
                             if (xhr.responseJSON.redirect) {
                                 setTimeout(() => {
                                     window.location.href = xhr.responseJSON.redirect;
@@ -383,6 +432,28 @@
             $("#prev-button")
                 .toggleClass("disabled", data.current_order === 1)
                 .data("url", prevUrl);
+
+            // Update Submit/Next button
+            const $submitButton = $("#next-button");
+            if (data.current_order >= data.quiz.questions_count) {
+                $submitButton
+                    .removeClass("btn-primary")
+                    .addClass("btn-success")
+                    .html(`
+                        <span class="align-middle d-sm-inline-block d-none me-sm-1">{{ trans('admin/quizzes.submit') }}</span>
+                        <i class="icon-base ri ri-check-line icon-16px"></i>
+                    `);
+            } else {
+                $submitButton
+                    .removeClass("btn-success")
+                    .addClass("btn-primary")
+                    .html(`
+                        <span class="align-middle d-sm-inline-block d-none me-sm-1">{{ trans('main.next') }}</span>
+                        <i class="icon-base ri ri-arrow-left-line icon-16px"></i>
+                    `);
+            }
+            $submitButton.prop("disabled", false);
+            $("#prev-button").prop("disabled", data.current_order === 1);
         }
 
         $(document).ready(function() {
@@ -400,73 +471,84 @@
             let violationCooldown = 5000;
             let lastViolationTime = 0;
 
-            function recordViolation(type, details) {
-                let now = Date.now();
-                if (now - lastViolationTime < violationCooldown) return;
-                lastViolationTime = now;
+            // function recordViolation(type, details) {
+            //     let now = Date.now();
+            //     if (now - lastViolationTime < violationCooldown) return;
+            //     lastViolationTime = now;
 
-                $.ajax({
-                    url: '{{ route('student.quizzes.violation', $quiz->uuid) }}',
-                    method: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        violation_type: type,
-                    },
-                    success: function(response) {
-                        console.log('Violation recorded:', type);
-                        showAlert("{{ trans('main.warning') }}", "{{ trans('admin/quizzes.violationMessage') }}", "error", "{{ trans('admin/quizzes.violationButtonText') }}");
-                    },
-                    error: function(xhr) {
-                        console.error('Violation recording failed:', xhr.responseText);
-                    }
-                });
-            }
+            //     $.ajax({
+            //         url: '{{ route('student.quizzes.violation', $quiz->uuid) }}',
+            //         method: 'POST',
+            //         data: {
+            //             _token: '{{ csrf_token() }}',
+            //             violation_type: type,
+            //         },
+            //         success: function(response) {
+            //             console.log('Violation recorded:', type);
+            //             showAlert("{{ trans('main.warning') }}",
+            //                 "{{ trans('admin/quizzes.violationMessage') }}", "error",
+            //                 "{{ trans('admin/quizzes.violationButtonText') }}");
+            //         }
+            //     });
+            // }
 
-            // Detect tab switching, app switching, or screen lock (desktop and mobile)
-            document.addEventListener('visibilitychange', function() {
-                if (document.hidden) {
-                    recordViolation('tab_switch');
-                }
-            });
+            // // Detect tab switching, app switching, or screen lock (desktop and mobile)
+            // document.addEventListener('visibilitychange', function() {
+            //     if (document.hidden) {
+            //         recordViolation('tab_switch');
+            //     }
+            // });
 
-            // Detect page hide (mobile: app minimization, tab unload)
-            window.addEventListener('pagehide', function() {
-                recordViolation('tab_switch');
-            });
+            // // Detect page hide (mobile: app minimization, tab unload)
+            // window.addEventListener('pagehide', function() {
+            //     recordViolation('tab_switch');
+            // });
 
-            // Detect window focus loss (desktop: window switch, mobile: browser controls)
-            window.addEventListener('blur', function() {
-                recordViolation('focus_loss');
-            });
+            // // Detect window focus loss (desktop: window switch, mobile: browser controls)
+            // window.addEventListener('blur', function() {
+            //     recordViolation('focus_loss');
+            // });
 
-            // Detect copy/paste (works on mobile)
-            $(document).on('copy', function(e) {
-                recordViolation('copy');
-                e.preventDefault(); // Optional: block copy
-            });
+            // // Detect copy/paste (works on mobile)
+            // $(document).on('copy', function(e) {
+            //     recordViolation('copy');
+            //     e.preventDefault(); // Optional: block copy
+            // });
 
-            $(document).on('paste', function(e) {
-                recordViolation('paste');
-                e.preventDefault(); // Optional: block paste
-            });
+            // $(document).on('paste', function(e) {
+            //     recordViolation('paste');
+            //     e.preventDefault(); // Optional: block paste
+            // });
 
-            // Detect right-click (desktop) or long-press (mobile context menu)
-            $(document).on('contextmenu', function(e) {
-                recordViolation('context_menu');
-                e.preventDefault(); // Optional: block context menu
-            });
+            // // Detect right-click (desktop) or long-press (mobile context menu)
+            // $(document).on('contextmenu', function(e) {
+            //     recordViolation('context_menu');
+            //     e.preventDefault(); // Optional: block context menu
+            // });
 
-            // Detect keyboard shortcuts (desktop, limited on mobile)
-            $(document).on('keydown', function(e) {
-                if (e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 't')) {
-                    recordViolation('shortcut');
-                    e.preventDefault(); // Optional: block shortcut
-                }
-                if (e.altKey && e.key === 'Tab') {
-                    recordViolation('shortcut');
-                    e.preventDefault(); // Cannot fully block Alt+Tab
-                }
-            });
+            // // Detect keyboard shortcuts (desktop, limited on mobile)
+            // $(document).on('keydown', function(e) {
+            //     if (e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 't')) {
+            //         recordViolation('shortcut');
+            //         e.preventDefault(); // Optional: block shortcut
+            //     }
+            //     if (e.altKey && e.key === 'Tab') {
+            //         recordViolation('shortcut');
+            //         e.preventDefault(); // Cannot fully block Alt+Tab
+            //     }
+            //     // Detect screenshot shortcuts (desktop only)
+            //     if (e.key === 'PrintScreen' || (e.metaKey && e.shiftKey && (e.key === '3' || e.key ===
+            //             '4'))) {
+            //         recordViolation('screenshot');
+            //         e.preventDefault(); // Cannot fully block
+            //     }
+            //     // Developer tools shortcuts (desktop)
+            //     if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e
+            //             .key === 'C'))) {
+            //         recordViolation('dev_tools');
+            //         e.preventDefault(); // Cannot fully block
+            //     }
+            // });
 
             if (timeLeft > 0) {
                 $('#time-left').text(formatTime(timeLeft));
@@ -474,12 +556,16 @@
                     timeLeft--;
                     let now = new Date().getTime();
                     if (!halfTimeReminderShown && timeLeft <= halfTime && timeLeft > halfTime - 1) {
-                        showAlert("{{ trans('main.warning') }}", "{{ trans('admin/quizzes.halfTimeMessage') }}", "info", "{{ trans('main.submit') }}");
+                        showAlert("{{ trans('main.warning') }}",
+                            "{{ trans('admin/quizzes.halfTimeMessage') }}", "info",
+                            "{{ trans('main.submit') }}");
                         halfTimeReminderShown = true;
                     }
                     if (!fiveMinutesReminderShown && timeLeft <= fiveMinutes && timeLeft > fiveMinutes -
                         1) {
-                        showAlert("{{ trans('main.warning') }}", "{{ trans('admin/quizzes.fiveMinutesMessage') }}", "warning", "{{ trans('main.submit') }}");
+                        showAlert("{{ trans('main.warning') }}",
+                            "{{ trans('admin/quizzes.fiveMinutesMessage') }}", "warning",
+                            "{{ trans('main.submit') }}");
                         fiveMinutesReminderShown = true;
                     }
                     if (timeLeft <= 0) {
@@ -489,10 +575,9 @@
                             clearInterval(timer);
                             $('#time-left').text('00:00:00');
                             if (quizMode === 1 || quizMode === 2) {
-                                toastr.error('Time expired!');
-                                setTimeout(() => {
-                                    window.location.href = '{{ route('student.quizzes.index') }}';
-                                }, 1500);
+                                showAlert("{{ trans('main.error') }}",
+                                    "{{ trans('toasts.quizTimeExpired') }}", "error",
+                                    "{{ trans('main.submit') }}");
                             }
                         } else {
                             $('#time-left').text(formatTime(timeLeft));
@@ -504,10 +589,8 @@
             } else if (timeLeft === 0 && $('#timer-badge').length) {
                 $('#time-left').text('00:00:00');
                 if (quizMode === 1 || quizMode === 2) {
-                    toastr.error('Time expired!');
-                    setTimeout(() => {
-                        window.location.href = '{{ route('student.quizzes.index') }}';
-                    }, 1500);
+                    showAlert("{{ trans('main.error') }}", "{{ trans('toasts.quizTimeExpired') }}", "error",
+                        "{{ trans('main.submit') }}");
                 }
             }
 
@@ -517,7 +600,9 @@
                     let url = $(this).data("url");
                     let order = $(this).data("order");
                     if (!$('input[name="answer_id"]:checked').length) {
-                        showAlert("{{ trans('main.warning') }}", "{{ trans('admin/quizzes.noAnswerSelected') }}", "warning", "{{ trans('admin/quizzes.confirmButtonText') }}").then((result) => {
+                        showAlert("{{ trans('main.warning') }}",
+                            "{{ trans('admin/quizzes.noAnswerSelected') }}", "warning",
+                            "{{ trans('admin/quizzes.confirmButtonText') }}").then((result) => {
                             if (result.isConfirmed) {
                                 loadQuestion(url, order);
                             }
@@ -534,7 +619,9 @@
                     let url = $(this).data("url");
                     let order = parseInt($('#current_order').val()) - 1;
                     if (!$('input[name="answer_id"]:checked').length) {
-                        showAlert("{{ trans('main.warning') }}", "{{ trans('admin/quizzes.noAnswerSelected') }}", "warning", "{{ trans('admin/quizzes.confirmButtonText') }}").then((result) => {
+                        showAlert("{{ trans('main.warning') }}",
+                            "{{ trans('admin/quizzes.noAnswerSelected') }}", "warning",
+                            "{{ trans('admin/quizzes.confirmButtonText') }}").then((result) => {
                             if (result.isConfirmed) {
                                 loadQuestion(url, order);
                             }

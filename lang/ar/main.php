@@ -1,6 +1,9 @@
 <?php
 
 return [
+    # General
+    'shattor' => 'شطُّور',
+
     # Constants
     'currency' => 'ج.م',
 
@@ -212,6 +215,7 @@ return [
     'validateTeacherGradesGroups' => 'لازم يكون المدرس مع الصف والمجموعة المحددين.',
     'validateTeacherZoomAccount' => 'لازم يكون المدرس عنده حساب زوم عشان يقدر يضيف حصص.',
     'warning' => 'تحذير!',
+    'error' => 'خطأ!',
 
     # Other
     'mr' => 'مستر',

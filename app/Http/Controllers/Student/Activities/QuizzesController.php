@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Student\Activities;
 
 use Carbon\Carbon;
 use App\Models\Quiz;
+use App\Models\Answer;
 use App\Models\Question;
 use Illuminate\Http\Request;
 use App\Models\StudentAnswer;
@@ -88,7 +89,7 @@ class QuizzesController extends Controller
             ->whereHas('groups', function ($query) {
                 $query->whereIn('groups.id', $this->studentGroupIds);
             })
-            ->with('questions')
+            ->with(['questions', 'teacher:id,name'])
             ->withCount('questions')
             ->firstOrFail();
 
@@ -105,13 +106,16 @@ class QuizzesController extends Controller
             if ($result) {
                 $result->update(['status' => 2, 'completed_at' => now()]);
             }
-            return response()->json(['error' => trans('toasts.quizTimeExpired'), 'redirect' => route('student.quizzes.index')], 403);
+            return request()->expectsJson()
+                ? response()->json(['error' => trans('toasts.quizTimeExpired'), 'redirect' => route('student.quizzes.index')], 403)
+                : redirect()->route('student.quizzes.index')->with('error', trans('toasts.quizTimeExpired'));
         }
         if ($quiz->quiz_mode == 2 && $result && $quiz->duration > 0 && Carbon::parse($result->started_at)->addMinutes($quiz->duration) < now()) {
             $result->update(['status' => 2, 'completed_at' => now()]);
-            return response()->json(['error' => trans('toasts.quizTimeExpired'), 'redirect' => route('student.quizzes.index')], 403);
+            return request()->expectsJson()
+                ? response()->json(['error' => trans('toasts.quizTimeExpired'), 'redirect' => route('student.quizzes.index')], 403)
+                : redirect()->route('student.quizzes.index')->with('error', trans('toasts.quizTimeExpired'));
         }
-
 
         if (!now()->greaterThanOrEqualTo($quiz->start_time)) {
             return response()->json(['error' => trans('toasts.quizNotAvailable'), 'redirect' => route('student.quizzes.index')], 403);
@@ -304,11 +308,15 @@ class QuizzesController extends Controller
 
         if ($quiz->quiz_mode == 1 && $quiz->duration > 0 && now()->greaterThanOrEqualTo(Carbon::parse($quiz->end_time))) {
             $result->update(['status' => 2, 'completed_at' => now()]);
-            return response()->json(['error' => trans('toasts.quizTimeExpired'), 'redirect' => route('student.quizzes.index')], 403);
+            return request()->expectsJson()
+                ? response()->json(['error' => trans('toasts.quizTimeExpired'), 'redirect' => route('student.quizzes.index')], 403)
+                : redirect()->route('student.quizzes.index')->with('error', trans('toasts.quizTimeExpired'));
         }
         if ($quiz->quiz_mode == 2 && $quiz->duration > 0 && Carbon::parse($result->started_at)->addMinutes($quiz->duration) < now()) {
             $result->update(['status' => 2, 'completed_at' => now()]);
-            return response()->json(['error' => trans('toasts.quizTimeExpired'), 'redirect' => route('student.quizzes.index')], 403);
+            return request()->expectsJson()
+                ? response()->json(['error' => trans('toasts.quizTimeExpired'), 'redirect' => route('student.quizzes.index')], 403)
+                : redirect()->route('student.quizzes.index')->with('error', trans('toasts.quizTimeExpired'));
         }
         if (!now()->greaterThanOrEqualTo($quiz->start_time) || $result->status == 2) {
             return response()->json(['error' => trans('toasts.quizNotAvailable'), 'redirect' => route('student.quizzes.index')], 403);
@@ -320,17 +328,41 @@ class QuizzesController extends Controller
         }
 
         $request->validate([
-            'question_id' => 'required|integer|exists:questions,id',
-            'answer_id' => 'nullable|integer|exists:answers,id',
+            'question_id' => [
+                'required',
+                'integer',
+                'exists:questions,id',
+                function ($attribute, $value, $fail) use ($quiz) {
+                    // Ensure question belongs to the quiz
+                    if (!Question::where('id', $value)->where('quiz_id', $quiz->id)->exists()) {
+                        $fail(trans('toasts.invalidQuestionForQuiz'));
+                    }
+                },
+            ],
+            'answer_id' => [
+                'required',
+                'integer',
+                'exists:answers,id',
+                function ($attribute, $value, $fail) use ($request) {
+                    // Ensure answer belongs to the question
+                    if (!Answer::where('id', $value)->where('question_id', $request->question_id)->exists()) {
+                        $fail(trans('toasts.invalidAnswerForQuestion'));
+                    }
+                },
+            ],
             'current_order' => 'required|integer|min:1',
         ]);
 
-        // $question = Question::findOrFail($request->question_id)->value('id');
-        // if ($validationResult = $this->quizService->ensureQuizOwnership($quiz->id, $this->teacherId))
-        //     return $validationResult;
+        // Verify question is in the student's quiz order
+        $questionOrder = StudentQuizOrder::where('student_id', $this->studentId)
+            ->where('quiz_id', $quiz->id)
+            ->where('question_id', $request->question_id)
+            ->where('display_order', $request->current_order)
+            ->exists();
 
-        // if ($validationResult = $this->quizService->ensureQuestionOwnership($question->id, $this->teacherId))
-        //     return $validationResult;
+        if (!$questionOrder) {
+            return response()->json(['error' => trans('toasts.invalidQuestionOrder')], 403);
+        }
 
         StudentAnswer::updateOrCreate(
             [

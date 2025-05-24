@@ -1,6 +1,9 @@
 <?php
 
 return [
+    # General
+    'shattor' => 'Shattor',
+
     # Constants
     'currency' => 'EGP',
 
@@ -210,6 +213,7 @@ return [
     'validateTeacherGradesGroups' => 'The teacher must be assigned to the specified grade and group.',
     'validateTeacherZoomAccount' => 'The teacher must have a Zoom account to be able to add zooms.',
     'warning' => 'Warning!',
+    'error' => 'Error!',
 
     # Other
     'mr' => 'Mr',

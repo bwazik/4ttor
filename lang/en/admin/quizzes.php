@@ -24,4 +24,9 @@ return [
     'confirmButtonText' => 'Next Question',
     'violationMessage' => 'Please try to focus on the exam. If you try to cheat again, the quiz will be closed and the teacher will know!',
     'violationButtonText' => 'I will not do it again',
+    'halfTimeMessage' => 'Be careful: Half of the time has passed. Try to manage your time well.',
+    'fiveMinutesMessage' => 'Be careful: Only five minutes left until the quiz ends. Review your answers.',
+    'timeoutMessage' => 'Sorry, time is up. The quiz has been closed.',
+    'unansweredQuestions' => 'You have unanswered questions. Try to review them before finishing the quiz.',
+    'submit' => 'Finish Quiz',
 ];

@@ -111,7 +111,7 @@ class QuizService
             ->with(['answer' => fn($q) => $q->select('id', 'score', 'is_correct')])
             ->get();
 
-        $totalScore = $answers->sum(fn($answer) => $answer->answer->is_correct ? $answer->answer->score : 0);
+        $totalScore = $answers->sum(fn($answer) => $answer->answer && $answer->answer->is_correct ? $answer->answer->score : 0);
         $maxScore = $result->quiz->questions()->with('answers')->get()->sum(fn($q) => $q->answers->where('is_correct', true)->max('score'));
 
         $percentage = $maxScore > 0 ? ($totalScore / $maxScore) * 100 : 0;
