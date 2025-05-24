@@ -33,7 +33,10 @@ Route::group(
         Route::prefix('quizzes')->controller(QuizzesController::class)->name('quizzes.')->group(function() {
             Route::get('/', 'index')->name('index');
             Route::get('/{uuid}/notices', 'notices')->name('notices');
-            Route::get('/{uuid}/take', 'take')->name('take');
+            Route::get('/{uuid}/take/{order?}', 'take')->name('take');
+            Route::post('/{uuid}/submit', 'submitAnswer')->name('submit');
+            Route::post('/{uuid}/violation',  'violation')->name('violation');
+            Route::get('/{uuid}/review', 'review')->name('review');
         });
     });
 });

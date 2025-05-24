@@ -19,7 +19,7 @@ class QuizzesRequest extends FormRequest
             'grade_id' => 'required|integer|exists:grades,id',
             'duration' => 'required|integer|min:1|max:180',
             'quiz_mode' => 'required|in:1,2',
-            'start_time' => 'required|date|after_or_equal:now|date_format:Y-m-d H:i',
+            'start_time' => 'required|date|date_format:Y-m-d H:i',
             'end_time' => 'required|date|after:start_time|date_format:Y-m-d H:i',
             'randomize_questions' => 'nullable|boolean',
             'randomize_answers' => 'nullable|boolean',

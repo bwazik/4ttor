@@ -186,6 +186,9 @@ return [
     'yes_archive' => 'Yes, Archive',
     'yes_restore' => 'Yes, Restore',
     'processing' => 'Processing',
+    'next' => 'Next',
+    'previous' => 'Previous',
+    'finish' => 'Finish',
 
     # Toasts
     'errorMessage' => 'An unexpected error occurred. Please try again later!',
@@ -206,6 +209,7 @@ return [
     'validateTeacherGrades' => 'The teacher must be assigned to the specified grade.',
     'validateTeacherGradesGroups' => 'The teacher must be assigned to the specified grade and group.',
     'validateTeacherZoomAccount' => 'The teacher must have a Zoom account to be able to add zooms.',
+    'warning' => 'Warning!',
 
     # Other
     'mr' => 'Mr',

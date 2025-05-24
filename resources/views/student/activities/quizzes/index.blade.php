@@ -17,6 +17,7 @@
         <th>{{ trans('main.duration') }}</th>
         <th>{{ trans('main.start_time') }}</th>
         <th>{{ trans('main.end_time') }}</th>
+        <th>{{ trans('main.status') }}</th>
     </x-datatable>
     <!--/ DataTable -->
 @endsection
@@ -33,11 +34,15 @@
                 { data: 'duration', name: 'duration', orderable: false, searchable: false },
                 { data: 'start_time', name: 'start_time', orderable: false, searchable: false },
                 { data: 'end_time', name: 'end_time', orderable: false, searchable: false },
+                { data: 'status', name: 'status', orderable: false, searchable: false },
             ],
         );
 
         @if(session('error'))
             toastr.error("{{ session('error') }}");
+        @endif
+        @if(session('success'))
+            toastr.error("{{ session('success') }}");
         @endif
     </script>
 @endsection

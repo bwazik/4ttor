@@ -159,7 +159,8 @@ document.addEventListener('DOMContentLoaded', function () {
     Array.from(dateTimePickers).forEach((dateTimePicker) => {
         flatpickr(dateTimePicker, {
             enableTime: true,
-            dateFormat: 'Y-m-d H:i'
+            dateFormat: 'Y-m-d H:i',
+            minuteIncrement: 1
         });
     });
 });

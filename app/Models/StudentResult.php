@@ -29,6 +29,7 @@ class StudentResult extends Model
         'started_at',
         'completed_at',
         'status', // 1 => in progress, 2 => completed, 3 => failed
+        'last_order',
     ];
 
     protected $hidden = [

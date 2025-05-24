@@ -373,12 +373,13 @@ if (!function_exists('formatDuration')) {
 }
 
 if (!function_exists('formatSpanUrl')) {
-    function formatSpanUrl($href, $linkText, $color = 'success'): string
+    function formatSpanUrl($href, $linkText, $color = 'success', $newTab = true): string
     {
         return
-            '<a href="'.$href.'" target="_blank"' .
-            'class="btn btn-sm btn-label-'.$color.' waves-effect">' .
-                $linkText .
+            '<a href="' . $href . '" ' .
+            ($newTab ? 'target="_blank" ' : '') .
+            'class="btn btn-sm btn-label-' . $color . ' waves-effect">' .
+            $linkText .
             '</a>';
     }
 }

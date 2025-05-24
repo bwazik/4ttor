@@ -188,6 +188,9 @@ return [
     'yes_archive' => 'آه, أرشف',
     'yes_restore' => 'آه, رجعهم',
     'processing' => 'اصبر',
+    'next' => 'التالي',
+    'previous' => 'السابق',
+    'finish' => 'خلصت',
 
     # Toasts
     'errorMessage' => 'فيه مشكلة حصلت، جرب تاني بعد شوية!',
@@ -208,6 +211,7 @@ return [
     'validateTeacherGrades' => 'لازم يكون المدرس مع الصف المحدد.',
     'validateTeacherGradesGroups' => 'لازم يكون المدرس مع الصف والمجموعة المحددين.',
     'validateTeacherZoomAccount' => 'لازم يكون المدرس عنده حساب زوم عشان يقدر يضيف حصص.',
+    'warning' => 'تحذير!',
 
     # Other
     'mr' => 'مستر',

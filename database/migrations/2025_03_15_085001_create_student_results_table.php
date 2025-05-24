@@ -21,6 +21,7 @@ return new class extends Migration
             $table->timestamp('started_at')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->tinyInteger('status')->default(1)->comment('1 => in progress, 2 => completed, 3 => failed');
+            $table->integer('last_order')->unsigned()->nullable();
             $table->timestamps();
 
             $table->index(['student_id', 'quiz_id']);

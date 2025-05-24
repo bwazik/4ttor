@@ -122,6 +122,7 @@ class QuizService
                 'teacher_id' => $request['teacher_id'],
                 'grade_id' => $request['grade_id'],
                 'duration' => $request['duration'],
+                'quiz_mode' => $request['quiz_mode'],
                 'start_time' => $request['start_time'],
                 'end_time' => $request['end_time'],
                 'randomize_questions' => $request['randomize_questions'] ?? 0,
