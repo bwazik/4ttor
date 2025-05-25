@@ -20,7 +20,7 @@ return new class extends Migration
             $table->json('answer_order')->nullable()->comment('Array of answer_id order for this question');
             $table->timestamps();
             $table->unique(['student_id', 'quiz_id', 'question_id']);
-            $table->index(['student_id', 'quiz_id']);
+            $table->index(['student_id', 'quiz_id', 'display_order']);
         });
     }
 

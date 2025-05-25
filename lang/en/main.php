@@ -60,7 +60,8 @@ return [
     'print' => 'Print',
     'payment' => 'Payments',
     'refund' => 'Refunds',
-
+    'link' => 'Link',
+    
     # Weekdays
     'weekdays' => [
         1 => 'Saturday',

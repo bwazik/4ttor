@@ -62,6 +62,7 @@ return [
     'refund' => 'إستردادات',
     'invoice' => 'الفاتورة',
     'balance_after' => 'الأرباح بعد',
+    'link' => 'اللينك',
 
     # Weekdays
     'weekdays' => [

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamp('answered_at')->useCurrent();
             $table->timestamps();
 
-            $table->index(['quiz_id', 'answer_id']);
+            $table->index(['quiz_id', 'answer_id', 'question_id']);
             $table->unique(['student_id', 'question_id']);
         });
     }

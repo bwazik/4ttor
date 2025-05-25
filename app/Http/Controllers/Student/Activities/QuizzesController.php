@@ -14,11 +14,13 @@ use App\Models\StudentViolation;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
 use App\Traits\ServiceResponseTrait;
+use Illuminate\Support\Facades\Cache;
+use App\Traits\DatabaseTransactionTrait;
 use App\Services\Student\Activities\QuizService;
 
 class QuizzesController extends Controller
 {
-    use ValidatesExistence, ServiceResponseTrait;
+    use ValidatesExistence, ServiceResponseTrait, DatabaseTransactionTrait;
 
     protected $studentId;
     protected $studentGradeId;
@@ -39,7 +41,18 @@ class QuizzesController extends Controller
     public function index(Request $request)
     {
         $quizzesQuery = Quiz::query()->with(['teacher:id,name'])
-            ->select('id', 'uuid', 'name', 'teacher_id', 'duration', 'start_time', 'end_time')
+            ->select(
+                'id',
+                'uuid',
+                'name',
+                'teacher_id',
+                'duration',
+                'quiz_mode',
+                'start_time',
+                'end_time',
+                'show_result',
+                'allow_review'
+            )
             ->where('grade_id', $this->studentGradeId)
             ->whereIn('teacher_id', $this->teacherIds)
             ->whereHas('groups', function ($query) {
@@ -65,17 +78,37 @@ class QuizzesController extends Controller
             ->withCount('questions')
             ->firstOrFail();
 
-        if (!now()->between($quiz->start_time, $quiz->end_time)) {
-            return redirect()->route('student.quizzes.index')->with('error', trans('toasts.quizNotAvailable'));
-        }
-
         $result = StudentResult::where('student_id', $this->studentId)
             ->where('quiz_id', $quiz->id)
             ->first();
 
-        // if ($result && $result->status == 2) {
-        //     return redirect()->route('student.quizzes.review', $quiz->uuid)->with('info', trans('toasts.quizAlreadyCompleted'));
-        // }
+        $isAvailable = false;
+        if ($quiz->quiz_mode == 1) {
+            $isAvailable = now()->between($quiz->start_time, $quiz->end_time);
+        } elseif ($quiz->quiz_mode == 2) {
+            if ($result) {
+                $endTime = Carbon::parse($result->started_at)->addMinutes($quiz->duration);
+                $isAvailable = now()->lessThan($endTime);
+            } else {
+                $isAvailable = now()->between($quiz->start_time, $quiz->end_time);
+            }
+        }
+
+        if ($result && $result->status == 2 && ($quiz->show_result || $quiz->allow_review)) {
+            return redirect()->route('student.quizzes.review', $quiz->uuid);
+        }
+
+        if (!$isAvailable) {
+            return redirect()->route('student.quizzes.index')->with('error', trans('toasts.quizNotAvailable'));
+        }
+
+        if ($quiz->questions_count === 0) {
+            return redirect()->route('student.quizzes.index')->with('error', trans('toasts.quizNoQuestions'));
+        }
+
+        $quiz->total_score = $quiz->questions->flatMap(function ($question) {
+            return $question->answers->pluck('score');
+        })->sum();
 
         return view('student.activities.quizzes.notices', compact('quiz', 'result'));
     }
@@ -116,15 +149,20 @@ class QuizzesController extends Controller
                 ? response()->json(['error' => trans('toasts.quizTimeExpired'), 'redirect' => route('student.quizzes.index')], 403)
                 : redirect()->route('student.quizzes.index')->with('error', trans('toasts.quizTimeExpired'));
         }
-
         if (!now()->greaterThanOrEqualTo($quiz->start_time)) {
-            return response()->json(['error' => trans('toasts.quizNotAvailable'), 'redirect' => route('student.quizzes.index')], 403);
+            return request()->expectsJson()
+                ? response()->json(['error' => trans('toasts.quizNotAvailable'), 'redirect' => route('student.quizzes.index')], 403)
+                : redirect()->route('student.quizzes.index')->with('error', trans('toasts.quizNotAvailable'));
         }
-
+        if ($result && $result->status == 3) {
+            return request()->expectsJson()
+                ? response()->json(['success' => trans('toasts.quizAlreadyCompleted'), 'redirect' => route('student.quizzes.index')], 403)
+                : redirect()->route('student.quizzes.index')->with('success', trans('toasts.quizAlreadyCompleted'));
+        }
 
         // 4. Check if Quiz is Already Completed
         if ($result && $result->status == 2) {
-            return redirect()->route('student.quizzes.index')->with('error', trans('toasts.quizAlreadyCompleted'));
+            return redirect()->route('student.quizzes.index')->with('success', trans('toasts.quizAlreadyCompleted'));
         }
 
         // 5. Initialize New Result if None Exists
@@ -141,6 +179,8 @@ class QuizzesController extends Controller
                 'status' => 1,
                 'last_order' => 1,
             ]);
+
+            Cache::put("heartbeat:{$this->studentId}:{$quiz->id}", now(), 120);
 
             $this->quizService->initializeQuizOrder($result, $quiz);
 
@@ -183,7 +223,9 @@ class QuizzesController extends Controller
         // 8. Determine Current Question Order
         $currentOrder = $questionOrder ?? $result->last_order ?? 1;
         if ($questionOrder && $questionOrder > $result->last_order + 1) {
-            return response()->json(['error' => trans('toasts.questionNotAccessible')], 403);
+            return request()->expectsJson()
+                ? response()->json(['error' => trans('toasts.questionNotAccessible'), 'redirect' => route('student.quizzes.index')], 403)
+                : redirect()->route('student.quizzes.index')->with('error', trans('toasts.questionNotAccessible'));
         }
 
         // 9. Update last_order in StudentResult
@@ -306,6 +348,31 @@ class QuizzesController extends Controller
             ->where('quiz_id', $quiz->id)
             ->firstOrFail();
 
+        if ($result && $result->status == 3) {
+            return response()->json(['success' => trans('toasts.quizAlreadyCompleted'), 'redirect' => route('student.quizzes.index')], 403);
+        }
+
+        // Check heartbeat cache
+        $key = "heartbeat:{$this->studentId}:{$quiz->id}";
+        if ($result->status == 1 && !Cache::has($key) && $request->current_order > 1) {
+            StudentViolation::create([
+                'student_id' => $this->studentId,
+                'quiz_id' => $quiz->id,
+                'violation_type' => 'tampering',
+                'detected_at' => now(),
+            ]);
+            $violationCount = StudentViolation::where('student_id', $this->studentId)
+                ->where('quiz_id', $quiz->id)
+                ->count();
+            if ($violationCount >= 5) {
+                $result->update(['status' => 3, 'completed_at' => now()]);
+                return response()->json([
+                    'error' => trans('toasts.tooManyViolations'),
+                    'redirect' => route('student.quizzes.index')
+                ], 403);
+            }
+        }
+
         if ($quiz->quiz_mode == 1 && $quiz->duration > 0 && now()->greaterThanOrEqualTo(Carbon::parse($quiz->end_time))) {
             $result->update(['status' => 2, 'completed_at' => now()]);
             return request()->expectsJson()
@@ -407,8 +474,12 @@ class QuizzesController extends Controller
             })
             ->firstOrFail();
 
+        $result = StudentResult::where('student_id', $this->studentId)
+            ->where('quiz_id', $quiz->id)
+            ->firstOrFail();
+
         $request->validate([
-            'violation_type' => 'required|string|max:255',
+            'violation_type' => 'required|string|in:tab_switch,focus_loss,copy,paste,context_menu,shortcut,screenshot,dev_tools,tampering',
         ]);
 
         StudentViolation::create([
@@ -418,7 +489,43 @@ class QuizzesController extends Controller
             'detected_at' => now(),
         ]);
 
+        $violationCount = StudentViolation::where('student_id', $this->studentId)
+            ->where('quiz_id', $quiz->id)
+            ->count();
+
+        if ($violationCount >= 5) {
+            $result->update(['status' => 3, 'completed_at' => now()]);
+            return response()->json([
+                'error' => trans('toasts.tooManyViolations'),
+                'redirect' => route('student.quizzes.index')
+            ], 403);
+        }
+
         return response()->json(['success' => true], 200);
+    }
+
+    public function heartbeat(Request $request, $uuid)
+    {
+        $quiz = Quiz::uuid($uuid)
+            ->where('grade_id', $this->studentGradeId)
+            ->whereIn('teacher_id', $this->teacherIds)
+            ->whereHas('groups', function ($query) {
+                $query->whereIn('groups.id', $this->studentGroupIds);
+            })->firstOrFail();
+
+        $result = StudentResult::where('student_id', $this->studentId)
+            ->where('quiz_id', $quiz->id)
+            ->firstOrFail();
+
+        if ($result->status != 1) {
+            return response()->json(['error' => trans('toasts.quizNotProccesing')], 403);
+        }
+
+        // Update last heartbeat timestamp in cache
+        $key = "heartbeat:{$this->studentId}:{$quiz->id}";
+        Cache::put($key, now(), 120);
+
+        return response()->json(['success' => true]);
     }
 
     public function review($uuid)

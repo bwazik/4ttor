@@ -33,8 +33,9 @@ Route::group(
         Route::prefix('quizzes')->controller(QuizzesController::class)->name('quizzes.')->group(function() {
             Route::get('/', 'index')->name('index');
             Route::get('/{uuid}/notices', 'notices')->name('notices');
-            Route::get('/{uuid}/take/{order?}', 'take')->name('take');
-            Route::post('/{uuid}/submit', 'submitAnswer')->name('submit');
+            Route::get('/{uuid}/take/{order?}', 'take')->name('take')->middleware('throttle:20,1');
+            Route::post('/{uuid}/submit', 'submitAnswer')->name('submit')->middleware('throttle:20,1');
+            Route::post('/{uuid}/heartbeat',  'heartbeat')->name('heartbeat')->middleware('throttle:5,1');
             Route::post('/{uuid}/violation',  'violation')->name('violation');
             Route::get('/{uuid}/review', 'review')->name('review');
         });

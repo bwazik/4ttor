@@ -237,7 +237,6 @@
                     contentType: false,
                     data: formData,
                     success: function(response) {
-                        console.log(response);
                         if (response.success) {
                             if (response.is_last) {
                                 showAlert("{{ trans('main.shattor') }}", response.success,
@@ -269,7 +268,6 @@
                         }
                     },
                     error: function(xhr) {
-                        console.log(xhr);
                         if (xhr.status === 429) {
                             toastr.error(tooManyRequestsMessage);
                         } else if (xhr.responseJSON) {
@@ -328,7 +326,6 @@
                     Accept: "application/json",
                 },
                 success: function(data) {
-                    console.log(data);
                     if (data.success) {
                         updateQuestion(data);
                     } else if (data.status === "success") {
@@ -338,7 +335,6 @@
                     }
                 },
                 error: function(xhr) {
-                    console.log(xhr);
                     if (xhr.status === 429) {
                         toastr.error(tooManyRequestsMessage);
                     } else if (xhr.responseJSON) {
@@ -467,88 +463,139 @@
             let halfTimeReminderShown = false;
             let fiveMinutesReminderShown = false;
 
-            // Violation tracking
-            let violationCooldown = 5000;
-            let lastViolationTime = 0;
+            let lastViolationTime = {};
 
-            // function recordViolation(type, details) {
-            //     let now = Date.now();
-            //     if (now - lastViolationTime < violationCooldown) return;
-            //     lastViolationTime = now;
+            function recordViolation(type) {
+                const now = Date.now();
+                const validTypes = ['tab_switch', 'focus_loss', 'copy', 'paste', 'context_menu', 'shortcut',
+                    'screenshot', 'dev_tools', 'tampering'
+                ];
+                if (!validTypes.includes(type)) {
+                    return;
+                }
+                if (validTypes.includes(type)) {
+                    if (!lastViolationTime[type] || (now - lastViolationTime[type] > 30000)) {
+                        lastViolationTime[type] = now;
+                    } else {
+                        return;
+                    }
+                }
+                $.ajax({
+                    url: '{{ route('student.quizzes.violation', $quiz->uuid) }}',
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: JSON.stringify({
+                        violation_type: type
+                    }),
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function(response) {
+                        showAlert(
+                            "{{ trans('main.warning') }}",
+                            "{{ trans('admin/quizzes.violationMessage') }}",
+                            "error",
+                            "{{ trans('admin/quizzes.violationButtonText') }}"
+                        );
+                        if (response.error && response.redirect) {
+                            showAlert(
+                                "{{ trans('main.error') }}",
+                                response.error,
+                                "error",
+                                "{{ trans('main.submit') }}"
+                            );
+                            setTimeout(() => {
+                                window.location.href = response.redirect;
+                            }, 1500);
+                        }
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 403 || xhr.status === 419) {
+                            showAlert(
+                                "{{ trans('main.error') }}",
+                                "{{ trans('admin/quizzes.violationMessage') }}",
+                                "error",
+                                "{{ trans('main.submit') }}"
+                            );
+                            setTimeout(() => {
+                                window.location.href = '{{ route('student.quizzes.index') }}';
+                            }, 1500);
+                        }
+                    }
+                });
+            }
 
-            //     $.ajax({
-            //         url: '{{ route('student.quizzes.violation', $quiz->uuid) }}',
-            //         method: 'POST',
-            //         data: {
-            //             _token: '{{ csrf_token() }}',
-            //             violation_type: type,
-            //         },
-            //         success: function(response) {
-            //             console.log('Violation recorded:', type);
-            //             showAlert("{{ trans('main.warning') }}",
-            //                 "{{ trans('admin/quizzes.violationMessage') }}", "error",
-            //                 "{{ trans('admin/quizzes.violationButtonText') }}");
-            //         }
-            //     });
-            // }
+            $(document).on('visibilitychange', function() {
+                if (document.hidden) {
+                    recordViolation('tab_switch');
+                }
+            });
+            $(window).on('pagehide', function() {
+                recordViolation('tab_switch');
+            });
+            $(window).on('blur', function() {
+                if (!document.hidden) {
+                    recordViolation('focus_loss');
+                }
+            });
+            $(document).on('copy', function(e) {
+                recordViolation('copy');
+                e.preventDefault();
+            });
+            $(document).on('paste', function(e) {
+                recordViolation('paste');
+                e.preventDefault();
+            });
+            $(document).on('contextmenu', function(e) {
+                recordViolation('context_menu');
+                e.preventDefault();
+            });
+            $(document).on('keydown', function(e) {
+                if (e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 't')) {
+                    recordViolation('shortcut');
+                    e.preventDefault();
+                }
+                if (e.altKey && e.key === 'Tab') {
+                    recordViolation('shortcut');
+                    e.preventDefault();
+                }
+                if (e.key === 'PrintScreen' || (e.metaKey && e.shiftKey && (e.key === '3' || e.key ===
+                        '4'))) {
+                    recordViolation('screenshot');
+                    e.preventDefault();
+                }
+                if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e
+                        .key === 'C'))) {
+                    recordViolation('dev_tools');
+                    e.preventDefault();
+                }
+            });
 
-            // // Detect tab switching, app switching, or screen lock (desktop and mobile)
-            // document.addEventListener('visibilitychange', function() {
-            //     if (document.hidden) {
-            //         recordViolation('tab_switch');
-            //     }
-            // });
-
-            // // Detect page hide (mobile: app minimization, tab unload)
-            // window.addEventListener('pagehide', function() {
-            //     recordViolation('tab_switch');
-            // });
-
-            // // Detect window focus loss (desktop: window switch, mobile: browser controls)
-            // window.addEventListener('blur', function() {
-            //     recordViolation('focus_loss');
-            // });
-
-            // // Detect copy/paste (works on mobile)
-            // $(document).on('copy', function(e) {
-            //     recordViolation('copy');
-            //     e.preventDefault(); // Optional: block copy
-            // });
-
-            // $(document).on('paste', function(e) {
-            //     recordViolation('paste');
-            //     e.preventDefault(); // Optional: block paste
-            // });
-
-            // // Detect right-click (desktop) or long-press (mobile context menu)
-            // $(document).on('contextmenu', function(e) {
-            //     recordViolation('context_menu');
-            //     e.preventDefault(); // Optional: block context menu
-            // });
-
-            // // Detect keyboard shortcuts (desktop, limited on mobile)
-            // $(document).on('keydown', function(e) {
-            //     if (e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 't')) {
-            //         recordViolation('shortcut');
-            //         e.preventDefault(); // Optional: block shortcut
-            //     }
-            //     if (e.altKey && e.key === 'Tab') {
-            //         recordViolation('shortcut');
-            //         e.preventDefault(); // Cannot fully block Alt+Tab
-            //     }
-            //     // Detect screenshot shortcuts (desktop only)
-            //     if (e.key === 'PrintScreen' || (e.metaKey && e.shiftKey && (e.key === '3' || e.key ===
-            //             '4'))) {
-            //         recordViolation('screenshot');
-            //         e.preventDefault(); // Cannot fully block
-            //     }
-            //     // Developer tools shortcuts (desktop)
-            //     if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e
-            //             .key === 'C'))) {
-            //         recordViolation('dev_tools');
-            //         e.preventDefault(); // Cannot fully block
-            //     }
-            // });
+            let lastHeartbeatSuccess = Date.now();
+            let heartbeatInterval = setInterval(() => {
+                $.ajax({
+                    url: '{{ route('student.quizzes.heartbeat', $quiz->uuid) }}',
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: JSON.stringify({
+                        timestamp: Date.now()
+                    }),
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function(response) {
+                        lastHeartbeatSuccess = Date.now();
+                    },
+                    error: function(xhr) {
+                        if (xhr.status !== 429 && Date.now() - lastHeartbeatSuccess > 60000) {
+                            recordViolation('tampering');
+                            lastHeartbeatSuccess = Date.now();
+                        }
+                    }
+                });
+            }, 30000);
 
             if (timeLeft > 0) {
                 $('#time-left').text(formatTime(timeLeft));
@@ -561,7 +608,8 @@
                             "{{ trans('main.submit') }}");
                         halfTimeReminderShown = true;
                     }
-                    if (!fiveMinutesReminderShown && timeLeft <= fiveMinutes && timeLeft > fiveMinutes -
+                    if (!fiveMinutesReminderShown && timeLeft <= fiveMinutes && timeLeft >
+                        fiveMinutes -
                         1) {
                         showAlert("{{ trans('main.warning') }}",
                             "{{ trans('admin/quizzes.fiveMinutesMessage') }}", "warning",
@@ -589,7 +637,8 @@
             } else if (timeLeft === 0 && $('#timer-badge').length) {
                 $('#time-left').text('00:00:00');
                 if (quizMode === 1 || quizMode === 2) {
-                    showAlert("{{ trans('main.error') }}", "{{ trans('toasts.quizTimeExpired') }}", "error",
+                    showAlert("{{ trans('main.error') }}", "{{ trans('toasts.quizTimeExpired') }}",
+                        "error",
                         "{{ trans('main.submit') }}");
                 }
             }
