@@ -33,7 +33,6 @@ class QuizService
             ->addColumn('duration', fn($row) => formatDuration($row->duration))
             ->editColumn('start_time', fn($row) => isoFormat($row->start_time))
             ->editColumn('end_time', fn($row) => isoFormat($row->end_time))
-            ->addColumn('status', fn($row) => $this->getQuizStatus($row))
             ->filterColumn('teacher_id', fn($query, $keyword) => filterByRelation($query, 'teacher', 'name', $keyword))
             ->rawColumns(['startQuiz', 'status'])
             ->make(true);
@@ -46,7 +45,7 @@ class QuizService
             ->where('quiz_id', $row->id)
             ->first();
 
-        if ($result && $result->status == 2 && ($row->show_result || $row->allow_review)) {
+        if ($result && ($result->status == 2 || $result->status == 3) && ($row->show_result || $row->allow_review) && now()->greaterThanOrEqualTo($row->end_time)) {
             return formatSpanUrl(
                 route('student.quizzes.review', $row->uuid),
                 trans('admin/quizzes.reviewAnswers'),

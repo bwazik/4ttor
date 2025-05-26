@@ -47,4 +47,11 @@ return [
     'timeoutMessage' => 'معلش، الوقت خلص. الكويز اتقفل.',
     'unansweredQuestions' => 'في أسئلة لسه مجاوبتش عليها. حاول تراجعها قبل ما تخلص الكويز.',
     'submit' => 'خلصت الكويز',
+    'result' => 'الدرجة',
+    'correctAnswers' => 'الإجابات الصح',
+    'wrongAnswers' => 'الإجابات الغلط',
+    'unanswered' => 'متجاوبش عليها',
+    'rank' => 'المركز',
+    'unranked' => 'برا التصنيف',
+    'lastRank' => 'الأخير',
 ];

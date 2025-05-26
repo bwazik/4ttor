@@ -9,6 +9,7 @@ use App\Models\Question;
 use Illuminate\Http\Request;
 use App\Models\StudentAnswer;
 use App\Models\StudentResult;
+use App\Services\GeminiService;
 use App\Models\StudentQuizOrder;
 use App\Models\StudentViolation;
 use App\Traits\ValidatesExistence;
@@ -22,20 +23,23 @@ class QuizzesController extends Controller
 {
     use ValidatesExistence, ServiceResponseTrait, DatabaseTransactionTrait;
 
+    protected $quizService;
+    protected $geminiService;
+    protected $student;
     protected $studentId;
     protected $studentGradeId;
     protected $studentGroupIds;
     protected $teacherIds;
-    protected $quizService;
 
-    public function __construct(QuizService $quizService)
+    public function __construct(QuizService $quizService, GeminiService $geminiService)
     {
         $this->quizService = $quizService;
-        $student = auth()->guard('student')->user();
-        $this->studentId = $student->id;
-        $this->studentGradeId = $student->grade_id;
-        $this->studentGroupIds = $student->groups()->pluck('groups.id')->toArray();
-        $this->teacherIds = $student->teachers()->pluck('teachers.id')->toArray();
+        $this->geminiService = $geminiService;
+        $this->student = auth()->guard('student')->user();
+        $this->studentId = $this->student->id;
+        $this->studentGradeId = $this->student->grade_id;
+        $this->studentGroupIds = $this->student->groups()->pluck('groups.id')->toArray();
+        $this->teacherIds = $this->student->teachers()->pluck('teachers.id')->toArray();
     }
 
     public function index(Request $request)
@@ -94,7 +98,7 @@ class QuizzesController extends Controller
             }
         }
 
-        if ($result && $result->status == 2 && ($quiz->show_result || $quiz->allow_review)) {
+        if ($result && ($result->status == 2 || $result->status == 3) && ($quiz->show_result || $quiz->allow_review)) {
             return redirect()->route('student.quizzes.review', $quiz->uuid);
         }
 
@@ -131,6 +135,13 @@ class QuizzesController extends Controller
             ->where('quiz_id', $quiz->id)
             ->first();
 
+        // 4. Check if Quiz is Already Completed
+        if ($result && ($result->status == 2 || $result->status == 3)) {
+            return request()->expectsJson()
+                ? response()->json(['success' => trans('toasts.quizAlreadyCompleted'), 'redirect' => route('student.quizzes.index')], 403)
+                : redirect()->route('student.quizzes.index')->with('success', trans('toasts.quizAlreadyCompleted'));
+        }
+
         // 2. Check Quiz Availability
         if ($quiz->quiz_mode == 1 && $quiz->duration > 0 && now()->greaterThanOrEqualTo(Carbon::parse($quiz->end_time))) {
             $result = StudentResult::where('student_id', $this->studentId)
@@ -153,16 +164,6 @@ class QuizzesController extends Controller
             return request()->expectsJson()
                 ? response()->json(['error' => trans('toasts.quizNotAvailable'), 'redirect' => route('student.quizzes.index')], 403)
                 : redirect()->route('student.quizzes.index')->with('error', trans('toasts.quizNotAvailable'));
-        }
-        if ($result && $result->status == 3) {
-            return request()->expectsJson()
-                ? response()->json(['success' => trans('toasts.quizAlreadyCompleted'), 'redirect' => route('student.quizzes.index')], 403)
-                : redirect()->route('student.quizzes.index')->with('success', trans('toasts.quizAlreadyCompleted'));
-        }
-
-        // 4. Check if Quiz is Already Completed
-        if ($result && $result->status == 2) {
-            return redirect()->route('student.quizzes.index')->with('success', trans('toasts.quizAlreadyCompleted'));
         }
 
         // 5. Initialize New Result if None Exists
@@ -348,8 +349,10 @@ class QuizzesController extends Controller
             ->where('quiz_id', $quiz->id)
             ->firstOrFail();
 
-        if ($result && $result->status == 3) {
-            return response()->json(['success' => trans('toasts.quizAlreadyCompleted'), 'redirect' => route('student.quizzes.index')], 403);
+        if ($result && ($result->status == 2 || $result->status == 3)) {
+            return request()->expectsJson()
+                ? response()->json(['success' => trans('toasts.quizAlreadyCompleted'), 'redirect' => route('student.quizzes.index')], 403)
+                : redirect()->route('student.quizzes.index')->with('success', trans('toasts.quizAlreadyCompleted'));
         }
 
         // Check heartbeat cache
@@ -504,7 +507,7 @@ class QuizzesController extends Controller
         return response()->json(['success' => true], 200);
     }
 
-    public function heartbeat(Request $request, $uuid)
+    public function cheatDetector(Request $request, $uuid)
     {
         $quiz = Quiz::uuid($uuid)
             ->where('grade_id', $this->studentGradeId)
@@ -536,28 +539,92 @@ class QuizzesController extends Controller
             ->whereHas('groups', function ($query) {
                 $query->whereIn('groups.id', $this->studentGroupIds);
             })
+            ->withCount('questions')
             ->firstOrFail();
+
+        if (now()->lessThan($quiz->end_time)) {
+            return redirect()->route('student.quizzes.index')->with('error', trans('toasts.reviewNotAvailableYet'));
+        }
+
+        $quiz->total_score = $quiz->questions->flatMap(function ($question) {
+            return $question->answers->pluck('score');
+        })->sum();
 
         $result = StudentResult::where('student_id', $this->studentId)
             ->where('quiz_id', $quiz->id)
             ->firstOrFail();
 
-        if ($result->status != 2 || (!$quiz->show_result && !$quiz->allow_review)) {
+        if ((!in_array($result->status, [2, 3])) || (!$quiz->show_result || !$quiz->allow_review)) {
             return redirect()->route('student.quizzes.index')->with('error', trans('toasts.reviewNotAvailable'));
         }
 
-        $answers = StudentAnswer::where('student_id', $this->studentId)
-            ->where('quiz_id', $quiz->id)
-            ->with(['question', 'answer'])
-            ->join('student_quiz_order', function ($join) {
-                $join->on('student_answers.student_id', '=', 'student_quiz_order.student_id')
-                    ->on('student_answers.quiz_id', '=', 'student_quiz_order.quiz_id')
-                    ->on('student_answers.question_id', '=', 'student_quiz_order.question_id');
+        $questions = StudentQuizOrder::where('student_quiz_order.student_id', $this->studentId)
+            ->where('student_quiz_order.quiz_id', $quiz->id)
+            ->with([
+                'question' => function ($query) {
+                    $query->select('id', 'question_text');
+                },
+                'question.answers' => function ($query) {
+                    $query->select('id', 'question_id', 'answer_text', 'is_correct', 'score');
+                }
+            ])
+            ->leftJoin('student_answers', function ($join) {
+                $join->on('student_quiz_order.student_id', '=', 'student_answers.student_id')
+                    ->on('student_quiz_order.quiz_id', '=', 'student_answers.quiz_id')
+                    ->on('student_quiz_order.question_id', '=', 'student_answers.question_id');
             })
-            ->orderBy('student_quiz_order.display_order')
+            ->select('student_quiz_order.question_id', 'student_quiz_order.display_order', 'student_quiz_order.answer_order', 'student_answers.answer_id')
+            ->orderBy('display_order')
             ->get();
 
-        return view('student.activities.quizzes.review', compact('quiz', 'result', 'answers'));
+        $questions->each(function ($question) use ($quiz) {
+            $question->sorted_answers = $quiz->randomize_answers && $question->answer_order
+                ? collect(json_decode($question->answer_order, true))
+                    ->map(function ($answerId) use ($question) {
+                        return $question->question->answers->firstWhere('id', $answerId);
+                    })
+                    ->filter()
+                    ->values()
+                : $question->question->answers;
+        });
+
+        $correctAnswers = $questions->filter(function ($question) {
+            return $question->answer_id && $question->question->answers->firstWhere('id', $question->answer_id)->is_correct;
+        })->count();
+
+        $wrongAnswers = $questions->filter(function ($question) {
+            return $question->answer_id && !$question->question->answers->firstWhere('id', $question->answer_id)->is_correct;
+        })->count();
+
+        $unanswered = $questions->filter(function ($question) {
+            return is_null($question->answer_id);
+        })->count();
+
+        $scores = StudentResult::where('quiz_id', $quiz->id)
+            ->orderBy('total_score', 'desc')
+            ->pluck('total_score')
+            ->values()
+            ->toArray();
+
+        $totalStudents = count($scores);
+        $uniqueScores = array_values(array_unique($scores));
+        $rank = array_search($result->total_score, $uniqueScores) + 1;
+
+        $lastRankScore = end($uniqueScores);
+        $isLastRank = $result->total_score === $lastRankScore;
+
+        $formattedRank = app()->getLocale() === 'ar'
+            ? getArabicOrdinal($rank, $isLastRank)
+            : ($isLastRank ? trans('admin/quizzes.lastRank') : $rank . (($rank % 10 == 1 && $rank % 100 != 11) ? 'st' : (($rank % 10 == 2 && $rank % 100 != 12) ? 'nd' : (($rank % 10 == 3 && $rank % 100 != 13) ? 'rd' : 'th'))));
+
+        $prompt = str_replace(
+            ['{name}', '{score}', '{total_score}', '{correct}', '{wrong}', '{unanswered}', '{rank}'],
+            [$this->student->name, $result->total_score, $quiz->total_score, $correctAnswers, $wrongAnswers, $unanswered, $formattedRank],
+            config('prompts.quiz_review')
+        );
+        $aiMessage = $this->geminiService->generateContent($prompt);
+
+        return view('student.activities.quizzes.review', compact('quiz', 'result', 'questions', 'formattedRank', 'correctAnswers', 'wrongAnswers', 'unanswered', 'aiMessage'));
     }
 }
 

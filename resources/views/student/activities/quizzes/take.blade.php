@@ -464,7 +464,6 @@
             let fiveMinutesReminderShown = false;
 
             let lastViolationTime = {};
-
             function recordViolation(type) {
                 const now = Date.now();
                 const validTypes = ['tab_switch', 'focus_loss', 'copy', 'paste', 'context_menu', 'shortcut',
@@ -525,7 +524,6 @@
                     }
                 });
             }
-
             $(document).on('visibilitychange', function() {
                 if (document.hidden) {
                     recordViolation('tab_switch');
@@ -539,6 +537,30 @@
                     recordViolation('focus_loss');
                 }
             });
+            let cheatDateDetector = Date.now();
+            setInterval(() => {
+                $.ajax({
+                    url: '{{ route('student.quizzes.cheatDetector', $quiz->uuid) }}',
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: JSON.stringify({
+                        timestamp: Date.now()
+                    }),
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function(response) {
+                        cheatDateDetector = Date.now();
+                    },
+                    error: function(xhr) {
+                        if (xhr.status !== 429 && Date.now() - cheatDateDetector > 60000) {
+                            recordViolation('tampering');
+                            cheatDateDetector = Date.now();
+                        }
+                    }
+                });
+            }, 30000);
             $(document).on('copy', function(e) {
                 recordViolation('copy');
                 e.preventDefault();
@@ -571,31 +593,6 @@
                     e.preventDefault();
                 }
             });
-
-            let lastHeartbeatSuccess = Date.now();
-            let heartbeatInterval = setInterval(() => {
-                $.ajax({
-                    url: '{{ route('student.quizzes.heartbeat', $quiz->uuid) }}',
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    data: JSON.stringify({
-                        timestamp: Date.now()
-                    }),
-                    contentType: 'application/json',
-                    dataType: 'json',
-                    success: function(response) {
-                        lastHeartbeatSuccess = Date.now();
-                    },
-                    error: function(xhr) {
-                        if (xhr.status !== 429 && Date.now() - lastHeartbeatSuccess > 60000) {
-                            recordViolation('tampering');
-                            lastHeartbeatSuccess = Date.now();
-                        }
-                    }
-                });
-            }, 30000);
 
             if (timeLeft > 0) {
                 $('#time-left').text(formatTime(timeLeft));

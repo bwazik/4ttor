@@ -17,7 +17,6 @@
         <th>{{ trans('main.start_time') }}</th>
         <th>{{ trans('main.end_time') }}</th>
         <th>{{ trans('main.link') }}</th>
-        <th>{{ trans('main.status') }}</th>
     </x-datatable>
     <!--/ DataTable -->
 @endsection
@@ -34,7 +33,6 @@
                 { data: 'start_time', name: 'start_time', orderable: false, searchable: false },
                 { data: 'end_time', name: 'end_time', orderable: false, searchable: false },
                 { data: 'startQuiz', name: 'startQuiz', orderable: false, searchable: false },
-                { data: 'status', name: 'status', orderable: false, searchable: false },
             ],
         );
 

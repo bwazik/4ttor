@@ -35,7 +35,7 @@ Route::group(
             Route::get('/{uuid}/notices', 'notices')->name('notices');
             Route::get('/{uuid}/take/{order?}', 'take')->name('take')->middleware('throttle:20,1');
             Route::post('/{uuid}/submit', 'submitAnswer')->name('submit')->middleware('throttle:20,1');
-            Route::post('/{uuid}/heartbeat',  'heartbeat')->name('heartbeat')->middleware('throttle:5,1');
+            Route::post('/{uuid}/cheat-detector',  'cheatDetector')->name('cheatDetector')->middleware('throttle:10,1');
             Route::post('/{uuid}/violation',  'violation')->name('violation');
             Route::get('/{uuid}/review', 'review')->name('review');
         });

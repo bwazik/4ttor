@@ -71,6 +71,7 @@ return [
     'quizCompleted' => 'خلصت الكويز. لو عندك أي أسئلة كلم المستر.',
     'quizNoQuestionsRemaining' => 'مفيش أسئلة متبقية فالكويز. لو عندك أي استفسارات، اتواصل مع المستر.',
     'reviewNotAvailable' => 'الكويز دا مش متاح للمراجعة. لو عندك أي استفسارات، اتواصل مع المستر.',
+    'reviewNotAvailableYet' => 'مش هينفع تراجع الكويز دا دلوقتي، لازم تستني لحد ما ميعاده يخلص.',
     'invalidQuestionForQuiz' => 'السؤال دا مش موجود في الكويز.',
     'invalidAnswerForQuestion' => 'الإجابة دي مش موجودة للسؤال دا.',
     'invalidQuestionOrder' => 'ترتيب الأسئلة مش مظبوط.',

@@ -504,3 +504,55 @@ if (!function_exists('formatDate')) {
         return Carbon::parse($date)->translatedFormat($format);
     }
 }
+
+
+if (!function_exists('getArabicOrdinal')) {
+    function getArabicOrdinal($number, $isLastRank = false)
+    {
+        if (!is_numeric($number) || $number <= 0) {
+            return trans('admin/quizzes.unranked');
+        }
+
+        if ($isLastRank) {
+            return trans('admin/quizzes.lastRank');
+        }
+
+        $number = (int) $number;
+
+        if ($number <= 10) {
+            return trans("main.ordinals.{$number}");
+        }
+
+        $units = ['', 'واحد', 'اثنان', 'ثلاثة', 'أربعة', 'خمسة', 'ستة', 'سبعة', 'ثمانية', 'تسعة'];
+        $tens = ['', 'عشرة', 'عشرون', 'ثلاثون', 'أربعون', 'خمسون', 'ستون', 'سبعون', 'ثمانون', 'تسعون'];
+        $hundreds = ['', 'مائة', 'مائتان', 'ثلاثمائة', 'أربعمائة', 'خمسمائة', 'ستمائة', 'سبعمائة', 'ثمانمائة', 'تسعمائة'];
+
+        $result = '';
+
+        if ($number >= 100) {
+            $hundredCount = floor($number / 100);
+            $number %= 100;
+            $result .= $hundreds[$hundredCount];
+        }
+
+        if ($number > 0) {
+            if ($result) {
+                $result .= ' و';
+            }
+            if ($number >= 10) {
+                $tenCount = floor($number / 10);
+                $unitCount = $number % 10;
+                if ($unitCount == 0) {
+                    $result .= $tens[$tenCount];
+                } else {
+                    $result .= $units[$unitCount] . ' و' . $tens[$tenCount];
+                }
+            } else {
+                $result .= $units[$number];
+            }
+        }
+
+        return 'ال' . trim($result);
+    }
+}
+

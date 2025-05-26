@@ -70,6 +70,7 @@ return [
     'quizCompleted' => 'You have completed the quiz. Contact your teacher if you have any questions.',
     'quizNoQuestionsRemaining' => 'No questions remaining in this quiz. Contact your teacher if you have any questions.',
     'reviewNotAvailable' => 'This quiz is not available for review. Contact your teacher if you have any questions.',
+    'reviewNotAvailableYet' => 'This quiz cannot be reviewed until after the end time. Please check back later.',
     'invalidQuestionForQuiz' => 'This question is not included in the quiz.',
     'invalidAnswerForQuestion' => 'This answer does not exist for this question.',
     'invalidQuestionOrder' => 'Invalid question order.',

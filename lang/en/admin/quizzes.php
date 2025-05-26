@@ -47,4 +47,11 @@ return [
     'timeoutMessage' => 'Sorry, time is up. The quiz has been closed.',
     'unansweredQuestions' => 'You have unanswered questions. Try to review them before finishing the quiz.',
     'submit' => 'Finish Quiz',
+    'result' => 'Score',
+    'correctAnswers' => 'Correct Answers',
+    'wrongAnswers' => 'Wrong Answers',
+    'unanswered' => 'Unanswered',
+    'rank' => 'Rank',
+    'unranked' => 'Unranked',
+    'lastRank' => 'The Last'
 ];
