@@ -100,6 +100,10 @@ class QuizService
     public function initializeResultWithQuizOrder(Quiz $quiz)
     {
         return $this->executeTransaction(function () use ($quiz) {
+            if (StudentQuizOrder::where('student_id', $this->studentId)->where('quiz_id', $quiz->id)->exists()) {
+                StudentQuizOrder::where('student_id', $this->studentId)->where('quiz_id', $quiz->id)->delete();
+            }
+
             $result = StudentResult::create([
                 'student_id' => $this->studentId,
                 'quiz_id' => $quiz->id,
@@ -137,6 +141,10 @@ class QuizService
                 ]);
             }
 
+            Cache::forget("student_quiz_orders:{$this->studentId}:{$quiz->id}");
+            Cache::forget("student_quiz_review:{$this->studentId}:{$quiz->id}");
+            Cache::forget("quiz_total_score:{$quiz->id}");
+
             return $result;
         });
 
@@ -149,6 +157,8 @@ class QuizService
                 ['student_id' => $studentId, 'quiz_id' => $quizId, 'question_id' => $questionId],
                 ['answer_id' => $answerId, 'answered_at' => now()]
             );
+            Cache::forget("quiz_total_score:{$quizId}");
+
             $this->updateStudentResult($result);
         });
     }

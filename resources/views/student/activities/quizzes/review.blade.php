@@ -233,5 +233,5 @@
 @endsection
 
 @section('page-js')
-    <script src="{{ asset('assets/vendor/libs/apex-charts/apexcharts.js') }}"></script>
+
 @endsection

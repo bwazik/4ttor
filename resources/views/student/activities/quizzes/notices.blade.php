@@ -56,60 +56,66 @@
                             </div>
                             <hr class="my-6" />
                             <h5>{{ trans('admin/assignments.instructions') }}</h5>
-                            <ol class="mb-6">
-                                <li class="mb-3">
-                                    <p>
-                                        {{ e(trans('admin/quizzes.instructions.screen_lock')) }}
-                                    </p>
-                                </li>
-                                <li class="mb-3 text-warning">
-                                    <p>{{ e(trans('admin/quizzes.instructions.cheating')) }}</p>
-                                </li>
-                                <li class="mb-3">
-                                    <p>{{ e(trans('admin/quizzes.instructions.navigation')) }}</p>
-                                </li>
-                                <li class="mb-3">
-                                    <p>{{ e(trans('admin/quizzes.instructions.saving')) }}</p>
-                                </li>
-                                <li class="mb-3">
-                                    <p>{{ e(trans('admin/quizzes.instructions.submission')) }}</p>
-                                </li>
-                                <li class="mb-3">
-                                    <p>
-                                        {{ e(trans('admin/quizzes.instructions.warnings')) }}
-                                    </p>
-                                </li>
-                                <li class="mb-3">
-                                    <p>{{ e(trans('admin/quizzes.instructions.review')) }}</p>
-                                </li>
-                                <li class="mb-3">
-                                    <p>{{ e(trans('admin/quizzes.instructions.closure')) }}</p>
-                                </li>
-                            </ol>
-                                @if (!now()->between($quiz->start_time, $quiz->end_time))
-                                    <a href="#"
-                                        class="btn btn-secondary me-2 waves-effect waves-light">{{ trans('account.notAvailable') }}</a>
-                                @elseif ($result && $result->status == 1)
-                                    <a href="{{ route('student.quizzes.take', $quiz->uuid) }}"
-                                        class="btn btn-primary me-2 waves-effect waves-light">{{ trans('admin/quizzes.resumeQuiz') }}</a>
-                                @else
-                                    <a href="{{ route('student.quizzes.take', $quiz->uuid) }}"
-                                        class="btn btn-primary me-2 waves-effect waves-light">{{ trans('admin/quizzes.startQuiz') }}</a>
-                                @endif
-                                <hr class="my-6" />
-                                <h5>{{ app()->getLocale() === 'ar' ? 'ال' : '' }}{{ trans('admin/teachers.teacher') }}
-                                </h5>
-                                <div class="d-flex justify-content-start align-items-center user-name">
-                                    <div class="avatar-wrapper">
-                                        <div class="avatar me-4">
-                                            <img src="{{ $quiz->teacher->profile_pic ? asset('storage/profiles/teachers/' . $quiz->teacher->profile_pic) : asset('assets/img/avatars/default.jpg') }}"
-                                                alt="Avatar" class="rounded-circle" />
-                                        </div>
-                                    </div>
-                                    <div class="d-flex flex-column">
-                                        <h6 class="mb-1">{{ $quiz->teacher->name ?? 'N/A' }}</h6>
+                            <x-alert type="info" :dismissible=false icon="openai" :message="trans('admin/quizzes.instructionsAlert')"/>
+                            <button class="btn btn-primary me-2 waves-effect waves-light" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#instructions" aria-expanded="true"
+                                aria-controls="instructions">{{ trans('main.showInstructions') }}</button>
+                            @if (!now()->between($quiz->start_time, $quiz->end_time))
+                                <a href="#"
+                                    class="btn btn-secondary me-2 waves-effect waves-light">{{ trans('account.notAvailable') }}</a>
+                            @elseif ($result && $result->status == 1)
+                                <a href="{{ route('student.quizzes.take', $quiz->uuid) }}"
+                                    class="btn btn-primary waves-effect waves-light">{{ trans('admin/quizzes.resumeQuiz') }}</a>
+                            @else
+                                <a href="{{ route('student.quizzes.take', $quiz->uuid) }}"
+                                    class="btn btn-primary waves-effect waves-light">{{ trans('admin/quizzes.startQuiz') }}</a>
+                            @endif
+                            <div class="collapse mt-3" id="instructions" style="">
+                                <ol class="mb-6">
+                                    <li class="mb-3">
+                                        <p>
+                                            {{ e(trans('admin/quizzes.instructions.screen_lock')) }}
+                                        </p>
+                                    </li>
+                                    <li class="mb-3 text-warning">
+                                        <p>{{ e(trans('admin/quizzes.instructions.cheating')) }}</p>
+                                    </li>
+                                    <li class="mb-3">
+                                        <p>{{ e(trans('admin/quizzes.instructions.navigation')) }}</p>
+                                    </li>
+                                    <li class="mb-3">
+                                        <p>{{ e(trans('admin/quizzes.instructions.saving')) }}</p>
+                                    </li>
+                                    <li class="mb-3">
+                                        <p>{{ e(trans('admin/quizzes.instructions.submission')) }}</p>
+                                    </li>
+                                    <li class="mb-3">
+                                        <p>
+                                            {{ e(trans('admin/quizzes.instructions.warnings')) }}
+                                        </p>
+                                    </li>
+                                    <li class="mb-3">
+                                        <p>{{ e(trans('admin/quizzes.instructions.review')) }}</p>
+                                    </li>
+                                    <li class="mb-3">
+                                        <p>{{ e(trans('admin/quizzes.instructions.closure')) }}</p>
+                                    </li>
+                                </ol>
+                            </div>
+                            <hr class="my-6" />
+                            <h5>{{ app()->getLocale() === 'ar' ? 'ال' : '' }}{{ trans('admin/teachers.teacher') }}
+                            </h5>
+                            <div class="d-flex justify-content-start align-items-center user-name">
+                                <div class="avatar-wrapper">
+                                    <div class="avatar me-4">
+                                        <img src="{{ $quiz->teacher->profile_pic ? asset('storage/profiles/teachers/' . $quiz->teacher->profile_pic) : asset('assets/img/avatars/default.jpg') }}"
+                                            alt="Avatar" class="rounded-circle" />
                                     </div>
                                 </div>
+                                <div class="d-flex flex-column">
+                                    <h6 class="mb-1">{{ $quiz->teacher->name ?? 'N/A' }}</h6>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

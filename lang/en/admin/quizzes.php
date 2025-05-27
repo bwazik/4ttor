@@ -21,6 +21,7 @@ return [
     'completed' => 'Completed',
     'failed' => 'Failed',
     'reviewAnswers' => 'Review Answers',
+    'instructionsAlert' => 'Before starting the quiz, you must read the instructions carefully as they will help you understand everything and act correctly (trust me, you\'ll regret cheating).',
     'resumeQuiz' => 'Resume Quiz',
     'instructions' => [
         'screen_lock' => 'Set your phone\'s screen lock timer to 30 minutes. This keeps the screen on during the exam and prevents it from being counted as a violation.',

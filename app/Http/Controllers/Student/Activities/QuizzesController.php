@@ -324,7 +324,7 @@ class QuizzesController extends Controller
         $wrongAnswers = $reviewData['wrongAnswers'];
         $unanswered = $reviewData['unanswered'];
         $formattedRank = $reviewData['formattedRank'];
-        
+
         $prompt = str_replace(
             ['{name}', '{score}', '{total_score}', '{correct}', '{wrong}', '{unanswered}', '{rank}'],
             [$this->student->name, $result->total_score, $quiz->total_score, $reviewData['correctAnswers'], $reviewData['wrongAnswers'], $reviewData['unanswered'], $reviewData['formattedRank']],
@@ -385,12 +385,18 @@ class QuizzesController extends Controller
     protected function validateQuizAvailability($quiz, $result)
     {
         if ($quiz->quiz_mode == 1 && $quiz->duration > 0 && now()->greaterThanOrEqualTo(Carbon::parse($quiz->end_time))) {
-            if($result) $result->update(['status' => 2, 'completed_at' => now()]);
+            if($result){
+                $this->executeTransaction(function () use ($result) {
+                    $result->update(['status' => 2, 'completed_at' => now()]);
+                });
+            }
             return $this->createResponse('error', trans('toasts.quizTimeExpired'));
         }
 
         if ($quiz->quiz_mode == 2 && $result && $quiz->duration > 0 && Carbon::parse($result->started_at)->addMinutes($quiz->duration) < now()) {
-            $result->update(['status' => 2, 'completed_at' => now()]);
+            $this->executeTransaction(function () use ($result) {
+                $result->update(['status' => 2, 'completed_at' => now()]);
+            });
             return $this->createResponse('error', trans('toasts.quizTimeExpired'));
         }
 

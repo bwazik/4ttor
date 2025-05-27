@@ -197,6 +197,7 @@ return [
     'finish' => 'خلصت',
     'reportIssue' => 'في مشكلة؟',
     'reportIssueTooltip' => 'النص دا مستخرج عن طريق الذكاء الإصطناعي لو في أي مشلكة اضغط علي الزرار دا.',
+    'showInstructions' => 'وريني التعليمات',
 
     # Toasts
     'errorMessage' => 'فيه مشكلة حصلت، جرب تاني بعد شوية!',

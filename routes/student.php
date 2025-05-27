@@ -29,15 +29,31 @@ Route::group(
             Route::post('coupons/redeem', 'redeemCoupon')->name('coupons.redeem')->middleware('throttle:5,1');
         });
 
-        # Quizzes
-        Route::prefix('quizzes')->controller(QuizzesController::class)->name('quizzes.')->group(function() {
-            Route::get('/', 'index')->name('index');
-            Route::get('/{uuid}/notices', 'notices')->name('notices');
-            Route::get('/{uuid}/take/{order?}', 'take')->name('take')->middleware('throttle:20,1');
-            Route::post('/{uuid}/submit', 'submitAnswer')->name('submit')->middleware('throttle:20,1');
-            Route::post('/{uuid}/cheat-detector',  'cheatDetector')->name('cheatDetector')->middleware('throttle:10,1');
-            Route::post('/{uuid}/violation',  'violation')->name('violation');
-            Route::get('/{uuid}/review', 'review')->name('review');
-        });
+        # Start Activities
+            # Quizzes
+            Route::prefix('quizzes')->controller(QuizzesController::class)->name('quizzes.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::get('/{uuid}/notices', 'notices')->name('notices');
+                Route::get('/{uuid}/take/{order?}', 'take')->name('take')->middleware('throttle:20,1');
+                Route::post('/{uuid}/submit', 'submitAnswer')->name('submit')->middleware('throttle:20,1');
+                Route::post('/{uuid}/cheat-detector',  'cheatDetector')->name('cheatDetector')->middleware('throttle:10,1');
+                Route::post('/{uuid}/violation',  'violation')->name('violation');
+                Route::get('/{uuid}/review', 'review')->name('review');
+            });
+            # Assignments
+            Route::prefix('assignments')->controller(AssignmentsController::class)->name('assignments.')->group(function() {
+                Route::get('/', 'index')->name('index');
+                Route::get('{uuid}', 'details')->name('details');
+                Route::post('{uuid}/upload', 'uploadFile')->name('files.upload');
+                Route::get('files/{fileId}/download', 'downloadFile')->name('files.download');
+                Route::post('files/delete', 'deleteFile')->name('files.delete');
+                Route::middleware('throttle:10,1')->group(function() {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
+            });
+        # End Activities
     });
 });
