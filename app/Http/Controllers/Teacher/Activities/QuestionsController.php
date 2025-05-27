@@ -48,9 +48,11 @@ class QuestionsController extends Controller
 
     public function update(QuestionsRequest $request)
     {
+        $quizId = Question::findOrFail($request->id)->value('quiz_id');
+
         $result = $this->questionService->updateQuestion($request->id, $request->validated());
 
-        return $this->conrtollerJsonResponse($result);
+        return $this->conrtollerJsonResponse($result, "quiz_total_score_{$quizId}");
     }
 
     public function delete(Request $request)

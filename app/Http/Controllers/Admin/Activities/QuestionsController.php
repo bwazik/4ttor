@@ -7,12 +7,13 @@ use App\Models\Question;
 use Illuminate\Http\Request;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
+use App\Traits\ServiceResponseTrait;
 use App\Services\Admin\Activities\QuestionService;
 use App\Http\Requests\Admin\Activities\QuestionsRequest;
 
 class QuestionsController extends Controller
 {
-    use ValidatesExistence;
+    use ValidatesExistence, ServiceResponseTrait;
 
     protected $questionService;
 
@@ -38,22 +39,16 @@ class QuestionsController extends Controller
     {
         $result = $this->questionService->insertQuestion($request->validated(), $quizId);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function update(QuestionsRequest $request)
     {
+        $quizId = Question::findOrFail($request->id)->value('quiz_id');
+
         $result = $this->questionService->updateQuestion($request->id, $request->validated());
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result, "quiz_total_score_{$quizId}");
     }
 
     public function delete(Request $request)
@@ -62,11 +57,7 @@ class QuestionsController extends Controller
 
         $result = $this->questionService->deleteQuestion($request->id);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 
     public function deleteSelected(Request $request)
@@ -75,10 +66,6 @@ class QuestionsController extends Controller
 
         $result = $this->questionService->deleteSelectedQuestions($request->ids);
 
-        if ($result['status'] === 'success') {
-            return response()->json(['success' => $result['message']], 200);
-        }
-
-        return response()->json(['error' => $result['message']], 500);
+        return $this->conrtollerJsonResponse($result);
     }
 }

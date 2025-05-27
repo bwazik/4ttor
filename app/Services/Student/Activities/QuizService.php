@@ -8,7 +8,9 @@ use App\Models\Question;
 use App\Models\StudentAnswer;
 use App\Models\StudentResult;
 use App\Models\StudentQuizOrder;
+use App\Models\StudentViolation;
 use App\Traits\PublicValidatesTrait;
+use Illuminate\Support\Facades\Cache;
 use App\Traits\DatabaseTransactionTrait;
 use App\Traits\PreventDeletionIfRelated;
 
@@ -95,33 +97,36 @@ class QuizService
         };
     }
 
-    public function initializeQuizOrder(StudentResult $result, Quiz $quiz)
+    public function initializeResultWithQuizOrder(Quiz $quiz)
     {
-        return $this->executeTransaction(function () use ($result, $quiz) {
-            if (
-                StudentQuizOrder::where('student_id', $result->student_id)
-                    ->where('quiz_id', $quiz->id)
-                    ->exists()
-            ) {
-                return;
-            }
+        return $this->executeTransaction(function () use ($quiz) {
+            $result = StudentResult::create([
+                'student_id' => $this->studentId,
+                'quiz_id' => $quiz->id,
+                'total_score' => 0,
+                'percentage' => 0,
+                'started_at' => now(),
+                'status' => 1,
+                'last_order' => 1,
+            ]);
+
+            Cache::put("heartbeat:{$this->studentId}:{$quiz->id}", now(), 120);
 
             $questions = $quiz->questions()->get();
             if ($questions->isEmpty()) {
-                return;
+                $result->delete();
+                return response()->json([
+                    'error' => trans('toasts.quizNoQuestions'),
+                    'redirect' => route('student.quizzes.index')
+                ], 403);
             }
 
             $questions = $quiz->randomize_questions ? $questions->shuffle() : $questions;
 
             foreach ($questions as $index => $question) {
-                $answerOrder = null;
-                if ($quiz->randomize_answers) {
-                    $answers = $question->answers()->pluck('id')->toArray();
-                    shuffle($answers);
-                    $answerOrder = json_encode($answers);
-                } else {
-                    $answerOrder = json_encode($question->answers()->pluck('id')->toArray());
-                }
+                $answerOrder = $quiz->randomize_answers
+                    ? json_encode($question->answers()->pluck('id')->shuffle()->toArray())
+                    : json_encode($question->answers()->pluck('id')->toArray());
 
                 StudentQuizOrder::create([
                     'student_id' => $result->student_id,
@@ -131,13 +136,27 @@ class QuizService
                     'answer_order' => $answerOrder,
                 ]);
             }
+
+            return $result;
         });
 
     }
 
+    public function submitAnswer($studentId, $quizId, $questionId, $answerId, StudentResult $result)
+    {
+        return $this->executeTransaction(function () use ($studentId, $quizId, $questionId, $answerId, $result) {
+            StudentAnswer::updateOrCreate(
+                ['student_id' => $studentId, 'quiz_id' => $quizId, 'question_id' => $questionId],
+                ['answer_id' => $answerId, 'answered_at' => now()]
+            );
+            $this->updateStudentResult($result);
+        });
+    }
+
     public function updateStudentResult(StudentResult $result)
     {
-        return $this->executeTransaction(function () use ($result) {
+        return $this->executeTransaction(function () use ($result)
+        {
             $answers = StudentAnswer::where('student_id', $result->student_id)
                 ->where('quiz_id', $result->quiz_id)
                 ->with(['answer' => fn($q) => $q->select('id', 'score', 'is_correct')])
@@ -152,6 +171,26 @@ class QuizService
                 'total_score' => $totalScore,
                 'percentage' => round($percentage, 2),
             ]);
+        });
+    }
+
+    public function recordViolation($studentId, $quizId, $violationType, StudentResult $result)
+    {
+        return $this->executeTransaction(function () use ($studentId, $quizId, $violationType, $result) {
+            StudentViolation::create([
+                'student_id' => $studentId,
+                'quiz_id' => $quizId,
+                'violation_type' => $violationType,
+                'detected_at' => now(),
+            ]);
+
+            if (StudentViolation::where('student_id', $studentId)->where('quiz_id', $quizId)->count() >= 5) {
+                $result->update(['status' => 3, 'completed_at' => now()]);
+                return response()->json([
+                    'error' => trans('toasts.tooManyViolations'),
+                    'redirect' => route('student.quizzes.index')
+                ], 403);
+            }
         });
     }
 }

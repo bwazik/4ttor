@@ -463,136 +463,136 @@
             let halfTimeReminderShown = false;
             let fiveMinutesReminderShown = false;
 
-            let lastViolationTime = {};
-            function recordViolation(type) {
-                const now = Date.now();
-                const validTypes = ['tab_switch', 'focus_loss', 'copy', 'paste', 'context_menu', 'shortcut',
-                    'screenshot', 'dev_tools', 'tampering'
-                ];
-                if (!validTypes.includes(type)) {
-                    return;
-                }
-                if (validTypes.includes(type)) {
-                    if (!lastViolationTime[type] || (now - lastViolationTime[type] > 30000)) {
-                        lastViolationTime[type] = now;
-                    } else {
-                        return;
-                    }
-                }
-                $.ajax({
-                    url: '{{ route('student.quizzes.violation', $quiz->uuid) }}',
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    data: JSON.stringify({
-                        violation_type: type
-                    }),
-                    contentType: 'application/json',
-                    dataType: 'json',
-                    success: function(response) {
-                        showAlert(
-                            "{{ trans('main.warning') }}",
-                            "{{ trans('admin/quizzes.violationMessage') }}",
-                            "error",
-                            "{{ trans('admin/quizzes.violationButtonText') }}"
-                        );
-                        if (response.error && response.redirect) {
-                            showAlert(
-                                "{{ trans('main.error') }}",
-                                response.error,
-                                "error",
-                                "{{ trans('main.submit') }}"
-                            );
-                            setTimeout(() => {
-                                window.location.href = response.redirect;
-                            }, 1500);
-                        }
-                    },
-                    error: function(xhr) {
-                        if (xhr.status === 403 || xhr.status === 419) {
-                            showAlert(
-                                "{{ trans('main.error') }}",
-                                "{{ trans('admin/quizzes.violationMessage') }}",
-                                "error",
-                                "{{ trans('main.submit') }}"
-                            );
-                            setTimeout(() => {
-                                window.location.href = '{{ route('student.quizzes.index') }}';
-                            }, 1500);
-                        }
-                    }
-                });
-            }
-            $(document).on('visibilitychange', function() {
-                if (document.hidden) {
-                    recordViolation('tab_switch');
-                }
-            });
-            $(window).on('pagehide', function() {
-                recordViolation('tab_switch');
-            });
-            $(window).on('blur', function() {
-                if (!document.hidden) {
-                    recordViolation('focus_loss');
-                }
-            });
-            let cheatDateDetector = Date.now();
-            setInterval(() => {
-                $.ajax({
-                    url: '{{ route('student.quizzes.cheatDetector', $quiz->uuid) }}',
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    data: JSON.stringify({
-                        timestamp: Date.now()
-                    }),
-                    contentType: 'application/json',
-                    dataType: 'json',
-                    success: function(response) {
-                        cheatDateDetector = Date.now();
-                    },
-                    error: function(xhr) {
-                        if (xhr.status !== 429 && Date.now() - cheatDateDetector > 60000) {
-                            recordViolation('tampering');
-                            cheatDateDetector = Date.now();
-                        }
-                    }
-                });
-            }, 30000);
-            $(document).on('copy', function(e) {
-                recordViolation('copy');
-                e.preventDefault();
-            });
-            $(document).on('paste', function(e) {
-                recordViolation('paste');
-                e.preventDefault();
-            });
-            $(document).on('contextmenu', function(e) {
-                recordViolation('context_menu');
-                e.preventDefault();
-            });
-            $(document).on('keydown', function(e) {
-                if (e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 't')) {
-                    recordViolation('shortcut');
-                    e.preventDefault();
-                }
-                if (e.altKey && e.key === 'Tab') {
-                    recordViolation('shortcut');
-                    e.preventDefault();
-                }
-                if (e.key === 'PrintScreen' || (e.metaKey && e.shiftKey && (e.key === '3' || e.key ===
-                        '4'))) {
-                    recordViolation('screenshot');
-                    e.preventDefault();
-                }
-                if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e
-                        .key === 'C'))) {
-                    recordViolation('dev_tools');
-                    e.preventDefault();
-                }
-            });
+            // let lastViolationTime = {};
+            // function recordViolation(type) {
+            //     const now = Date.now();
+            //     const validTypes = ['tab_switch', 'focus_loss', 'copy', 'paste', 'context_menu', 'shortcut',
+            //         'screenshot', 'dev_tools', 'tampering'
+            //     ];
+            //     if (!validTypes.includes(type)) {
+            //         return;
+            //     }
+            //     if (validTypes.includes(type)) {
+            //         if (!lastViolationTime[type] || (now - lastViolationTime[type] > 30000)) {
+            //             lastViolationTime[type] = now;
+            //         } else {
+            //             return;
+            //         }
+            //     }
+            //     $.ajax({
+            //         url: '{{ route('student.quizzes.violation', $quiz->uuid) }}',
+            //         method: 'POST',
+            //         headers: {
+            //             'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            //         },
+            //         data: JSON.stringify({
+            //             violation_type: type
+            //         }),
+            //         contentType: 'application/json',
+            //         dataType: 'json',
+            //         success: function(response) {
+            //             showAlert(
+            //                 "{{ trans('main.warning') }}",
+            //                 "{{ trans('admin/quizzes.violationMessage') }}",
+            //                 "error",
+            //                 "{{ trans('admin/quizzes.violationButtonText') }}"
+            //             );
+            //             if (response.error && response.redirect) {
+            //                 showAlert(
+            //                     "{{ trans('main.error') }}",
+            //                     response.error,
+            //                     "error",
+            //                     "{{ trans('main.submit') }}"
+            //                 );
+            //                 setTimeout(() => {
+            //                     window.location.href = response.redirect;
+            //                 }, 1500);
+            //             }
+            //         },
+            //         error: function(xhr) {
+            //             if (xhr.status === 403 || xhr.status === 419) {
+            //                 showAlert(
+            //                     "{{ trans('main.error') }}",
+            //                     "{{ trans('admin/quizzes.violationMessage') }}",
+            //                     "error",
+            //                     "{{ trans('main.submit') }}"
+            //                 );
+            //                 setTimeout(() => {
+            //                     window.location.href = '{{ route('student.quizzes.index') }}';
+            //                 }, 1500);
+            //             }
+            //         }
+            //     });
+            // }
+            // $(document).on('visibilitychange', function() {
+            //     if (document.hidden) {
+            //         recordViolation('tab_switch');
+            //     }
+            // });
+            // $(window).on('pagehide', function() {
+            //     recordViolation('tab_switch');
+            // });
+            // $(window).on('blur', function() {
+            //     if (!document.hidden) {
+            //         recordViolation('focus_loss');
+            //     }
+            // });
+            // let cheatDateDetector = Date.now();
+            // setInterval(() => {
+            //     $.ajax({
+            //         url: '{{ route('student.quizzes.cheatDetector', $quiz->uuid) }}',
+            //         method: 'POST',
+            //         headers: {
+            //             'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            //         },
+            //         data: JSON.stringify({
+            //             timestamp: Date.now()
+            //         }),
+            //         contentType: 'application/json',
+            //         dataType: 'json',
+            //         success: function(response) {
+            //             cheatDateDetector = Date.now();
+            //         },
+            //         error: function(xhr) {
+            //             if (xhr.status !== 429 && Date.now() - cheatDateDetector > 60000) {
+            //                 recordViolation('tampering');
+            //                 cheatDateDetector = Date.now();
+            //             }
+            //         }
+            //     });
+            // }, 30000);
+            // $(document).on('copy', function(e) {
+            //     recordViolation('copy');
+            //     e.preventDefault();
+            // });
+            // $(document).on('paste', function(e) {
+            //     recordViolation('paste');
+            //     e.preventDefault();
+            // });
+            // $(document).on('contextmenu', function(e) {
+            //     recordViolation('context_menu');
+            //     e.preventDefault();
+            // });
+            // $(document).on('keydown', function(e) {
+            //     if (e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 't')) {
+            //         recordViolation('shortcut');
+            //         e.preventDefault();
+            //     }
+            //     if (e.altKey && e.key === 'Tab') {
+            //         recordViolation('shortcut');
+            //         e.preventDefault();
+            //     }
+            //     if (e.key === 'PrintScreen' || (e.metaKey && e.shiftKey && (e.key === '3' || e.key ===
+            //             '4'))) {
+            //         recordViolation('screenshot');
+            //         e.preventDefault();
+            //     }
+            //     if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e
+            //             .key === 'C'))) {
+            //         recordViolation('dev_tools');
+            //         e.preventDefault();
+            //     }
+            // });
 
             if (timeLeft > 0) {
                 $('#time-left').text(formatTime(timeLeft));
