@@ -172,7 +172,7 @@
                     </div>
                 </div>
                 <div class="card-body pt-5">
-                    @foreach ($data['topStudents'] as $student)
+                    @forelse ($data['topStudents'] as $student)
                         <div class="d-flex justify-content-between align-items-center mb-6">
                             <div class="d-flex align-items-center">
                                 <div class="avatar avatar me-4">
@@ -193,7 +193,9 @@
                                 <h6 class="mb-0">{{ $student['quiz_score'] }}</h6>
                             </div>
                         </div>
-                    @endforeach
+                    @empty
+                        <div class="text-center">{{ trans('main.datatable.empty_table') }}</d>
+                    @endforelse
                 </div>
             </div>
         </div>
