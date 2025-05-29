@@ -125,7 +125,7 @@
         let fields = ['question_text_ar', 'question_text_en'];
         handleFormSubmit('#add-form', fields, '#add-modal', 'offcanvas', '#noDatatable');
         handleFormSubmit('#edit-form', fields, '#edit-modal', 'offcanvas', '#noDatatable');
-        handleDeletionFormSubmit('#delete-form', '#delete-modal', '#noDatatable')
+        ('#delete-form', '#delete-modal', '#noDatatable')
         handleDeletionFormSubmit('#delete-selected-form', '#delete-selected-modal', '#noDatatable')
         $(function() {
             $('body').on('click', '#delete-selected-btn', function(e) {

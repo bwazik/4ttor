@@ -4,9 +4,14 @@ namespace App\Services\Admin\Activities;
 
 use Carbon\Carbon;
 use App\Models\Quiz;
-use App\Traits\PreventDeletionIfRelated;
-use App\Traits\DatabaseTransactionTrait;
+use App\Models\StudentAnswer;
+use App\Models\StudentResult;
+use App\Models\StudentQuizOrder;
+use App\Models\StudentViolation;
 use App\Traits\PublicValidatesTrait;
+use Illuminate\Support\Facades\Cache;
+use App\Traits\DatabaseTransactionTrait;
+use App\Traits\PreventDeletionIfRelated;
 
 class QuizService
 {
@@ -45,6 +50,9 @@ class QuizService
                     '<i class="ri-more-2-line"></i>' .
                 '</a>' .
                 '<ul class="dropdown-menu dropdown-menu-end m-0">' .
+                    '<li>
+                        <a href="' . route('admin.quizzes.reports', $row->id) . '" class="dropdown-item">'.trans('main.reports').'</a>
+                    </li>' .
                     '<li>
                         <a target="_blank" href="' . route('admin.questions.index', $row->id) . '" class="dropdown-item">'.trans('admin/questions.questions').'</a>
                     </li>' .
@@ -181,5 +189,26 @@ class QuizService
     public function checkDependenciesForMultipleDeletion($quizzes)
     {
         return $this->checkForMultipleDependencies($quizzes, $this->relationships, $this->transModelKey);
+    }
+
+    public function resetStudentQuiz($quizId, $studentId): array
+    {
+        return $this->executeTransaction(function () use ($quizId, $studentId)
+        {
+            StudentResult::where('quiz_id', $quizId)->where('student_id', $studentId)->delete();
+            StudentAnswer::where('quiz_id', $quizId)->where('student_id', $studentId)->delete();
+            StudentQuizOrder::where('quiz_id', $quizId)->where('student_id', $studentId)->delete();
+            StudentViolation::where('quiz_id', $quizId)->where('student_id', $studentId)->delete();
+
+            Cache::forget("student_quiz_review:{$studentId}:{$quizId}");
+            Cache::forget("quiz_{$quizId}_avg_score");
+            Cache::forget("quiz_{$quizId}_avg_percentage");
+            Cache::forget("quiz_{$quizId}_avg_time");
+            Cache::forget("score_distribution_{$quizId}");
+            Cache::forget("question_stats_{$quizId}");
+            Cache::forget("top_students_{$quizId}");
+
+            return $this->successResponse(trans('toasts.quizResetSuccess'));
+        });
     }
 }

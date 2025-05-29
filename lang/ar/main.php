@@ -27,6 +27,8 @@ return [
         'info_filtered' => '(مفلتر من _MAX_ عناصر كلياً)',
     ],
     'detailsOf' => 'تفاصيل ال',
+    'reports' => 'التقارير',
+    'reportsOf' => 'تقارير :dependency',
 
     # Datatable headers
     'name' => 'الإسم',
@@ -120,6 +122,7 @@ return [
     'used' => 'مستخدم',
     'unused' => 'متاح',
     'score' => 'الدرجة',
+    'percentage' => 'النسبة',
     'files' => 'الملفات',
     'video_url' => 'رمز الفيديو',
     'allowed' => 'مسموح',

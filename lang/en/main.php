@@ -27,6 +27,9 @@ return [
         'info_filtered' => '(filtered from _MAX_ total entries)',
     ],
     'detailsOf' => 'Details of',
+    'reports' => 'Reports',
+    'reportsOf' => ':dependency Reports',
+
 
     # Datatable headers
     'name' => 'Name',
@@ -118,6 +121,7 @@ return [
     'used' => 'Used',
     'unused' => 'Available',
     'score' => 'Score',
+    'percentage' => 'Percentage',
     'files' => 'Files',
     'video_url' => 'Video URL',
     'allowed' => 'Allowed',

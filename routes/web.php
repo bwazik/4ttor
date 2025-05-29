@@ -283,11 +283,16 @@ Route::group(
             # Quizzes
             Route::prefix('quizzes')->controller(QuizzesController::class)->name('quizzes.')->group(function () {
                 Route::get('/', 'index')->name('index');
+                Route::get('{id}/reports', 'reports')->name('reports');
+                Route::get('{id}/students/{studentId}/review', 'review')->name('review');
+                Route::get('{id}/students-taken-quiz', 'studentsTakenQuiz')->name('studentsTakenQuiz');
+                Route::get('{id}/students-not-taken-quiz', 'studentsNotTakenQuiz')->name('studentsNotTakenQuiz');
                 Route::middleware('throttle:10,1')->group(function () {
                     Route::post('insert', 'insert')->name('insert');
                     Route::post('update', 'update')->name('update');
                     Route::post('delete', 'delete')->name('delete');
                     Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                    Route::post('{id}/students/{studentId}/reset', 'resetStudentQuiz')->name('resetStudentQuiz');
                 });
             });
 

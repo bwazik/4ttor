@@ -22,7 +22,7 @@
     </style>
 @endsection
 
-@section('title', pageTitle('admin/quizzes.quizzes'))
+@section('title', pageTitle(trans('admin/quizzes.reviewAnswers').' - '.$quiz->name))
 
 @section('content')
     <div class="row g-6">
@@ -65,7 +65,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="card-info">
-                                                        <h5 class="mb-0">{{ $formattedRank }}</h5>
+                                                        <h5 class="mb-0">{{ $reviewData['formattedRank'] }}</h5>
                                                         <p class="mb-0">{{ trans('admin/quizzes.rank') }}</p>
                                                     </div>
                                                 </div>
@@ -93,7 +93,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="card-info">
-                                                        <h5 class="mb-0">{{ $correctAnswers }}</h5>
+                                                        <h5 class="mb-0">{{ $reviewData['correctAnswers'] }}</h5>
                                                         <p class="mb-0">{{ trans('admin/quizzes.correctAnswers') }}</p>
                                                     </div>
                                                 </div>
@@ -107,7 +107,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="card-info">
-                                                        <h5 class="mb-0">{{ $wrongAnswers }}</h5>
+                                                        <h5 class="mb-0">{{ $reviewData['wrongAnswers'] }}</h5>
                                                         <p class="mb-0">{{ trans('admin/quizzes.wrongAnswers') }}</p>
                                                     </div>
                                                 </div>
@@ -121,7 +121,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="card-info">
-                                                        <h5 class="mb-0">{{ $unanswered }}</h5>
+                                                        <h5 class="mb-0">{{ $reviewData['unanswered'] }}</h5>
                                                         <p class="mb-0">{{ trans('admin/quizzes.unanswered') }}</p>
                                                     </div>
                                                 </div>
@@ -152,11 +152,11 @@
                             @if ($quiz->allow_review)
                                 <div class="tab-pane fade {{ !$quiz->show_result ? 'active show' : '' }}"
                                     id="answers-tab" role="tabpanel">
-                                    @if ($questions->isEmpty())
+                                    @if ($reviewData['questions']->isEmpty())
                                         <p class="text-center">{{ trans('main.errorMessage') }}</p>
                                     @else
                                         <div class="accordion accordion-popout" id="accordionPopout">
-                                            @foreach ($questions as $index => $question)
+                                            @foreach ($reviewData['questions'] as $index => $question)
                                                 <div class="accordion-item">
                                                     <h2 class="accordion-header"
                                                         id="headingPopout{{ $question->question_id }}">

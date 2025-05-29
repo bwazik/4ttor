@@ -717,7 +717,7 @@ function handleFormSubmit(formId, fields, modalId, modalType, getDatatableId, re
     });
 }
 
-function handleDeletionFormSubmit(formId, modalId, getDatatableId) {
+function handleDeletionFormSubmit(formId, modalId, getDatatableId, redirectTo = null) {
     const $form = $(formId);
     const $submitButton = $form.find('button[type="submit"]');
     const originalButtonContent = $submitButton.html();
@@ -746,6 +746,8 @@ function handleDeletionFormSubmit(formId, modalId, getDatatableId) {
                     $(modalId).modal('hide')
                     if ($(datatableId).length) {
                         refreshDataTable(datatableId);
+                    } else if (redirectTo) {
+                        window.location.href = redirectTo;
                     } else {
                         location.reload();
                     }

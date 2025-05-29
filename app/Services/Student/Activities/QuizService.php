@@ -194,13 +194,20 @@ class QuizService
                 'detected_at' => now(),
             ]);
 
-            if (StudentViolation::where('student_id', $studentId)->where('quiz_id', $quizId)->count() >= 5) {
+            $violationCount = StudentViolation::where('student_id', $studentId)
+                ->where('quiz_id', $quizId)
+                ->count();
+
+            if ($violationCount >= 5) {
                 $result->update(['status' => 3, 'completed_at' => now()]);
-                return response()->json([
-                    'error' => trans('toasts.tooManyViolations'),
+                return [
+                    'status' => 'error',
+                    'message' => trans('toasts.tooManyViolations'),
                     'redirect' => route('student.quizzes.index')
-                ], 403);
+                ];
             }
+
+            return ['status' => 'success'];
         });
     }
 }

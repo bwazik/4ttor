@@ -54,5 +54,40 @@ return [
     'unanswered' => 'Unanswered',
     'rank' => 'Rank',
     'unranked' => 'Unranked',
-    'lastRank' => 'The Last'
+    'lastRank' => 'The Last',
+
+    // Reports
+    'totalStudents' => 'Total Students',
+    'tookQuiz' => 'Took Quiz',
+    'didntTakeQuiz' => 'Did Not Take Quiz',
+    'averageScore' => 'Average Score',
+    'averagePercentage' => 'Average Percentage',
+    'averageTimeTaken' => 'Average Time Taken',
+    'scoreDistribution' => 'Score Distribution',
+    'studentsWhoTookQuiz' => 'Students (Took Quiz)',
+    'studentsWhoDidnotTookQuiz' => 'Students (Did Not Take Quiz)',
+    'top10Students' => 'Top 10 Students',
+    'questionDifficulty' => 'Question Difficulty Statistics',
+
+    // Review
+    'originalAnswers' => 'Answers (Orginal Ordering)',
+    'studentViolations' => 'Student Violations',
+    'violationType' => 'Violation Type',
+    'detectedAt' => 'Detected At',
+    'violationTypes' => [
+        'tab_switch' => 'Tab Switch',
+        'focus_loss' => 'Focus Loss',
+        'copy' => 'Copy Attempt',
+        'paste' => 'Paste Attempt',
+        'shortcut' => 'Keyboard Shortcuts',
+        'context_menu' => 'Right Click',
+        'screenshot' => 'Screenshot',
+        'dev_tools' => 'Developer Tools Attempt',
+        'tampering' => 'Code Tampering',
+    ],
+    'anotherDetails' => 'Another Details',
+    'lastOrder' => 'Last question the student reached before submission',
+    'totalTimeTaken' => 'Total time',
+    'avgTimePerQuestion' => 'Average time per question',
+    'resetStudentQuiz' => 'Reset Student Quiz'
 ];

@@ -11,7 +11,6 @@ use App\Models\StudentAnswer;
 use App\Models\StudentResult;
 use App\Services\GeminiService;
 use App\Models\StudentQuizOrder;
-use App\Models\StudentViolation;
 use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
 use App\Traits\ServiceResponseTrait;
@@ -274,11 +273,22 @@ class QuizzesController extends Controller
         $quiz = $this->getStudentQuizQuery()->uuid($uuid)->firstOrFail();
         $result = $this->getStudentResult($quiz->id, true);
 
+        if ($result->status != 1) {
+            return $this->createResponse('error', trans('toasts.quizNotProccesing'));
+        }
+
         $request->validate([
             'violation_type' => 'required|string|in:tab_switch,focus_loss,copy,paste,context_menu,shortcut,screenshot,dev_tools,tampering',
         ]);
 
-        $this->quizService->recordViolation($this->studentId, $quiz->id, $request->violation_type, $result);
+        $response = $this->quizService->recordViolation($this->studentId, $quiz->id, $request->violation_type, $result);
+
+        if ($response['status'] === 'error') {
+            return response()->json([
+                'error' => $response['message'],
+                'redirect' => $response['redirect']
+            ], 403);
+        }
 
         return response()->json(['success' => true], 200);
     }
@@ -319,11 +329,6 @@ class QuizzesController extends Controller
 
         $reviewCacheKey = "student_quiz_review:{$this->studentId}:{$quiz->id}";
         $reviewData = Cache::remember($reviewCacheKey, now()->addHours(24), fn() => $this->getReviewData($quiz, $result, $this->studentId));
-        $questions = $reviewData['questions'];
-        $correctAnswers = $reviewData['correctAnswers'];
-        $wrongAnswers = $reviewData['wrongAnswers'];
-        $unanswered = $reviewData['unanswered'];
-        $formattedRank = $reviewData['formattedRank'];
 
         $prompt = str_replace(
             ['{name}', '{score}', '{total_score}', '{correct}', '{wrong}', '{unanswered}', '{rank}'],
@@ -332,7 +337,7 @@ class QuizzesController extends Controller
         );
         $aiMessage = $this->geminiService->generateContent($prompt);
 
-        return view('student.activities.quizzes.review', compact('quiz', 'result', 'questions', 'formattedRank', 'correctAnswers', 'wrongAnswers', 'unanswered', 'aiMessage'));
+        return view('student.activities.quizzes.review', compact('quiz', 'result', 'reviewData', 'aiMessage'));
     }
 
     // Helpers
@@ -484,7 +489,6 @@ class QuizzesController extends Controller
             ->values()
             ->toArray();
 
-        $totalStudents = count($scores);
         $uniqueScores = array_values(array_unique($scores));
         $rank = array_search($result->total_score, $uniqueScores) + 1;
 
@@ -495,7 +499,7 @@ class QuizzesController extends Controller
             ? getArabicOrdinal($rank, $isLastRank)
             : ($isLastRank ? trans('admin/quizzes.lastRank') : $rank . (($rank % 10 == 1 && $rank % 100 != 11) ? 'st' : (($rank % 10 == 2 && $rank % 100 != 12) ? 'nd' : (($rank % 10 == 3 && $rank % 100 != 13) ? 'rd' : 'th'))));
 
-        return compact('questions', 'correctAnswers', 'wrongAnswers', 'unanswered', 'totalStudents', 'rank', 'formattedRank');
+        return compact('questions', 'correctAnswers', 'wrongAnswers', 'unanswered', 'rank', 'formattedRank');
     }
 
     protected function createResponse($status, $message, $redirectRoute = 'student.quizzes.index', $statusCode = 403)

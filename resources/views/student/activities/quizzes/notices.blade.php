@@ -1,13 +1,10 @@
 @extends('layouts.student.master')
-@php
-    use Carbon\Carbon;
-@endphp
 
 @section('page-css')
 
 @endsection
 
-@section('title', pageTitle('admin/quizzes.quizzes'))
+@section('title', pageTitle($quiz->name))
 
 @section('content')
     <div class="row g-6">
