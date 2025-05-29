@@ -219,8 +219,7 @@
                                                             <span
                                                                 class="badge rounded-pill bg-label-danger text-capitalized ms-2">{{ trans('admin/quizzes.unanswered') }}</span>
                                                         @endif
-                                                        <span
-                                                            class="text-muted small ms-2">({{ isoFormat($question->answered_at) ?? 'N/A' }})</span>
+                                                        <span class="text-muted small ms-2">({{ $question->answered_at ? isoFormat($question->answered_at) : 'N/A' }})</span>
                                                     </button>
                                                 </h2>
                                                 <div id="accordionAnswers{{ $question->question_id }}"
@@ -291,8 +290,7 @@
                                                             <span
                                                                 class="badge rounded-pill bg-label-danger text-capitalized ms-2">{{ trans('admin/quizzes.unanswered') }}</span>
                                                         @endif
-                                                        <span
-                                                            class="text-muted small ms-2">({{ isoFormat($question->answered_at) ?? 'N/A' }})</span>
+                                                        <span class="text-muted small ms-2">({{ $question->answered_at ? isoFormat($question->answered_at) : 'N/A' }})</span>
                                                     </button>
                                                 </h2>
                                                 <div id="accordionOriginalAnswers{{ $question->id }}"
@@ -347,7 +345,7 @@
                                                 <tr>
                                                     <td>{{ trans('admin/quizzes.violationTypes.' . $violation->violation_type) ?? 'N/A' }}
                                                     </td>
-                                                    <td>{{ isoFormat($violation->detected_at) ?? 'N/A' }}</td>
+                                                    <td>({{ $violation->detected_at ? isoFormat($violation->detected_at) : 'N/A' }})</td>
                                                 </tr>
                                             @empty
                                                 <tr>
@@ -366,7 +364,7 @@
                                             <div class="timeline-header mb-3">
                                                 <h6 class="mb-0">{{ trans('main.start_time') }}</h6>
                                             </div>
-                                            <p class="mb-2">{{ isoFormat($result->started_at) ?? 'N/A' }}</p>
+                                            <p class="mb-2">{{ $result->started_at ? isoFormat($result->started_at) : 'N/A' }}</p>
                                         </div>
                                     </li>
                                     <li class="timeline-item timeline-item-transparent">
@@ -385,7 +383,7 @@
                                             <div class="timeline-header mb-3">
                                                 <h6 class="mb-0">{{ trans('main.end_time') }}</h6>
                                             </div>
-                                            <p class="mb-2">{{ isoFormat($result->completed_at) ?? 'N/A' }}</p>
+                                            <p class="mb-2">{{ $result->completed_at ? isoFormat($result->completed_at) : 'N/A' }}</p>
                                         </div>
                                     </li>
                                     <li class="timeline-item timeline-item-transparent">
