@@ -76,5 +76,5 @@ return [
     'invalidQuestionOrder' => 'Invalid question order.',
     'quizNotProccesing' => 'Quiz is not processing. Please try again later.',
     'tooManyViolations' => 'The exam has been locked due to multiple violations. Follow the rules and do not attempt to cheat next time.',
-    'quizResetSuccess' => 'Quiz has been reset successfully.
+    'quizResetSuccess' => 'Quiz has been reset successfully.'
 ];

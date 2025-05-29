@@ -5,7 +5,13 @@ namespace App\Services\Teacher\Activities;
 use Carbon\Carbon;
 use App\Models\Quiz;
 use App\Models\Group;
+use App\Models\Student;
+use App\Models\StudentAnswer;
+use App\Models\StudentResult;
+use App\Models\StudentQuizOrder;
+use App\Models\StudentViolation;
 use App\Traits\PublicValidatesTrait;
+use Illuminate\Support\Facades\Cache;
 use App\Traits\DatabaseTransactionTrait;
 use App\Traits\PreventDeletionIfRelated;
 
@@ -47,6 +53,9 @@ class QuizService
                     '<i class="ri-more-2-line"></i>' .
                 '</a>' .
                 '<ul class="dropdown-menu dropdown-menu-end m-0">' .
+                    '<li>
+                        <a href="' . route('teacher.quizzes.reports', $row->uuid) . '" class="dropdown-item">'.trans('main.reports').'</a>
+                    </li>' .
                     '<li>
                         <a target="_blank" href="' . route('teacher.questions.index', $row->uuid) . '" class="dropdown-item">'.trans('admin/questions.questions').'</a>
                     </li>' .
@@ -161,6 +170,37 @@ class QuizService
             Quiz::where('teacher_id', $this->teacherId)->whereIn('id', $ids)->delete();
 
             return $this->successResponse(trans('main.deletedSelected', ['item' => trans('admin/quizzes.quiz')]));
+        }, trans('toasts.ownershipError'));
+    }
+
+    public function resetStudentQuiz($uuid, $studentUuid): array
+    {
+        return $this->executeTransaction(function () use ($uuid, $studentUuid)
+        {
+            $quiz = Quiz::where('uuid', $uuid)
+                ->where('teacher_id', $this->teacherId)
+                ->select('id')
+                ->firstOrFail();
+
+            $student = Student::where('uuid', $studentUuid)
+                ->whereHas('teachers', fn($query) => $query->where('teacher_id', $this->teacherId))
+                ->select('id')
+                ->firstOrFail();
+
+            StudentResult::where('quiz_id', $quiz->id)->where('student_id', $student->id)->delete();
+            StudentAnswer::where('quiz_id', $quiz->id)->where('student_id', $student->id)->delete();
+            StudentQuizOrder::where('quiz_id', $quiz->id)->where('student_id', $student->id)->delete();
+            StudentViolation::where('quiz_id', $quiz->id)->where('student_id', $student->id)->delete();
+
+            Cache::forget("student_quiz_review:{$student->id}:{$quiz->id}");
+            Cache::forget("quiz_{$quiz->id}_avg_score");
+            Cache::forget("quiz_{$quiz->id}_avg_percentage");
+            Cache::forget("quiz_{$quiz->id}_avg_time");
+            Cache::forget("score_distribution_{$quiz->id}");
+            Cache::forget("question_stats_{$quiz->id}");
+            Cache::forget("top_students_{$quiz->id}");
+
+            return $this->successResponse(trans('toasts.quizResetSuccess'));
         }, trans('toasts.ownershipError'));
     }
 }

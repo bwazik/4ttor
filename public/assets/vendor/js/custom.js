@@ -324,7 +324,13 @@ function initializeDataTable(tableId, ajaxUrl, exportColumns, columns) {
                         display: $.fn.dataTable.Responsive.display.modal({
                             header: function (row) {
                                 var data = row.data();
-                                return window.translations.detailsOf + ': ' + data["name"];
+                                let displayName = '';
+                                if (data.name && typeof data.name === 'object') {
+                                    displayName = currentLocale === 'ar' ? data.name.ar : data.name.en;
+                                } else {
+                                    displayName = data.name || data.title || data.topic || '';
+                                }
+                                return window.translations.detailsOf + ': ' + displayName;
                             },
                         }),
                         type: "column",

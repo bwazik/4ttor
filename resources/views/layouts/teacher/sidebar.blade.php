@@ -100,7 +100,7 @@
         </li>
         <li class="menu-item {{ isActiveRoute('teacher.attendance.index') ? 'active' : '' }}">
             <a href="{{ route('teacher.attendance.index') }}" class="menu-link">
-                <i class="menu-icon tf-icons ri-file-list-3-line"></i>
+                <i class="menu-icon tf-icons ri-calendar-check-line"></i>
                 <div>{{ trans('layouts/sidebar.attendance') }}</div>
             </a>
         </li>
@@ -112,7 +112,7 @@
         </li>
         <li class="menu-item {{ isActiveRoute('teacher.quizzes.index') ? 'active' : '' }}">
             <a href="{{ route('teacher.quizzes.index') }}" class="menu-link">
-                <i class="menu-icon tf-icons ri-brain-line"></i>
+                <i class="menu-icon tf-icons ri-questionnaire-line"></i>
                 <div>{{ trans('layouts/sidebar.quizzes') }}</div>
             </a>
         </li>

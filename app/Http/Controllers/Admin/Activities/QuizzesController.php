@@ -28,12 +28,10 @@ class QuizzesController extends Controller
     use ValidatesExistence, ServiceResponseTrait;
 
     protected $quizService;
-    protected $geminiService;
 
-    public function __construct(QuizService $quizService, GeminiService $geminiService)
+    public function __construct(QuizService $quizService)
     {
         $this->quizService = $quizService;
-        $this->geminiService = $geminiService;
     }
 
     public function index(Request $request)
@@ -219,8 +217,8 @@ class QuizzesController extends Controller
                     $textArray = json_decode($item->question_text, true);
                     $text = $textArray[app()->getLocale()] ?? '';
                     return [
-                        'question_text' => mb_strlen($text) > 10
-                            ? mb_substr($text, 0, 10) . '…'
+                        'question_text' => mb_strlen($text) > 7
+                            ? mb_substr($text, 0, 7) . '…'
                             : $text,
                         'correct_count' => (int) $item->correct_count,
                         'wrong_count' => (int) $item->wrong_count
@@ -232,7 +230,7 @@ class QuizzesController extends Controller
         $topStudents = Cache::remember("top_students_{$quiz->id}", 600, function () use ($quiz) {
             return StudentResult::where('quiz_id', $quiz->id)
                 ->whereIn('status', [2, 3])
-                ->with(['student' => fn($q) => $q->select('id', 'name', 'profile_pic', 'phone')])
+                ->with(['student' => fn($q) => $q->select('id', 'uuid', 'name', 'profile_pic', 'phone')])
                 ->select('student_id', 'total_score as quiz_score')
                 ->orderBy('quiz_score', 'desc')
                 ->take(10)
@@ -240,6 +238,7 @@ class QuizzesController extends Controller
                 ->map(function ($item) {
                     return [
                         'id' => $item->student->id,
+                        'uuid' => $item->student->uuid,
                         'name' => $item->student->name,
                         'phone' => $item->student->phone ?? 'N/A',
                         'profile_pic' => $item->student->profile_pic,
@@ -304,7 +303,7 @@ class QuizzesController extends Controller
             ->with(['studentResults' => fn($q) => $q->where('quiz_id', $id)])
             ->whereHas('groups', fn($q) => $q->whereIn('groups.id', $groupIds))
             ->whereHas('studentResults', fn($q) => $q->where('quiz_id', $id))
-            ->select('id', 'name', 'email', 'profile_pic')
+            ->select('id', 'name', 'phone', 'profile_pic')
             ->addSelect([
                 'quiz_score' => StudentResult::select('total_score')
                     ->whereColumn('student_id', 'students.id')
@@ -323,12 +322,12 @@ class QuizzesController extends Controller
         if ($request->ajax()) {
             return datatables()->eloquent($studentsTakenQuery)
                 ->addColumn('rank', fn($row) => $this->getRank($id, $row->quiz_score))
-                ->addColumn('details', fn($row) => generateDetailsColumn($row->name, $row->profile_pic, 'storage/profiles/students', $row->email, 'admin.students.details', $row->id))
+                ->addColumn('details', fn($row) => generateDetailsColumn($row->name, $row->profile_pic, 'storage/profiles/students', $row->phone, 'admin.students.details', $row->id))
                 ->addColumn('score', fn($row) => $row->quiz_score !== null ? number_format($row->quiz_score, 2) : 'N/A')
                 ->addColumn('percentage', fn($row) => $row->quiz_percentage !== null ? number_format($row->quiz_percentage, 2) : 'N/A')
                 ->addColumn('status', fn($row) => $this->getQuizStatus($row->status))
                 ->addColumn('link', fn($row) => $this->getReviewLink($id, $row->id))
-                ->filterColumn('details', fn($query, $keyword) => filterDetailsColumn($query, $keyword, 'email'))
+                ->filterColumn('details', fn($query, $keyword) => filterDetailsColumn($query, $keyword, 'phone'))
                 ->rawColumns(['details', 'status', 'link'])
                 ->make(true);
         }
@@ -344,7 +343,7 @@ class QuizzesController extends Controller
             ->where('grade_id', $quiz->grade_id)
             ->whereHas('groups', fn($q) => $q->whereIn('groups.id', $groupIds))
             ->whereDoesntHave('studentResults', fn($q) => $q->where('quiz_id', $id)->whereIn('status', [2, 3]))
-            ->select('id', 'name', 'email', 'phone', 'profile_pic')
+            ->select('id', 'name', 'phone', 'profile_pic')
             ->addSelect([
                 'quiz_score' => StudentResult::select('total_score')
                     ->whereColumn('student_id', 'students.id')

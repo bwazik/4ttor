@@ -1,4 +1,4 @@
-@extends('layouts.admin.master')
+@extends('layouts.teacher.master')
 
 @section('page-css')
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/apex-charts/apex-charts.css') }}" />
@@ -19,7 +19,7 @@
                                 <div class="d-flex align-items-center flex-wrap">
                                     <div class="avatar me-4">
                                         <div class="avatar-initial bg-label-primary rounded-3">
-                                            <i class="icon-base ri ri-bar-chart-line icon-24px"> </i>
+                                            <i class="icon-base ri ri-trophy-line icon-24px"> </i>
                                         </div>
                                     </div>
                                     <div class="card-info">
@@ -38,7 +38,7 @@
                                 <div class="d-flex align-items-center flex-wrap">
                                     <div class="avatar me-4">
                                         <div class="avatar-initial bg-label-primary rounded-3">
-                                            <i class="icon-base ri ri-bar-chart-line icon-24px"> </i>
+                                            <i class="icon-base ri ri-percent-line icon-24px"> </i>
                                         </div>
                                     </div>
                                     <div class="card-info">
@@ -57,7 +57,7 @@
                                 <div class="d-flex align-items-center flex-wrap">
                                     <div class="avatar me-4">
                                         <div class="avatar-initial bg-label-primary rounded-3">
-                                            <i class="icon-base ri ri-bar-chart-line icon-24px"> </i>
+                                            <i class="icon-base ri ri-time-line icon-24px"> </i>
                                         </div>
                                     </div>
                                     <div class="card-info">
@@ -181,7 +181,7 @@
                                 </div>
                                 <div>
                                     <div>
-                                        <a target="_blank" href="{{ route('admin.students.details', $student['id']) }}"
+                                        <a target="_blank" href="#"
                                             class="h6 text-truncate">
                                             <p class="mb-0 fw-medium">{{ $student['name'] }}</p>
                                         </a>
@@ -250,7 +250,7 @@
             }
 
             initializeDataTable('#students-taken-quiz-datatable',
-                "{{ route('admin.quizzes.studentsTakenQuiz', $quiz->id) }}", [0, 1, 2],
+                "{{ route('teacher.quizzes.studentsTakenQuiz', $quiz->uuid) }}", [0, 1, 2],
                 [{
                     data: "",
                     orderable: false,
@@ -293,7 +293,7 @@
                 ],
             );
             initializeDataTable('#students-not-taken-quiz-datatable',
-                "{{ route('admin.quizzes.studentsNotTakenQuiz', $quiz->id) }}", [0, 1, 2],
+                "{{ route('teacher.quizzes.studentsNotTakenQuiz', $quiz->uuid) }}", [0, 1, 2],
                 [{
                     data: "",
                     orderable: false,

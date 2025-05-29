@@ -6,16 +6,19 @@ use App\Models\Group;
 use App\Traits\PublicValidatesTrait;
 use App\Traits\DatabaseTransactionTrait;
 use App\Traits\PreventDeletionIfRelated;
+use App\Services\Admin\Tools\LessonService;
 
 class GroupService
 {
     use PreventDeletionIfRelated, PublicValidatesTrait, DatabaseTransactionTrait;
 
     protected $teacherId;
+    protected $lessonService;
 
-    public function __construct()
+    public function __construct(LessonService $lessonService)
     {
         $this->teacherId = auth()->guard('teacher')->user()->id;
+        $this->lessonService = $lessonService;
     }
 
     public function getGroupsForDatatable($groupsQuery)
@@ -74,7 +77,7 @@ class GroupService
             if ($validationResult = $this->validateTeacherGrade($request['grade_id'], $this->teacherId))
                 return $validationResult;
 
-            Group::create([
+            $group = Group::create([
                 'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
                 'teacher_id' => $this->teacherId,
                 'grade_id' => $request['grade_id'],
@@ -82,6 +85,8 @@ class GroupService
                 'day_2' => $request['day_2'] ?? null,
                 'time' => $request['time'],
             ]);
+
+            $this->lessonService->generateLessonsForGroup($group->id);
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/groups.group')]));
         });
