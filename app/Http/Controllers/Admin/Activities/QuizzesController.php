@@ -549,7 +549,7 @@ class QuizzesController extends Controller
             ]
         )->validate();
 
-        $result = $this->quizService->resetStudentQuiz($validated['quizId'], $validated['studentId']);
+        $result = $this->quizService->resetStudentQuiz($validated['quiz_id'], $validated['student_id']);
 
         return $this->conrtollerJsonResponse($result);
     }
