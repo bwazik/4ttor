@@ -503,7 +503,7 @@ class QuizzesController extends Controller
     protected function createResponse($status, $message, $redirectRoute = 'student.quizzes.index', $statusCode = 403)
     {
         return request()->expectsJson()
-            ? response()->json([$status => $message, 'redirect' => route($redirectRoute)], 403)
+            ? response()->json([$status => $message, 'redirect' => route($redirectRoute)], $statusCode)
             : redirect()->route($redirectRoute)->with($status, $message);
     }
 }

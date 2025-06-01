@@ -336,10 +336,10 @@ Route::group(
                     Route::post('{id}/students/{studentId}/feedback', 'feedback')->name('feedback');
                     Route::post('{id}/students/{studentId}/reset', 'resetStudentAssignment')->name('resetStudentAssignment');
                 });
-                Route::get('{uuid}/reports', 'reports')->name('reports');
-                Route::get('{uuid}/students/{studentUuid}/review', 'review')->name('review');
-                Route::get('{uuid}/students-took-assignment', 'studentsTookAssignment')->name('studentsTookAssignment');
-                Route::get('{uuid}/students-havenot-taken-assignment', 'studentsHavenotTakenAssignment')->name('studentsHavenotTakenAssignment');
+                Route::get('{id}/reports', 'reports')->name('reports');
+                Route::get('{id}/students/{studentId}/review', 'review')->name('review');
+                Route::get('{id}/students-took-assignment', 'studentsTookAssignment')->name('studentsTookAssignment');
+                Route::get('{id}/students-havenot-taken-assignment', 'studentsHavenotTakenAssignment')->name('studentsHavenotTakenAssignment');
                 Route::get('submissions/{fileId}/download', 'downloadSubmission')->name('submissions.download');
                 Route::get('submissions/{fileId}/view', 'viewSubmission')->name('submissions.view');
             });

@@ -51,7 +51,7 @@ class QuizService
             return formatSpanUrl(
                 route('student.quizzes.review', $row->uuid),
                 trans('admin/quizzes.reviewAnswers'),
-                'info',
+                'success',
                 false
             );
         }

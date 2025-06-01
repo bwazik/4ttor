@@ -32,29 +32,30 @@ Route::group(
             });
 
             # Start Activities
-            # Quizzes
-            Route::prefix('quizzes')->controller(QuizzesController::class)->name('quizzes.')->group(function () {
-                Route::get('/', 'index')->name('index');
-                Route::get('/{uuid}/notices', 'notices')->name('notices');
-                Route::get('/{uuid}/take/{order?}', 'take')->name('take')->middleware('throttle:20,1');
-                Route::get('/{uuid}/review', 'review')->name('review');
-                Route::middleware('throttle:20,1')->group(function () {
-                    Route::post('/{uuid}/submit', 'submitAnswer')->name('submit');
-                    Route::post('/{uuid}/cheat-detector', 'cheatDetector')->name('cheatDetector');
-                    Route::post('/{uuid}/violation', 'violation')->name('violation');
+                # Quizzes
+                Route::prefix('quizzes')->controller(QuizzesController::class)->name('quizzes.')->group(function () {
+                    Route::get('/', 'index')->name('index');
+                    Route::get('/{uuid}/notices', 'notices')->name('notices');
+                    Route::get('/{uuid}/take/{order?}', 'take')->name('take')->middleware('throttle:20,1');
+                    Route::get('/{uuid}/review', 'review')->name('review');
+                    Route::middleware('throttle:20,1')->group(function () {
+                        Route::post('/{uuid}/submit', 'submitAnswer')->name('submit');
+                        Route::post('/{uuid}/cheat-detector', 'cheatDetector')->name('cheatDetector');
+                        Route::post('/{uuid}/violation', 'violation')->name('violation');
+                    });
                 });
-            });
-            # Assignments
-            Route::prefix('assignments')->controller(AssignmentsController::class)->name('assignments.')->group(function () {
-                Route::get('/', 'index')->name('index');
-                Route::get('{uuid}', 'details')->name('details');
-                Route::get('assignments/{fileId}/download', 'downloadAssignment')->name('download');
-                Route::get('files/{fileId}/download', 'downloadFile')->name('files.download');
-                Route::middleware('throttle:10,1')->group(function () {
-                    Route::post('{uuid}/upload', 'uploadFile')->name('files.upload');
-                    Route::post('files/delete', 'deleteFile')->name('files.delete');
+                # Assignments
+                Route::prefix('assignments')->controller(AssignmentsController::class)->name('assignments.')->group(function () {
+                    Route::get('/', 'index')->name('index');
+                    Route::get('{uuid}', 'details')->name('details');
+                    Route::get('assignments/{fileId}/download', 'downloadAssignment')->name('download');
+                    Route::get('files/{fileId}/download', 'downloadFile')->name('files.download');
+                    Route::get('/{uuid}/review', 'review')->name('review');
+                    Route::middleware('throttle:10,1')->group(function () {
+                        Route::post('{uuid}/upload', 'uploadFile')->name('files.upload');
+                        Route::post('files/delete', 'deleteFile')->name('files.delete');
+                    });
                 });
-            });
             # End Activities
         });
     }

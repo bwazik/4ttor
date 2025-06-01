@@ -112,7 +112,7 @@
         </li>
         <li class="menu-item {{ isActiveRoute('teacher.quizzes.index') ? 'active' : '' }}">
             <a href="{{ route('teacher.quizzes.index') }}" class="menu-link">
-                <i class="menu-icon tf-icons ri-questionnaire-line"></i>
+                <i class="menu-icon tf-icons ri-question-line"></i>
                 <div>{{ trans('layouts/sidebar.quizzes') }}</div>
             </a>
         </li>

@@ -2,8 +2,11 @@
 
 namespace App\Services\Admin\Activities;
 
+use App\Models\Student;
 use App\Models\Assignment;
+use App\Models\AssignmentSubmission;
 use App\Traits\PublicValidatesTrait;
+use Illuminate\Support\Facades\Cache;
 use App\Traits\DatabaseTransactionTrait;
 use App\Traits\PreventDeletionIfRelated;
 use App\Services\Admin\FileUploadService;
@@ -49,6 +52,9 @@ class AssignmentService
                     '<i class="ri-more-2-line"></i>' .
                 '</a>' .
                 '<ul class="dropdown-menu dropdown-menu-end m-0">' .
+                    '<li>
+                        <a href="' . route('admin.assignments.reports', $row->id) . '" class="dropdown-item">' . trans('main.reports') . '</a>
+                    </li>' .
                     '<li>
                         <a target="_blank" href="' . route('admin.assignments.details', $row->id) . '" class="dropdown-item">'.trans('main.details').'</a>
                     </li>' .
@@ -178,5 +184,64 @@ class AssignmentService
     public function checkDependenciesForMultipleDeletion($assignments)
     {
         return $this->checkForMultipleDependencies($assignments, $this->relationships, $this->transModelKey);
+    }
+
+    public function feedback($id, $studentId, array $request): array
+    {
+        return $this->executeTransaction(function () use ($id, $studentId, $request)
+        {
+            $assignment = Assignment::findOrFail($id);
+
+            $student = Student::findOrFail($studentId);
+
+            $submission = AssignmentSubmission::where('student_id', $student->id)
+                ->where('assignment_id', $assignment->id)
+                ->firstOrFail();
+
+            if($request['score'] > $assignment->score) {
+                return $this->errorResponse(trans('toasts.invalidScore'));
+            }
+
+            $submission->update([
+                'score' => $request['score'],
+                'feedback' => $request['feedback'],
+            ]);
+
+            Cache::forget("student_assignment_review:{$student->id}:{$assignment->id}");
+            Cache::forget("assignment_{$assignment->id}_avg_score");
+            Cache::forget("score_distribution_{$assignment->id}");
+            Cache::forget("top_students_{$assignment->id}");
+
+            return $this->successResponse(trans('toasts.feedbackSubmitted'));
+        }, trans('toasts.ownershipError'));
+    }
+
+    public function resetStudentAssignment($id, $studentId): array
+    {
+        return $this->executeTransaction(function () use ($id, $studentId)
+        {
+            $assignment = Assignment::select('id')->findOrFail($id);
+
+            $student = Student::select('id')->findOrFail($studentId);
+
+            $submission = AssignmentSubmission::where('student_id', $student->id)
+                ->where('assignment_id', $assignment->id)
+                ->first();
+
+            if ($submission) {
+                $this->fileUploadService->deleteRelatedFiles($submission, 'submissionFiles');
+                $submission->delete();
+            }
+
+            Cache::forget("student_assignment_review:{$student->id}:{$assignment->id}");
+            Cache::forget("assignment_{$assignment->id}_avg_score");
+            Cache::forget("assignment_{$assignment->id}_avg_files");
+            Cache::forget("assignment_{$assignment->id}_avg_file_size");
+            Cache::forget("score_distribution_{$assignment->id}");
+            Cache::forget("top_students_{$assignment->id}");
+            Cache::forget("submission_trends_{$assignment->id}");
+
+            return $this->successResponse(trans('toasts.assignmentResetSuccess'));
+        }, trans('toasts.ownershipError'));
     }
 }

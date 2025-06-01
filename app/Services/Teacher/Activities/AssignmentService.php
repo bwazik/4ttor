@@ -5,7 +5,6 @@ namespace App\Services\Teacher\Activities;
 use App\Models\Group;
 use App\Models\Student;
 use App\Models\Assignment;
-use App\Models\SubmissionFile;
 use App\Models\AssignmentSubmission;
 use App\Traits\PublicValidatesTrait;
 use Illuminate\Support\Facades\Cache;
@@ -216,7 +215,7 @@ class AssignmentService
             $submission = AssignmentSubmission::where('student_id', $student->id)
                 ->where('assignment_id', $assignment->id)
                 ->first();
-            
+
             if ($submission) {
                 $this->fileUploadService->deleteRelatedFiles($submission, 'submissionFiles');
                 $submission->delete();
@@ -228,6 +227,7 @@ class AssignmentService
             Cache::forget("assignment_{$assignment->id}_avg_file_size");
             Cache::forget("score_distribution_{$assignment->id}");
             Cache::forget("top_students_{$assignment->id}");
+            Cache::forget("submission_trends_{$assignment->id}");
 
             return $this->successResponse(trans('toasts.assignmentResetSuccess'));
         }, trans('toasts.ownershipError'));
