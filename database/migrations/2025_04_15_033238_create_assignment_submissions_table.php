@@ -15,8 +15,8 @@ return new class extends Migration
 			$table->increments('id');
             $table->integer('assignment_id')->unsigned();
             $table->integer('student_id')->unsigned();
-            $table->timestamp('submitted_at');
-            $table->integer('score');
+            $table->timestamp('submitted_at')->nullable();
+            $table->integer('score')->nullable();
             $table->text('feedback')->nullable();
             $table->timestamps();
         });

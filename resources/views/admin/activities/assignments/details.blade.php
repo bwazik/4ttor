@@ -109,7 +109,7 @@
                                         @endphp
                                         <img src="{{ $imageSrc }}" alt="{{ $extension }} icon" style="width: 32px; height: 32px;" />
                                     </div>
-                                    <span class="text-nowrap overflow-hidden text-truncate" style="max-width: 200px;" title="{{ $file->file_name }}">
+                                    <span class="text-nowrap overflow-hidden text-truncate" style="max-width: 200px;" data-bs-toggle="tooltip" data-bs-original-title="{{ $file->file_name }}">
                                         <a href="{{ route('admin.assignments.files.download', $file->id) }}" class="text-decoration-none">
                                             {{ $file->file_name }}
                                         </a>

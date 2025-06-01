@@ -364,19 +364,7 @@ class QuizzesController extends Controller
             ->whereHas('groups', fn($q) => $q->whereIn('groups.id', $groupIds))
             ->whereHas('teachers', fn($query) => $query->where('teacher_id', $this->teacherId))
             ->whereDoesntHave('studentResults', fn($q) => $q->where('quiz_id', $quiz->id)->whereIn('status', [2, 3]))
-            ->select('id', 'name', 'phone', 'profile_pic')
-            ->addSelect([
-                'quiz_score' => StudentResult::select('total_score')
-                    ->whereColumn('student_id', 'students.id')
-                    ->where('quiz_id', $quiz->id)
-                    ->whereIn('status', [2, 3])
-                    ->limit(1),
-                'quiz_percentage' => StudentResult::select('percentage')
-                    ->whereColumn('student_id', 'students.id')
-                    ->where('quiz_id', $quiz->id)
-                    ->whereIn('status', [2, 3])
-                    ->limit(1),
-            ]);
+            ->select('id', 'name', 'phone', 'profile_pic');
 
         if ($request->ajax()) {
             return datatables()->eloquent($studentsNotTakenQuery)

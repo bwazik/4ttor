@@ -11,16 +11,14 @@ use App\Models\StudentAnswer;
 use App\Models\StudentResult;
 use App\Services\GeminiService;
 use App\Models\StudentQuizOrder;
-use App\Traits\ValidatesExistence;
 use App\Http\Controllers\Controller;
-use App\Traits\ServiceResponseTrait;
 use Illuminate\Support\Facades\Cache;
 use App\Traits\DatabaseTransactionTrait;
 use App\Services\Student\Activities\QuizService;
 
 class QuizzesController extends Controller
 {
-    use ValidatesExistence, ServiceResponseTrait, DatabaseTransactionTrait;
+    use DatabaseTransactionTrait;
 
     protected $quizService;
     protected $geminiService;

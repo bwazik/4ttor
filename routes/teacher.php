@@ -254,7 +254,15 @@ Route::group(
                         Route::post('update', 'update')->name('update');
                         Route::post('delete', 'delete')->name('delete');
                         Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                        Route::post('{uuid}/students/{studentUuid}/feedback', 'feedback')->name('feedback');
+                        Route::post('{uuid}/students/{studentUuid}/reset', 'resetStudentAssignment')->name('resetStudentAssignment');
                     });
+                    Route::get('{uuid}/reports', 'reports')->name('reports');
+                    Route::get('{uuid}/students/{studentUuid}/review', 'review')->name('review');
+                    Route::get('{uuid}/students-took-assignment', 'studentsTookAssignment')->name('studentsTookAssignment');
+                    Route::get('{uuid}/students-havenot-taken-assignment', 'studentsHavenotTakenAssignment')->name('studentsHavenotTakenAssignment');
+                    Route::get('submissions/{fileId}/download', 'downloadSubmission')->name('submissions.download');
+                    Route::get('submissions/{fileId}/view', 'viewSubmission')->name('submissions.view');
                 });
             # End Activities
 

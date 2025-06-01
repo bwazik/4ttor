@@ -71,6 +71,15 @@
             </div>
         </div>
         <div class="col-lg-4">
+            <x-alert type="info" :dismissible=false icon="error-warning">
+                <div class="alert-message">
+                    <ol class="mb-0 ps-3">
+                        @foreach(explode("\n", trans('admin/assignments.instructionsAlert')) as $instruction)
+                            <li>{{ $instruction }}</li>
+                        @endforeach
+                    </ol>
+                </div>
+            </x-alert>
             <form id="add-form"
                 action="{{ route('teacher.assignments.files.upload', $assignment->uuid) }}" method="POST"
                 enctype="multipart/form-data">
@@ -109,7 +118,7 @@
                                         @endphp
                                         <img src="{{ $imageSrc }}" alt="{{ $extension }} icon" style="width: 32px; height: 32px;" />
                                     </div>
-                                    <span class="text-nowrap overflow-hidden text-truncate" style="max-width: 200px;" title="{{ $file->file_name }}">
+                                    <span class="text-nowrap overflow-hidden text-truncate" style="max-width: 200px;" data-bs-toggle="tooltip" data-bs-original-title="{{ $file->file_name }}">
                                         <a href="{{ route('teacher.assignments.files.download', $file->id) }}" class="text-decoration-none">
                                             {{ $file->file_name }}
                                         </a>

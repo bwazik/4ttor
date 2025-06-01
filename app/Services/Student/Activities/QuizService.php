@@ -29,12 +29,12 @@ class QuizService
     {
         return datatables()->eloquent($quizzesQuery)
             ->addIndexColumn()
-            ->addColumn('startQuiz', fn($row) => $this->getQuizLink($row))
             ->editColumn('name', fn($row) => $row->name)
             ->editColumn('teacher_id', fn($row) => formatRelation($row->teacher_id, $row->teacher, 'name'))
             ->addColumn('duration', fn($row) => formatDuration($row->duration))
             ->editColumn('start_time', fn($row) => isoFormat($row->start_time))
             ->editColumn('end_time', fn($row) => isoFormat($row->end_time))
+            ->addColumn('startQuiz', fn($row) => $this->getQuizLink($row))
             ->filterColumn('teacher_id', fn($query, $keyword) => filterByRelation($query, 'teacher', 'name', $keyword))
             ->rawColumns(['startQuiz', 'status'])
             ->make(true);

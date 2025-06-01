@@ -125,7 +125,7 @@
                                             style="width: 32px; height: 32px;" />
                                     </div>
                                     <span class="text-nowrap overflow-hidden text-truncate" style="max-width: 200px;"
-                                        title="{{ $resource->file_name }}">
+                                        data-bs-toggle="tooltip" data-bs-original-title="{{ $resource->file_name }}">
                                         <a href="{{ route('admin.resources.download', $resource->id) }}"
                                             class="text-decoration-none">
                                             {{ $resource->file_name }}

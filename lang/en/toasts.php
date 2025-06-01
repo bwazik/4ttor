@@ -76,5 +76,9 @@ return [
     'invalidQuestionOrder' => 'Invalid question order.',
     'quizNotProccesing' => 'Quiz is not processing. Please try again later.',
     'tooManyViolations' => 'The exam has been locked due to multiple violations. Follow the rules and do not attempt to cheat next time.',
-    'quizResetSuccess' => 'Quiz has been reset successfully.'
+    'quizResetSuccess' => 'Quiz has been reset successfully.',
+    'assignmentDeadlinePassed' => 'The deadline for this assignment has passed. You cannot upload or delete files anymore.',
+    'invalidScore' => 'Please verify the score and ensure it does not exceed the original score.',
+    'feedbackSubmitted' => 'Score and feedback have been updated successfully.',
+    'assignmentResetSuccess' => 'Assignment has been reset successfully.',
 ];

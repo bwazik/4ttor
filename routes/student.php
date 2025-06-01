@@ -5,6 +5,7 @@ use App\Http\Controllers\AccountController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 use App\Http\Controllers\Student\Activities\QuizzesController;
+use App\Http\Controllers\Student\Activities\AssignmentsController;
 
 Route::group(
     [
@@ -45,6 +46,7 @@ Route::group(
                 Route::get('/', 'index')->name('index');
                 Route::get('{uuid}', 'details')->name('details');
                 Route::post('{uuid}/upload', 'uploadFile')->name('files.upload');
+                Route::get('assignments/{fileId}/download', 'downloadAssignment')->name('download');
                 Route::get('files/{fileId}/download', 'downloadFile')->name('files.download');
                 Route::post('files/delete', 'deleteFile')->name('files.delete');
                 Route::middleware('throttle:10,1')->group(function() {
