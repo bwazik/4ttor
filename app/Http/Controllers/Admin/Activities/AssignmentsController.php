@@ -41,7 +41,7 @@ class AssignmentsController extends Controller
             ->with(['teacher:id,name', 'grade:id,name'])
             ->orderBy('teacher_id')
             ->orderBy('grade_id')
-           ->get()
+            ->get()
             ->mapWithKeys(function ($group) {
                 $gradeName = $group->grade->name ?? 'N/A';
                 $teacherName = $group->teacher->name ?? 'N/A';

@@ -283,10 +283,6 @@ Route::group(
             # Quizzes
             Route::prefix('quizzes')->controller(QuizzesController::class)->name('quizzes.')->group(function () {
                 Route::get('/', 'index')->name('index');
-                Route::get('{id}/reports', 'reports')->name('reports');
-                Route::get('{id}/students/{studentId}/review', 'review')->name('review');
-                Route::get('{id}/students-taken-quiz', 'studentsTakenQuiz')->name('studentsTakenQuiz');
-                Route::get('{id}/students-not-taken-quiz', 'studentsNotTakenQuiz')->name('studentsNotTakenQuiz');
                 Route::middleware('throttle:10,1')->group(function () {
                     Route::post('insert', 'insert')->name('insert');
                     Route::post('update', 'update')->name('update');
@@ -294,6 +290,10 @@ Route::group(
                     Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
                     Route::post('{id}/students/{studentId}/reset', 'resetStudentQuiz')->name('resetStudentQuiz');
                 });
+                Route::get('{id}/reports', 'reports')->name('reports');
+                Route::get('{id}/students/{studentId}/review', 'review')->name('review');
+                Route::get('{id}/students-taken-quiz', 'studentsTakenQuiz')->name('studentsTakenQuiz');
+                Route::get('{id}/students-not-taken-quiz', 'studentsNotTakenQuiz')->name('studentsNotTakenQuiz');
             });
 
             # Questions
@@ -325,15 +325,23 @@ Route::group(
             Route::prefix('assignments')->controller(AssignmentsController::class)->name('assignments.')->group(function () {
                 Route::get('/', 'index')->name('index');
                 Route::get('{id}', 'details')->name('details');
-                Route::post('{id}/upload', 'uploadFile')->name('files.upload');
                 Route::get('files/{fileId}/download', 'downloadFile')->name('files.download');
-                Route::post('files/delete', 'deleteFile')->name('files.delete');
                 Route::middleware('throttle:10,1')->group(function () {
                     Route::post('insert', 'insert')->name('insert');
                     Route::post('update', 'update')->name('update');
                     Route::post('delete', 'delete')->name('delete');
                     Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                    Route::post('{id}/upload', 'uploadFile')->name('files.upload');
+                    Route::post('files/delete', 'deleteFile')->name('files.delete');
+                    Route::post('{id}/students/{studentId}/feedback', 'feedback')->name('feedback');
+                    Route::post('{id}/students/{studentId}/reset', 'resetStudentAssignment')->name('resetStudentAssignment');
                 });
+                Route::get('{uuid}/reports', 'reports')->name('reports');
+                Route::get('{uuid}/students/{studentUuid}/review', 'review')->name('review');
+                Route::get('{uuid}/students-took-assignment', 'studentsTookAssignment')->name('studentsTookAssignment');
+                Route::get('{uuid}/students-havenot-taken-assignment', 'studentsHavenotTakenAssignment')->name('studentsHavenotTakenAssignment');
+                Route::get('submissions/{fileId}/download', 'downloadSubmission')->name('submissions.download');
+                Route::get('submissions/{fileId}/view', 'viewSubmission')->name('submissions.view');
             });
         # End Activities
 
