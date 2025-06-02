@@ -472,6 +472,31 @@ class QuizzesController extends Controller
 
     public function getReviewData(Quiz $quiz, StudentResult $result, $studentId)
     {
+        // For students dashboard
+        $questions = StudentQuizOrder::where('student_quiz_order.student_id', $studentId)
+            ->where('student_quiz_order.quiz_id', $quiz->id)
+            ->with([
+                'question' => fn($query) => $query->select('id', 'question_text'),
+                'question.answers' => fn($query) => $query->select('id', 'question_id', 'answer_text', 'is_correct', 'score'),
+            ])
+            ->leftJoin('student_answers', function ($join) {
+                $join->on('student_quiz_order.student_id', '=', 'student_answers.student_id')
+                    ->on('student_quiz_order.quiz_id', '=', 'student_answers.quiz_id')
+                    ->on('student_quiz_order.question_id', '=', 'student_answers.question_id');
+            })
+            ->select('student_quiz_order.question_id', 'student_quiz_order.display_order', 'student_quiz_order.answer_order', 'student_answers.answer_id')
+            ->orderBy('display_order')
+            ->get();
+
+        $questions->each(function ($question) use ($quiz) {
+            $question->sorted_answers = $quiz->randomize_answers && $question->answer_order
+                ? collect(json_decode($question->answer_order, true))
+                    ->map(fn($answerId) => $question->question->answers->firstWhere('id', $answerId))
+                    ->filter()
+                    ->values()
+                : $question->question->answers;
+        });
+
         $studentOrderedQuestions = StudentQuizOrder::where('student_quiz_order.student_id', $studentId)
             ->where('student_quiz_order.quiz_id', $quiz->id)
             ->with([
@@ -547,7 +572,7 @@ class QuizzesController extends Controller
             ? getArabicOrdinal($rank, $isLastRank)
             : ($isLastRank ? trans('admin/quizzes.lastRank') : $rank . (($rank % 10 == 1 && $rank % 100 != 11) ? 'st' : (($rank % 10 == 2 && $rank % 100 != 12) ? 'nd' : (($rank % 10 == 3 && $rank % 100 != 13) ? 'rd' : 'th'))));
 
-        return compact('studentOrderedQuestions', 'normalOrderedQuestions', 'correctAnswers', 'wrongAnswers', 'unanswered', 'rank', 'formattedRank');
+        return compact('questions', 'studentOrderedQuestions', 'normalOrderedQuestions', 'correctAnswers', 'wrongAnswers', 'unanswered', 'rank', 'formattedRank');
     }
 
     public function resetStudentQuiz($uuid, $studentUuid)
