@@ -20,6 +20,7 @@
                 <div class="row row-gap-1">
                     <div class="col-xl-5 col-md-7">
                         <div class="card-body">
+                            <x-alert type="info" :dismissible=false icon="error-warning" :message="trans('account.zoomAccountAlert')"/>
                             <form id="zoom-account-form" action="{{ route('teacher.account.zoom.update') }}" method="POST" autocomplete="off">
                                 @csrf
                                 <div class="row gy-5">

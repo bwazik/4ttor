@@ -28,6 +28,7 @@ return [
     'passwordCase' => 'Must contain at least one lowercase or uppercase letter',
     'passwordNumbers' => 'Must contain at least one number',
     'passwordSpecialChar' => 'Must contain at least one symbol or space',
+    'zoomAccountAlert' => 'We store your information securely so only you can access it. No one else, including our team, can see your Zoom account details.',
     'linkZoomAccount' => 'Link Zoom Account',
     'accountId' => 'Account ID',
     'clientId' => 'Client ID',
