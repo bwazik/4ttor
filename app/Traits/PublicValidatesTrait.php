@@ -161,6 +161,12 @@ trait PublicValidatesTrait
 
     protected function configureZoomAPI(int $teacherId)
     {
+        config([
+            'zoom.client_id' => null,
+            'zoom.client_secret' => null,
+            'zoom.account_id' => null,
+        ]);
+
         if (!$this->hasZoomAccount($teacherId)) {
             return $this->errorResponse(trans('teacher/errors.validateTeacherZoomAccount'));
         }

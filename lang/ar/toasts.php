@@ -81,6 +81,7 @@ return [
     'assignmentDeadlinePassed' => 'معاد تسليم الواجب خلص. مش هينفع تبعت أو تمسح أي ملفات تاني.',
     'invalidScore' => 'اتأكد من الدرجة وانها متكونش أكبر من الدرجة الأصلية.',
     'feedbackSubmitted' => 'تم تحديث الدرجة والملاحظات بنجاح.',
-    'assignmentResetSuccess' => 'تم إعادة تعيين الواجب بنجاح.'
+    'assignmentResetSuccess' => 'تم إعادة تعيين الواجب بنجاح.',
+    'zoomAccountUpdated' => 'تم تحديث حساب الزوم بنجاح.',
 ];
 

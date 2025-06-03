@@ -81,4 +81,5 @@ return [
     'invalidScore' => 'Please verify the score and ensure it does not exceed the original score.',
     'feedbackSubmitted' => 'Score and feedback have been updated successfully.',
     'assignmentResetSuccess' => 'Assignment has been reset successfully.',
+    'zoomAccountUpdated' => 'Zoom account has been updated successfully.',
 ];

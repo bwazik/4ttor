@@ -86,9 +86,7 @@ class ZoomService
                 return $this->errorResponse(trans('teacher/errors.validateTeacherZoomAccount'));
             }
 
-            $this->configureZoomAPI($this->teacherId);
-
-            $meetingData = $this->prepareMeetingData($request, true, $groupId);
+            $meetingData = $this->prepareMeetingData($request, true, groupId: $groupId);
 
             $zoom = Zoom::create([
                 'teacher_id' => $this->teacherId,
@@ -103,7 +101,7 @@ class ZoomService
                 'join_url' => 'https://اصبر_علي_الصفحة_هتظهر_بعد_لما_تعمل_الميتنج.com',
             ]);
 
-            dispatch(new HandleZoomMeetingJob(HandleZoomMeetingJob::TYPE_CREATE, ['meeting_data' => $meetingData, 'zoom_id' => $zoom->id]));
+            dispatch(new HandleZoomMeetingJob(HandleZoomMeetingJob::TYPE_CREATE, ['meeting_data' => $meetingData, 'zoom_id' => $zoom->id, 'teacher_id' => $this->teacherId]));
 
             return $this->successResponse(trans('main.added', ['item' => trans('admin/zooms.zoom')]));
         }, trans('toasts.ownershipError'));
@@ -122,12 +120,10 @@ class ZoomService
                 return $this->errorResponse(trans('teacher/errors.validateTeacherZoomAccount'));
             }
 
-            $this->configureZoomAPI($this->teacherId);
-
             $meetingData = $this->prepareMeetingData($request, false, $groupId);
 
             dispatch(new HandleZoomMeetingJob(HandleZoomMeetingJob::TYPE_UPDATE,
-            ['meeting_id' => $meeting_id, 'meeting_data' => $meetingData]));
+            ['meeting_id' => $meeting_id, 'meeting_data' => $meetingData, 'teacher_id' => $this->teacherId]));
 
             $zoom = Zoom::where('teacher_id', $this->teacherId)->findOrFail($id);
             $zoom->update([
@@ -147,7 +143,7 @@ class ZoomService
         return $this->executeTransaction(function () use ($id, $meeting_id)
         {
             if ($meeting_id) {
-                dispatch(new HandleZoomMeetingJob(HandleZoomMeetingJob::TYPE_DELETE, ['meeting_id' => $meeting_id]));
+                dispatch(new HandleZoomMeetingJob(HandleZoomMeetingJob::TYPE_DELETE, ['meeting_id' => $meeting_id, 'teacher_id' => $this->teacherId]));
             }
 
             Zoom::where('teacher_id', $this->teacherId)->findOrFail($id)->delete();
@@ -169,7 +165,7 @@ class ZoomService
             {
                 if ($meeting->meeting_id) {
                     try {
-                        dispatch(new HandleZoomMeetingJob(HandleZoomMeetingJob::TYPE_DELETE, ['meeting_id' => $meeting->meeting_id]));
+                        dispatch(new HandleZoomMeetingJob(HandleZoomMeetingJob::TYPE_DELETE, ['meeting_id' => $meeting->meeting_id, 'teacher_id' => $this->teacherId]));
                     } catch (\Exception $e) {
                         Log::warning("Failed to delete Zoom meeting {$meeting->meeting_id}: " . $e->getMessage());
                     }

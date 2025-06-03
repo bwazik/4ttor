@@ -9,6 +9,7 @@ use App\Models\Coupon;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Teacher;
+use App\Models\ZoomAccount;
 use Illuminate\Http\Request;
 use App\Services\AccountService;
 use App\Services\SessionService;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Requests\ProfilePicRequest;
 use App\Traits\DatabaseTransactionTrait;
+use App\Http\Requests\ZoomAccountRequest;
 use App\Services\Admin\FileUploadService;
 use App\Http\Requests\PersonalDataRequest;
 use App\Http\Requests\PasswordUpdateRequest;
@@ -93,7 +95,7 @@ class AccountController extends Controller
                     'remainingGroups' => $plan ? max(0, $plan->group_limit - $currentGroups) : 0,
                     'teacher' => $user->setAttribute('grades', implode(',', $gradeIds)),
                 ];
-            } elseif($this->guard === 'student') {
+            } elseif ($this->guard === 'student') {
                 $user = $model::query()
                     ->with(['grade', 'parent', 'teachers', 'groups.teacher'])
                     ->select('id', 'username', 'name', 'phone', 'email', 'gender', 'birth_date', 'grade_id', 'parent_id')
@@ -130,10 +132,23 @@ class AccountController extends Controller
 
     public function securityIndex()
     {
+        $zoomAccount = null;
+        if ($this->guard === 'teacher') {
+            $zoomAccount = Cache::remember("zoom_account_{$this->userId}", 3600, function () {
+                $account = ZoomAccount::where('teacher_id', $this->userId)
+                    ->select('account_id', 'client_id', 'client_secret')
+                    ->first();
+                return $account ? [
+                    'accountId' => $account->account_id,
+                    'clientId' => $account->client_id,
+                    'clientSecret' => $account->client_secret,
+                ] : null;
+            });
+        }
         $sessions = $this->sessionService->getUserSessions($this->guard, $this->userId);
         $devices = $this->sessionService->getUserDevices($this->guard, $this->userId);
 
-        return view("{$this->mapping['view_prefix']}.security", compact('sessions', 'devices'));
+        return view("{$this->mapping['view_prefix']}.security", compact('zoomAccount', 'sessions', 'devices'));
     }
 
     public function updatePassword(PasswordUpdateRequest $request)
@@ -141,6 +156,13 @@ class AccountController extends Controller
         $result = $this->accountService->updatePassword($this->guard, $this->userId, $request->validated());
 
         return $this->conrtollerJsonResponse($result);
+    }
+
+    public function updateZoomAccount(ZoomAccountRequest $request)
+    {
+        $result = $this->accountService->updateZoomAccount($this->guard, $this->userId, $request->validated());
+
+        return $this->conrtollerJsonResponse($result, "zoom_account_{$this->userId}");
     }
 
     public function getCoupons(Request $request)

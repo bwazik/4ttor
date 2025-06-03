@@ -6,6 +6,7 @@ use App\Models\Coupon;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\Transaction;
+use App\Models\ZoomAccount;
 use App\Traits\PublicValidatesTrait;
 use Illuminate\Support\Facades\Hash;
 use App\Traits\DatabaseTransactionTrait;
@@ -26,10 +27,8 @@ class AccountService
 
     public function updatePersonalInfo(string $guard, int $userId, array $request): array
     {
-        return $this->executeTransaction(function () use ($guard, $userId, $request)
-        {
-            if($guard === 'teacher')
-            {
+        return $this->executeTransaction(function () use ($guard, $userId, $request) {
+            if ($guard === 'teacher') {
                 $teacher = Teacher::findOrFail($userId);
 
                 $teacher->update([
@@ -41,7 +40,7 @@ class AccountService
                 ]);
 
                 $teacher->grades()->sync($request['grades'] ?? []);
-            } elseif($guard === 'student') {
+            } elseif ($guard === 'student') {
                 $student = Student::findOrFail($userId);
 
                 $student->update([
@@ -57,8 +56,7 @@ class AccountService
 
     public function updatePassword(string $guard, int $userId, array $request): array
     {
-        return $this->executeTransaction(function () use ($guard, $userId, $request)
-        {
+        return $this->executeTransaction(function () use ($guard, $userId, $request) {
             $mapping = $this->guardMappings[$guard];
             $model = $mapping['model'];
             $user = $model::findOrFail($userId);
@@ -75,6 +73,26 @@ class AccountService
         });
     }
 
+    public function updateZoomAccount(string $guard, int $userId, array $request): array
+    {
+        return $this->executeTransaction(function () use ($guard, $userId, $request) {
+            $mapping = $this->guardMappings[$guard];
+            $model = $mapping['model'];
+            $user = $model::findOrFail($userId);
+
+            ZoomAccount::updateOrCreate(
+                ['teacher_id' => $user->id],
+                [
+                    'account_id' => $request['accountId'],
+                    'client_id' => $request['clientId'],
+                    'client_secret' => $request['clientSecret'],
+                ]
+            );
+
+            return $this->successResponse(trans('toasts.zoomAccountUpdated'));
+        });
+    }
+
     public function getCouponsForDatatable($couponsQuery)
     {
         return datatables()->eloquent($couponsQuery)
@@ -88,8 +106,7 @@ class AccountService
 
     public function redeemCoupon(string $guard, int $userId, array $request): array
     {
-        return $this->executeTransaction(function () use ($guard, $userId, $request)
-        {
+        return $this->executeTransaction(function () use ($guard, $userId, $request) {
             $mapping = $this->guardMappings[$guard];
             $model = $mapping['model'];
 
