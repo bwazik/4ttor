@@ -44,24 +44,24 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        $user = Auth::guard($guard)->user();
-        if (!$user->is_active) {
-            Auth::guard($guard)->logout();
-            RateLimiter::hit($this->throttleKey());
-
-            Log::warning('Inactive or soft-deleted user login attempt', [
-                'username' => $this->input('username'),
-                'guard' => $guard,
-                'ip' => request()->ip(),
-            ]);
-
-            throw ValidationException::withMessages([
-                'username' => trans('auth.inactive'),
-            ]);
-        }
-
         // Check and manage devices for non-web guards
         if ($guard !== 'web') {
+            $user = Auth::guard($guard)->user();
+            if (!$user->is_active) {
+                Auth::guard($guard)->logout();
+                RateLimiter::hit($this->throttleKey());
+
+                Log::warning('Inactive or soft-deleted user login attempt', [
+                    'username' => $this->input('username'),
+                    'guard' => $guard,
+                    'ip' => request()->ip(),
+                ]);
+
+                throw ValidationException::withMessages([
+                    'username' => trans('auth.inactive'),
+                ]);
+            }
+
             $deviceFingerprint = hash('sha256', request()->userAgent() . '|' . request()->ip());
             $deviceCount = DB::table('user_devices')
                 ->where('user_id', $user->id)
