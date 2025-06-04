@@ -141,7 +141,7 @@ class TeacherService
         return $this->executeTransaction(function () use ($request)
         {
             $teacher = Teacher::create([
-                'plan_id' => $request['plan_id'],
+                'plan_id' => $request['plan_id'] ?? NULL,
                 'username' => $request['username'],
                 'password' => Hash::make($request['username']),
                 'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
