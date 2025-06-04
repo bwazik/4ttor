@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Quiz;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,20 +11,31 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(AdminSeeder::class);
-        $this->call(StageSeeder::class);
-        $this->call(GradeSeeder::class);
-        $this->call(SubjectSeeder::class);
-        $this->call(PlanSeeder::class);
-        $this->call(TeacherSeeder::class);
-        $this->call(TeacherGradeSeeder::class);
-        $this->call(AssistantSeeder::class);
-        $this->call(ParentSeeder::class);
-        $this->call(StudentSeeder::class);
-        $this->call(StudentTeacherSeeder::class);
-        $this->call(GroupSeeder::class);
-        $this->call(StudentGroupSeeder::class);
-        $this->call(ZoomAccountSeeder::class);
-        $this->call(QuizSeeder::class);
+        if(config('app.env') === 'production')
+        {
+            $this->call(AdminSeeder::class);
+            $this->call(StageSeeder::class);
+            $this->call(GradeSeeder::class);
+            $this->call(SubjectSeeder::class);
+            $this->call(PlanSeeder::class);
+        }
+        else
+        {
+            $this->call(AdminSeeder::class);
+            $this->call(StageSeeder::class);
+            $this->call(GradeSeeder::class);
+            $this->call(SubjectSeeder::class);
+            $this->call(PlanSeeder::class);
+            $this->call(TeacherSeeder::class);
+            $this->call(TeacherGradeSeeder::class);
+            $this->call(AssistantSeeder::class);
+            $this->call(ParentSeeder::class);
+            $this->call(StudentSeeder::class);
+            $this->call(StudentTeacherSeeder::class);
+            $this->call(GroupSeeder::class);
+            $this->call(StudentGroupSeeder::class);
+            $this->call(ZoomAccountSeeder::class);
+            $this->call(QuizSeeder::class);
+        }
     }
 }
