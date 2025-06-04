@@ -165,7 +165,7 @@ class TeacherService
             $this->processPassword($request);
 
             $teacher->update([
-                'plan_id' => $request['plan_id'],
+                'plan_id' => $request['plan_id'] ?? NULL,
                 'username' => $request['username'],
                 'password' => $request['password'] ?? $teacher->password,
                 'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
