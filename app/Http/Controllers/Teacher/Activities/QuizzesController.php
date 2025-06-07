@@ -536,18 +536,8 @@ class QuizzesController extends Controller
                 $question->answer_id = $studentAnswer?->answer_id;
                 $question->answered_at = $studentAnswer?->answered_at;
 
-                // Fetch answer order from student_quiz_order for this question, if randomized
-                $answerOrder = StudentQuizOrder::where('student_id', $studentId)
-                    ->where('quiz_id', $quiz->id)
-                    ->where('question_id', $question->id)
-                    ->value('answer_order');
-
-                $question->sorted_answers = $quiz->randomize_answers && $answerOrder
-                    ? collect(json_decode($answerOrder, true))
-                        ->map(fn($answerId) => $question->answers->firstWhere('id', $answerId))
-                        ->filter()
-                        ->values()
-                    : $question->answers;
+                // Remove randomization logic and just return answers in original order
+                $question->sorted_answers = $question->answers;
 
                 return $question;
             });

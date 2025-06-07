@@ -493,18 +493,8 @@ class QuizzesController extends Controller
                 $question->answer_id = $studentAnswer?->answer_id;
                 $question->answered_at = $studentAnswer?->answered_at;
 
-                // Fetch answer order from student_quiz_order for this question, if randomized
-                $answerOrder = StudentQuizOrder::where('student_id', $studentId)
-                    ->where('quiz_id', $quiz->id)
-                    ->where('question_id', $question->id)
-                    ->value('answer_order');
-
-                $question->sorted_answers = $quiz->randomize_answers && $answerOrder
-                    ? collect(json_decode($answerOrder, true))
-                        ->map(fn($answerId) => $question->answers->firstWhere('id', $answerId))
-                        ->filter()
-                        ->values()
-                    : $question->answers;
+                // Remove randomization logic and just return answers in original order
+                $question->sorted_answers = $question->answers;
 
                 return $question;
             });
@@ -553,7 +543,7 @@ class QuizzesController extends Controller
             ? getArabicOrdinal($rank, $isLastRank)
             : ($isLastRank ? trans('admin/quizzes.lastRank') : $rank . (($rank % 10 == 1 && $rank % 100 != 11) ? 'st' : (($rank % 10 == 2 && $rank % 100 != 12) ? 'nd' : (($rank % 10 == 3 && $rank % 100 != 13) ? 'rd' : 'th'))));
 
-        return compact('studentOrderedQuestions', 'normalOrderedQuestions', 'questions', 'correctAnswers', 'wrongAnswers', 'unanswered', 'rank', 'formattedRank');
+        return compact('questions', 'studentOrderedQuestions', 'normalOrderedQuestions', 'correctAnswers', 'wrongAnswers', 'unanswered', 'rank', 'formattedRank');
     }
 
     protected function createResponse($status, $message, $redirectRoute = 'student.quizzes.index', $statusCode = 403)
