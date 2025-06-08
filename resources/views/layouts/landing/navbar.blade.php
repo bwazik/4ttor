@@ -295,6 +295,22 @@
         <!-- Menu wrapper: End -->
         <!-- Toolbar: Start -->
         <ul class="navbar-nav flex-row align-items-center ms-auto">
+            <!-- Language -->
+            <li class="nav-item dropdown me-xl-0">
+                @foreach (LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
+                    @if (App::getLocale() != $localeCode)
+                        <a class="nav-link btn btn-text-secondary rounded-pill btn-icon hide-arrow"
+                            href="{{ LaravelLocalization::getLocalizedURL($localeCode, null, [], true) }}"
+                            data-bs-toggle="tooltip" data-bs-original-title="{{ trans('layouts/navbar.language') }}">
+                            <i class="ri-global-line ri-22px"></i>
+                            <span class="visually-hidden">{{ $properties['native'] }}</span>
+                        </a>
+                        @break
+                    @endif
+                @endforeach
+            </li>
+            <!--/ Language -->
+
             <!-- Style Switcher -->
             <li class="nav-item dropdown-style-switcher dropdown me-2 me-xl-0">
                 <a class="nav-link btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow me-sm-4"
@@ -324,9 +340,10 @@
             <!-- navbar button: Start -->
             <li>
                 <a href="{{ route('login.choose') }}"
-                    class="btn btn-primary px-2 px-sm-4 px-lg-2 px-xl-4"><span
-                        class="tf-icons ri-user-line me-md-1"></span><span
-                        class="d-none d-md-block">Login</span></a>
+                    class="btn btn-primary px-2 px-sm-4 px-lg-2 px-xl-4">
+                    <span class="tf-icons ri-user-line me-md-1"></span>
+                    <span class="d-none d-md-block">Login</span>
+                </a>
             </li>
             <!-- navbar button: End -->
         </ul>

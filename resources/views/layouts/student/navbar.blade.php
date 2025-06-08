@@ -20,7 +20,20 @@
 
         <ul class="navbar-nav flex-row align-items-center ms-auto">
             <!-- Language -->
-            <li class="nav-item dropdown-language dropdown">
+            <li class="nav-item">
+                @foreach (LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
+                    @if (App::getLocale() != $localeCode)
+                        <a class="nav-link btn btn-text-secondary rounded-pill btn-icon"
+                            href="{{ LaravelLocalization::getLocalizedURL($localeCode, null, [], true) }}"
+                            data-bs-toggle="tooltip" data-bs-original-title="{{ trans('layouts/navbar.language') }}">
+                            <i class="ri-global-line ri-22px"></i>
+                            <span class="visually-hidden">{{ $properties['native'] }}</span>
+                        </a>
+                        @break
+                    @endif
+                @endforeach
+            </li>
+            {{-- <li class="nav-item dropdown-language dropdown">
                 <a class="nav-link btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow"
                     href="javascript:void(0);" data-bs-toggle="dropdown">
                     <i class="ri-translate-2 ri-22px"></i>
@@ -28,13 +41,14 @@
                 <ul class="dropdown-menu dropdown-menu-end">
                     @foreach (LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
                         <li>
-                            <a class="dropdown-item @if (App::getLocale() == $localeCode) active @endif" href="{{ LaravelLocalization::getLocalizedURL($localeCode, null, [], true) }}">
+                            <a class="dropdown-item @if (App::getLocale() == $localeCode) active @endif"
+                                href="{{ LaravelLocalization::getLocalizedURL($localeCode, null, [], true) }}">
                                 <span class="align-middle">{{ $properties['native'] }}</span>
                             </a>
                         </li>
                     @endforeach
                 </ul>
-            </li>
+            </li> --}}
             <!--/ Language -->
 
             <!-- Style Switcher -->

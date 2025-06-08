@@ -19,9 +19,11 @@
                     <div class="app-brand justify-content-center mt-5">
                         <a href="{{ route('landing') }}" class="app-brand-link gap-2">
                             <span class="app-brand-logo demo">
-                                <img width="80" height="80" src="{{ asset('assets/img/brand/navbar.png') }}" alt="Shattor">
+                                <img width="80" height="80" src="{{ asset('assets/img/brand/navbar.png') }}"
+                                    alt="Shattor">
                             </span>
-                            <span class="app-brand-text demo text-heading fw-semibold">{{ trans('layouts/sidebar.platformName') }}</span>
+                            <span
+                                class="app-brand-text demo text-heading fw-semibold">{{ trans('layouts/sidebar.platformName') }}</span>
                         </a>
                     </div>
                     <!-- /Logo -->
@@ -35,13 +37,15 @@
                         <div class="d-flex justify-content-center align-items-center gap-2 mb-4">
                             {{-- Conditional Back Button --}}
                             @if (isActiveRoute('login.choose'))
-                                <a href="{{ route('landing') }}" class="btn btn-sm btn-outline-secondary waves-effect waves-light text-nowrap"
+                                <a href="{{ route('landing') }}"
+                                    class="btn btn-sm btn-outline-secondary waves-effect waves-light text-nowrap"
                                     aria-label="{{ trans('layouts/auth.back_to_landing') }}">
                                     <i class="ri-arrow-left-line me-1"></i>
                                     <span>{{ trans('layouts/login.back_to_landing') }}</span>
                                 </a>
                             @elseif (isActiveRoute('login'))
-                                <a href="{{ route('login.choose') }}" class="btn btn-sm btn-outline-secondary waves-effect waves-light text-nowrap"
+                                <a href="{{ route('login.choose') }}"
+                                    class="btn btn-sm btn-outline-secondary waves-effect waves-light text-nowrap"
                                     aria-label="{{ trans('layouts/auth.back_to_selection') }}">
                                     <i class="ri-arrow-left-line me-1"></i>
                                     <span>{{ trans('layouts/login.back_to_selection') }}</span>
@@ -50,7 +54,18 @@
                             {{-- /Conditional Back Button --}}
 
                             {{-- Language Switcher --}}
-                            <div class="dropdown">
+                            @foreach (LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
+                                @if (App::getLocale() != $localeCode)
+                                    <a href="{{ LaravelLocalization::getLocalizedURL($localeCode) }}"
+                                        class="btn btn-sm btn-outline-secondary waves-effect waves-light"
+                                        data-bs-toggle="tooltip" data-bs-original-title="{{ trans('layouts/navbar.language') }}">
+                                        <i class="ri-global-line me-1"></i>
+                                        <span>{{ $properties['native'] }}</span>
+                                    </a>
+                                    @break
+                                @endif
+                            @endforeach
+                            {{-- <div class="dropdown">
                                 <button class="btn btn-sm btn-outline-secondary dropdown-toggle waves-effect waves-light" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="ri-global-line me-1"></i>
                                     <span>{{ LaravelLocalization::getCurrentLocaleNative() }}</span>
@@ -64,7 +79,7 @@
                                         </li>
                                     @endforeach
                                 </ul>
-                            </div>
+                            </div> --}}
                             {{-- /Language Switcher --}}
                         </div>
                     </div>
@@ -80,7 +95,8 @@
     <!-- / Sections:End -->
 
     <div class="buy-now">
-        <a href="https://wa.me/+201098617164" target="_blank" class="btn btn-success btn-buy-now waves-effect waves-light"> <i class="ri-whatsapp-line me-1"></i>{{ trans('layouts/login.whatsapp') }}</a>
+        <a href="https://wa.me/+201098617164" target="_blank" class="btn btn-success btn-buy-now waves-effect waves-light">
+            <i class="ri-whatsapp-line me-1"></i>{{ trans('layouts/login.whatsapp') }}</a>
     </div>
 @endsection
 

@@ -20,7 +20,20 @@
 
         <ul class="navbar-nav flex-row align-items-center ms-auto">
             <!-- Language -->
-            <li class="nav-item dropdown-language dropdown">
+            <li class="nav-item">
+                @foreach (LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
+                    @if (App::getLocale() != $localeCode)
+                        <a class="nav-link btn btn-text-secondary rounded-pill btn-icon"
+                            href="{{ LaravelLocalization::getLocalizedURL($localeCode, null, [], true) }}"
+                            data-bs-toggle="tooltip" data-bs-original-title="{{ trans('layouts/navbar.language') }}">
+                            <i class="ri-global-line ri-22px"></i>
+                            <span class="visually-hidden">{{ $properties['native'] }}</span>
+                        </a>
+                        @break
+                    @endif
+                @endforeach
+            </li>
+            {{-- <li class="nav-item dropdown-language dropdown">
                 <a class="nav-link btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow"
                     href="javascript:void(0);" data-bs-toggle="dropdown">
                     <i class="ri-translate-2 ri-22px"></i>
@@ -28,13 +41,14 @@
                 <ul class="dropdown-menu dropdown-menu-end">
                     @foreach (LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
                         <li>
-                            <a class="dropdown-item @if (App::getLocale() == $localeCode) active @endif" href="{{ LaravelLocalization::getLocalizedURL($localeCode, null, [], true) }}">
+                            <a class="dropdown-item @if (App::getLocale() == $localeCode) active @endif"
+                                href="{{ LaravelLocalization::getLocalizedURL($localeCode, null, [], true) }}">
                                 <span class="align-middle">{{ $properties['native'] }}</span>
                             </a>
                         </li>
                     @endforeach
                 </ul>
-            </li>
+            </li> --}}
             <!--/ Language -->
 
             <!-- Style Switcher -->
@@ -180,7 +194,8 @@
                                 <div class="d-flex">
                                     <div class="flex-shrink-0 me-3">
                                         <div class="avatar">
-                                            <img src="{{ asset('assets/img/avatars/1.png') }}" alt class="rounded-circle" />
+                                            <img src="{{ asset('assets/img/avatars/1.png') }}" alt
+                                                class="rounded-circle" />
                                         </div>
                                     </div>
                                     <div class="flex-grow-1">
@@ -223,7 +238,8 @@
                                 <div class="d-flex">
                                     <div class="flex-shrink-0 me-3">
                                         <div class="avatar">
-                                            <img src="{{ asset('assets/img/avatars/2.png') }}" alt class="rounded-circle" />
+                                            <img src="{{ asset('assets/img/avatars/2.png') }}" alt
+                                                class="rounded-circle" />
                                         </div>
                                     </div>
                                     <div class="flex-grow-1">
@@ -267,7 +283,8 @@
                                 <div class="d-flex">
                                     <div class="flex-shrink-0 me-3">
                                         <div class="avatar">
-                                            <img src="{{ asset('assets/img/avatars/9.png') }}" alt class="rounded-circle" />
+                                            <img src="{{ asset('assets/img/avatars/9.png') }}" alt
+                                                class="rounded-circle" />
                                         </div>
                                     </div>
                                     <div class="flex-grow-1">
@@ -312,7 +329,8 @@
                                 <div class="d-flex">
                                     <div class="flex-shrink-0 me-3">
                                         <div class="avatar">
-                                            <img src="{{ asset('assets/img/avatars/5.png') }}" alt class="rounded-circle" />
+                                            <img src="{{ asset('assets/img/avatars/5.png') }}" alt
+                                                class="rounded-circle" />
                                         </div>
                                     </div>
                                     <div class="flex-grow-1">
@@ -333,7 +351,8 @@
                                 <div class="d-flex">
                                     <div class="flex-shrink-0 me-3">
                                         <div class="avatar">
-                                            <img src="{{ asset('assets/img/avatars/6.png') }}" alt class="rounded-circle" />
+                                            <img src="{{ asset('assets/img/avatars/6.png') }}" alt
+                                                class="rounded-circle" />
                                         </div>
                                     </div>
                                     <div class="flex-grow-1">
@@ -390,7 +409,8 @@
             <li class="nav-item navbar-dropdown dropdown-user dropdown">
                 <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
                     <div class="avatar avatar-online">
-                        <img src="{{ Auth::user()->profile_pic ? asset('storage/profiles/teachers/' . Auth::user()->profile_pic) : asset('assets/img/avatars/default.jpg') }}" alt="avatar" class="rounded-circle" />
+                        <img src="{{ Auth::user()->profile_pic ? asset('storage/profiles/teachers/' . Auth::user()->profile_pic) : asset('assets/img/avatars/default.jpg') }}"
+                            alt="avatar" class="rounded-circle" />
                     </div>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
@@ -399,7 +419,8 @@
                             <div class="d-flex">
                                 <div class="flex-shrink-0 me-2">
                                     <div class="avatar avatar-online">
-                                        <img src="{{ Auth::user()->profile_pic ? asset('storage/profiles/teachers/' . Auth::user()->profile_pic) : asset('assets/img/avatars/default.jpg') }}" alt="avatar" class="rounded-circle" />
+                                        <img src="{{ Auth::user()->profile_pic ? asset('storage/profiles/teachers/' . Auth::user()->profile_pic) : asset('assets/img/avatars/default.jpg') }}"
+                                            alt="avatar" class="rounded-circle" />
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
@@ -414,12 +435,14 @@
                     </li>
                     <li>
                         <a class="dropdown-item" href="pages-profile-user.html">
-                            <i class="ri-user-3-line ri-22px me-3"></i><span class="align-middle">{{ trans('layouts/navbar.myProfile') }}</span>
+                            <i class="ri-user-3-line ri-22px me-3"></i><span
+                                class="align-middle">{{ trans('layouts/navbar.myProfile') }}</span>
                         </a>
                     </li>
                     <li>
                         <a class="dropdown-item" href="{{ route('teacher.account.personal.edit') }}">
-                            <i class="ri-settings-4-line ri-22px me-3"></i><span class="align-middle">{{ trans('layouts/navbar.settings') }}</span>
+                            <i class="ri-settings-4-line ri-22px me-3"></i><span
+                                class="align-middle">{{ trans('layouts/navbar.settings') }}</span>
                         </a>
                     </li>
                     <li>
@@ -435,7 +458,8 @@
                             <span class="d-flex align-items-center align-middle">
                                 <i class="flex-shrink-0 ri-wallet-line ri-22px me-3"></i>
                                 <span class="flex-grow-1 align-middle">{{ trans('main.balance') }}</span>
-                                <span class="flex-shrink-0 badge rounded-pill bg-primary">{{ trans('main.currency') }} {{ number_format(Auth::user()->balance, 2) }}</span>
+                                <span class="flex-shrink-0 badge rounded-pill bg-primary">{{ trans('main.currency') }}
+                                    {{ number_format(Auth::user()->balance, 2) }}</span>
                             </span>
                         </a>
                     </li>
@@ -450,17 +474,19 @@
                     </li>
                     <li>
                         <a class="dropdown-item" href="pages-faq.html">
-                            <i class="ri-question-line ri-22px me-3"></i><span class="align-middle">{{ trans('layouts/navbar.faq') }}</span>
+                            <i class="ri-question-line ri-22px me-3"></i><span
+                                class="align-middle">{{ trans('layouts/navbar.faq') }}</span>
                         </a>
                     </li>
                     <li>
                         <div class="d-grid px-4 pt-2 pb-1">
-                            <a class="btn btn-sm btn-danger d-flex" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            <a class="btn btn-sm btn-danger d-flex" href="#"
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                 <small class="align-middle">{{ trans('layouts/navbar.logout') }}</small>
                                 <i class="ri-logout-box-r-line ms-2 ri-16px"></i>
                             </a>
-                            <form id="logout-form" action="{{ route('logout', auth()->guard()->name) }}" method="POST"
-                                style="display: none;">
+                            <form id="logout-form" action="{{ route('logout', auth()->guard()->name) }}"
+                                method="POST" style="display: none;">
                                 @csrf
                             </form>
                         </div>

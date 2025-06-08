@@ -1,6 +1,6 @@
 <?php
 return [
-
+    'language' => 'Language',
     'myProfile' => 'My Profile',
     'settings' => 'Settings',
     'billing' => 'Billing & Subscriptions',

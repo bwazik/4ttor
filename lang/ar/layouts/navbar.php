@@ -1,5 +1,6 @@
 <?php
 return [
+    'language' => 'اللغة',
     'myProfile' => 'ملفي الشخصي',
     'settings' => 'الإعدادات',
     'billing' => 'الفواتير والإشتراك',
