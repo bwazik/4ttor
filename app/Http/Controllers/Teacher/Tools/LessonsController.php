@@ -100,7 +100,9 @@ class LessonsController extends Controller
     public function attendances(Request $request, $uuid)
     {
         $lesson = Lesson::with(['group:id,uuid,name,teacher_id,grade_id', 'group.teacher:id,uuid,name', 'group.grade:id,name'])
-            ->select('id', 'uuid', 'title', 'group_id', 'date')->uuid($uuid)->where('teacher_id', $this->teacherId)->firstOrFail();
+            ->select('id', 'uuid', 'title', 'group_id', 'date')
+            ->whereHas('group', fn($query) => $query->where('teacher_id', $this->teacherId))
+            ->uuid($uuid)->firstOrFail();
 
         if ($validationResult = $this->validateTeacherGradeAndGroups($this->teacherId, $lesson->group_id, $lesson->group->grade_id, true)){
             abort(404);

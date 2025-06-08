@@ -162,6 +162,6 @@
         ], 'period', 'GET', 'plan_id');
 
         let fields = ['plan_id', 'period'];
-        handleFormSubmit('#add-form', fields, '#add-modal', 'offcanvas');
+        handleFormSubmit('#add-form', fields, '#add-modal', 'offcanvas', null, '{{ route("teacher.billing.index") }}');
     </script>
 @endsection
