@@ -40,6 +40,14 @@
             ],
         );
 
+        // Setup add modal
+        setupModal({
+            buttonId: '#add-button',
+            modalId: '#add-modal',
+            fields: {
+                password: () => generateStrongPassword(12),
+            }
+        });
         // Setup edit modal
         setupModal({
             buttonId: '#edit-button',

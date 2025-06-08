@@ -46,6 +46,7 @@
             buttonId: '#add-button',
             modalId: '#add-modal',
             fields: {
+                password: () => generateStrongPassword(12),
                 gender: () => '',
                 students: () => '',
             }
