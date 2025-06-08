@@ -65,6 +65,7 @@ class ZoomService
                 '<button class="btn btn-sm btn-icon btn-text-danger rounded-pill text-body waves-effect waves-light me-1" ' .
                     'id="delete-button" ' .
                     'data-id="' . $row->uuid . '" ' .
+                    'data-meeting_id="' . $row->meeting_id . '" ' .
                     'data-topic_ar="' . $row->getTranslation('topic', 'ar') . '" ' .
                     'data-topic_en="' . $row->getTranslation('topic', 'en') . '" ' .
                     'data-bs-target="#delete-modal" data-bs-toggle="modal" data-bs-dismiss="modal">' .
