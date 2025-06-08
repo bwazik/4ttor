@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Middleware\Authenticate;
 use Jubaer\Zoom\Facades\Zoom;
 use Illuminate\Foundation\Application;
 use Yajra\DataTables\Facades\DataTables;
 use App\Http\Middleware\EnsureTeacherIsSubscribed;
+use App\Http\Middleware\RedirectIfAuthenticated;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect;
@@ -29,6 +31,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'DataTables' => DataTables::class,
             'Zoom' => Zoom::class,
             'subscribed' => EnsureTeacherIsSubscribed::class,
+            'auth' => Authenticate::class,
+            'guest' => RedirectIfAuthenticated::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
