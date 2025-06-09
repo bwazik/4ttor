@@ -50,4 +50,10 @@ return [
     'coupons' => 'Coupons',
     'teacherCoupons' => 'Teacher Coupons',
     'studentCoupons' => 'Student Coupons',
+
+    # Support
+    'support' => 'Support',
+    'categories' => 'Categories',
+    'faqs' => 'FAQs',
+    'helpCenter' => 'Help Center',
 ];

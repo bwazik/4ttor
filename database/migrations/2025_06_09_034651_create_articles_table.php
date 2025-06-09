@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug')->unique()->index();
             $table->integer('category_id')->unsigned();
+            $table->tinyInteger('audience')->default(0)->index()->comment('1 => teachers, 2 => students, 3 => assistants, 4 => parents, 5 => teachers & assistants, 6 => students & parents, 7 => all');;
             $table->string('description')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamp('published_at')->nullable();

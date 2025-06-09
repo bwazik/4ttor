@@ -15,6 +15,7 @@ class Faq extends Model
 
     protected $fillable = [
         'category_id',
+        'audience',
         'question',
         'answer',
         'is_active',

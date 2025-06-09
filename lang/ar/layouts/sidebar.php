@@ -51,4 +51,10 @@ return [
     'coupons' => 'الكوبونات',
     'teachersCoupons' => 'كوبونات المدرسين',
     'studentsCoupons' => 'كوبونات الطلاب',
+
+    # Support
+    'support' => 'الدعم',
+    'categories' => 'الأقسام',
+    'faqs' => 'الأسئلة الشائعة',
+    'helpCenter' => 'مركز المساعدة',
 ];

@@ -17,6 +17,7 @@ class Article extends Model
         'title',
         'slug',
         'category_id',
+        'audience',
         'description',
         'is_active',
         'published_at',
