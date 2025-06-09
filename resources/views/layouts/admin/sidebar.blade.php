@@ -217,7 +217,7 @@
         </li>
         <li class="menu-item {{ isActiveRoute(['admin.invoices.index', 'admin.invoices.archived', 'admin.invoices.teachers.index', 'admin.invoices.teachers.archived']) ? 'active open' : '' }}">
             <a href="javascript:void(0)" class="menu-link menu-toggle waves-effect">
-                <i class="menu-icon icon-base ri-money-dollar-circle-line"></i>
+                <i class="menu-icon tf-icons ri-money-dollar-circle-line"></i>
                 <div>{{ trans('layouts/sidebar.invoices') }}</div>
             </a>
             <ul class="menu-sub">
@@ -283,6 +283,24 @@
                 <i class="menu-icon tf-icons ri-coupon-2-line"></i>
                 <div>{{ trans('layouts/sidebar.coupons') }}</div>
             </a>
+        </li>
+
+        <!-- Misc -->
+        <li class="menu-header mt-5">
+            <span class="menu-header-text">{{ trans('layouts/sidebar.misc') }}</span>
+        </li>
+        <li class="menu-item {{ isActiveRoute(['admin.categories.index']) ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
+                <i class="menu-icon tf-icons ri-lifebuoy-line"></i>
+                <div>{{ trans('layouts/sidebar.support') }}</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ isActiveRoute('admin.categories.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.categories.index') }}" class="menu-link">
+                        <div>{{ trans('admin/categories.categories') }}</div>
+                    </a>
+                </li>
+            </ul>
         </li>
     </ul>
 </aside>

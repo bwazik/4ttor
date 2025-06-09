@@ -65,6 +65,9 @@ return [
     'invoice' => 'الفاتورة',
     'balance_after' => 'الأرباح بعد',
     'link' => 'اللينك',
+    'slug' => 'الرابط',
+    'icon' => 'الأيقونة',
+    'order' => 'الترتيب',
 
     # Weekdays
     'weekdays' => [

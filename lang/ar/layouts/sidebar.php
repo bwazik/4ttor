@@ -53,6 +53,7 @@ return [
     'studentsCoupons' => 'كوبونات الطلاب',
 
     # Support
+    'misc' => 'المزيد',
     'support' => 'الدعم',
     'categories' => 'الأقسام',
     'faqs' => 'الأسئلة الشائعة',

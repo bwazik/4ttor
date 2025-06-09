@@ -64,6 +64,9 @@ return [
     'payment' => 'Payments',
     'refund' => 'Refunds',
     'link' => 'Link',
+    'slug' => 'Slug',
+    'icon' => 'Icon',
+    'order' => 'Order',
 
     # Weekdays
     'weekdays' => [

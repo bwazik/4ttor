@@ -52,6 +52,7 @@ return [
     'studentCoupons' => 'Student Coupons',
 
     # Support
+    'misc' => 'Misc',
     'support' => 'Support',
     'categories' => 'Categories',
     'faqs' => 'FAQs',

@@ -39,6 +39,8 @@ use App\Http\Controllers\Admin\Finance\CouponsController;
 use App\Http\Controllers\Admin\Finance\TeacherSubscriptionsController;
 use App\Http\Controllers\Admin\Finance\TeachersInvoicesController;
 
+use App\Http\Controllers\Admin\Misc\CategoriesController;
+
 Route::group(
     [
         'prefix' => LaravelLocalization::setLocale(),
@@ -429,6 +431,18 @@ Route::group(
                 });
             });
         # End Finance Managment
+
+        # Start Misc
+            Route::prefix('categories')->controller(CategoriesController::class)->name('categories.')->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::middleware('throttle:10,1')->group(function () {
+                    Route::post('insert', 'insert')->name('insert');
+                    Route::post('update', 'update')->name('update');
+                    Route::post('delete', 'delete')->name('delete');
+                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                });
+            });
+        # End Misc
         });
     }
 );
