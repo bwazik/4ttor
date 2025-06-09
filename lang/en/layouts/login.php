@@ -1,7 +1,7 @@
 <?php
 return [
     'title' => 'Login',
-    'welcome' => 'Welcome to Shattour Platform! ☝️',
+    'welcome' => 'Welcome to Shattor Platform! ☝️',
     'sign_in_prompt' => 'Sign in to access the platform (try not to forget your password).',
     'username' => 'Username',
     'password' => 'Password',
