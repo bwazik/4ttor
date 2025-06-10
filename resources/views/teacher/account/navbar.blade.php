@@ -15,13 +15,5 @@
             <a class="nav-link {{ isActiveRoute('teacher.account.coupons.index') ? 'active' : '' }}" href="{{ route('teacher.account.coupons.index') }}"><i
                     class="ri-coupon-2-line me-2"></i>{{ trans('admin/coupons.coupons') }}</a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="pages-account-settings-notifications.html"><i
-                    class="ri-notification-4-line me-2"></i> Notifications</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="pages-account-settings-connections.html"><i class="ri-link-m me-2"></i>
-                Connections</a>
-        </li>
     </ul>
 </div>
