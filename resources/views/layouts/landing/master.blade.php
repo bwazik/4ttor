@@ -22,7 +22,7 @@
     <!-- / Sections:End -->
 
     <!-- Footer: Start -->
-    @include('layouts.landing.footer')
+    @include('layouts.base.footer')
     <!-- Footer: End -->
 @endsection
 

@@ -339,11 +339,17 @@
 
             <!-- navbar button: Start -->
             <li>
-                <a href="{{ route('login.choose') }}"
-                    class="btn btn-primary px-2 px-sm-4 px-lg-2 px-xl-4">
-                    <span class="tf-icons ri-user-line me-md-1"></span>
-                    <span class="d-none d-md-block">Login</span>
-                </a>
+                @if(isAdmin() || isTeacher() || isAssistant() || isStudent() || isParent())
+                    <a href="{{ getDashboardRoute() }}" class="btn btn-primary px-2 px-sm-4 px-lg-2 px-xl-4">
+                        <span class="tf-icons ri-user-line me-md-1"></span>
+                        <span class="d-none d-md-block">Dashboard</span>
+                    </a>
+                @else
+                    <a href="{{ route('login.choose') }}" class="btn btn-primary px-2 px-sm-4 px-lg-2 px-xl-4">
+                        <span class="tf-icons ri-user-line me-md-1"></span>
+                        <span class="d-none d-md-block">Login</span>
+                    </a>
+                @endauth
             </li>
             <!-- navbar button: End -->
         </ul>

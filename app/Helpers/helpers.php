@@ -103,6 +103,13 @@ if (!function_exists('isStudent')) {
     }
 }
 
+if (!function_exists('isParent')) {
+    function isParent()
+    {
+        return auth()->guard('parent')->check();
+    }
+}
+
 
 if (!function_exists('filterByRelation')) {
     function filterByRelation($query, $relation, $column, $keyword)
@@ -556,3 +563,15 @@ if (!function_exists('getArabicOrdinal')) {
     }
 }
 
+if (!function_exists('getDashboardRoute')) {
+    function getDashboardRoute() {
+        return match (true) {
+            isAdmin() => route('admin.dashboard'),
+            isTeacher() => route('teacher.dashboard'),
+            isAssistant() => route('assistant.dashboard'),
+            isStudent() => route('student.dashboard'),
+            isParent() => route('parent.dashboard'),
+            default => route('login.choose'),
+        };
+    }
+}

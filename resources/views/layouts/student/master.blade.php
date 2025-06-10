@@ -33,7 +33,7 @@
                     <!-- / Content -->
 
                     <!-- Footer -->
-                    @include('layouts.student.footer')
+                    @include('layouts.base.footer')
                     <!-- / Footer -->
 
                     <div class="content-backdrop fade"></div>
