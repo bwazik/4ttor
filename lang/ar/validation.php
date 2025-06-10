@@ -224,7 +224,7 @@ return [
     'prohibited_if' => ':attribute مش مسموح لو :other هو :value.',
     'prohibited_unless' => ':attribute مش مسموح إلا لو :other في :values.',
     'prohibits' => ':attribute بيمنع :other من إنه يكون موجود.',
-    'regex' => ':attribute مش في الفورمات الصح.',
+    'regex' => ':attribute مش مكتوب صح.',
     'required' => ':attribute لازم يكون موجود.',
     'required_array_keys' => ':attribute لازم يحتوي على مدخلات لـ: :values.',
     'required_if' => ':attribute لازم يكون موجود لو :other هو :value.',

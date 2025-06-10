@@ -82,4 +82,5 @@ return [
     'feedbackSubmitted' => 'Score and feedback have been updated successfully.',
     'assignmentResetSuccess' => 'Assignment has been reset successfully.',
     'zoomAccountUpdated' => 'Zoom account has been updated successfully.',
+    'messageSent' => 'Message has been sent successfully.',
 ];

@@ -24,6 +24,11 @@
     <!-- Footer: Start -->
     @include('layouts.base.footer')
     <!-- Footer: End -->
+    
+    <div class="buy-now">
+        <a href="https://wa.me/+201098617164" target="_blank" class="btn btn-success btn-buy-now waves-effect waves-light">
+            <i class="ri-whatsapp-line me-1"></i>{{ trans('layouts/login.whatsapp') }}</a>
+    </div>
 @endsection
 
 @section('scripts')

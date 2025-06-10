@@ -85,6 +85,7 @@ return [
         'description_ar' => 'اكتب وصف مختصر للعنصر دا.',
         'description_en' => 'Write a brief description of this item.',
         'realName' => 'Full Name',
+        'message' => 'Write your message here...',
     ],
 
     # Main inputs

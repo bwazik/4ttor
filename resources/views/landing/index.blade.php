@@ -2,9 +2,29 @@
 
 @section('page-css')
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/front-page-landing.css') }}" />
+    <style>
+        .hero-title {
+            line-height: 3.3rem;
+        }
+
+        .features-new-icon {
+            border: 2px solid rgba(102, 108, 255, 0.32);
+            height: 5.125rem;
+            width: 5.125rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: auto;
+            margin-right: auto;
+            border-width: 2px;
+            border-style: solid;
+            border-radius: 50rem;
+            transition: all 0.3s ease-in-out;
+        }
+    </style>
 @endsection
 
-@section('title', 'Landing Page')
+@section('title', trans('landing.title'))
 
 @section('content')
     <!-- Hero: Start -->
@@ -15,12 +35,9 @@
             data-app-dark-img="front-pages/backgrounds/hero-bg-dark.png" />
         <div class="container">
             <div class="hero-text-box text-center">
-                <h3 class="text-primary hero-title fs-2">All in one sass application for your business</h3>
-                <h2 class="h6 mb-8">
-                    No coding required to make customisations.<br />The live customiser has everything your marketing
-                    need.
-                </h2>
-                <a href="#landingPricing" class="btn btn-lg btn-primary">Get early access</a>
+                <h3 class="text-primary hero-title fs-2">{{ trans('landing.hero.title') }}</h3>
+                <h2 class="h6 mb-8">{{ trans('landing.hero.subtitle') }}</h2>
+                <a href="https://wa.me/+201098617164" class="btn btn-lg btn-primary">{{ trans('landing.hero.button') }}</a>
             </div>
             <div class="position-relative hero-animation-img">
                 <a href="../vertical-menu-template/app-ecommerce-dashboard.html" target="_blank">
@@ -48,72 +65,59 @@
             <h6 class="text-center d-flex justify-content-center align-items-center mb-6">
                 <img src="{{ asset('assets/img/front-pages/icons/section-tilte-icon.png') }}" alt="section title icon"
                     class="me-3" />
-                <span class="text-uppercase">Useful features</span>
+                <span class="text-uppercase">{{ trans('landing.features.title') }}</span>
             </h6>
             <h5 class="text-center mb-2">
-                <span class="display-5 fs-4 fw-bold">Everything you need</span> to start your next project
+                <span class="display-5 fs-4 fw-bold">{{ trans('landing.features.heading1') }}</span> {{ trans('landing.features.heading2') }}
             </h5>
-            <p class="text-center fw-medium mb-4 mb-md-12">
-                Not just a set of tools, the package includes ready-to-deploy conceptual application.
-            </p>
+            <p class="text-center fw-medium mb-4 mb-md-12">{{ trans('landing.features.subtitle') }}</p>
             <div class="features-icon-wrapper row gx-0 gy-12 gx-sm-6 mt-n4 mt-sm-0">
                 <div class="col-lg-4 col-sm-6 text-center features-icon-box">
-                    <div class="features-icon mb-4">
-                        <img src="{{ asset('assets/img/front-pages/icons/laptop-charging.png') }}" alt="laptop charging" />
-                    </div>
-                    <h5 class="mb-2">Quality Code</h5>
-                    <p class="features-icon-description">
-                        Code structure that all developers will easily understand and fall in love with.
-                    </p>
+                    <span class="features-new-icon badge rounded-pill bg-label-hover-primary mb-4 p-5 d-flex align-items-center justify-content-center">
+                        <i class="tf-icons ri-dashboard-3-line ri-42px"></i>
+                    </span>
+                    <h5 class="mb-2">{{ trans('landing.features.multiDashboards.title') }}</h5>
+                    <p class="features-icon-description">{{ trans('landing.features.multiDashboards.description') }}</p>
                 </div>
                 <div class="col-lg-4 col-sm-6 text-center features-icon-box">
-                    <div class="features-icon mb-4">
-                        <img src="{{ asset('assets/img/front-pages/icons/transition-up.png') }}" alt="transition up" />
-                    </div>
-                    <h5 class="mb-2">Continuous Updates</h5>
-                    <p class="features-icon-description">
-                        Free updates for the next 12 months, including new demos and features.
-                    </p>
+                    <span class="features-new-icon badge rounded-pill bg-label-hover-primary mb-4 p-5 d-flex align-items-center justify-content-center">
+                        <i class="tf-icons ri-video-on-line ri-42px"></i>
+                    </span>
+                    <h5 class="mb-2">{{ trans('landing.features.zoom.title') }}</h5>
+                    <p class="features-icon-description">{{ trans('landing.features.zoom.description') }}</p>
                 </div>
                 <div class="col-lg-4 col-sm-6 text-center features-icon-box">
-                    <div class="features-icon mb-4">
-                        <img src="{{ asset('assets/img/front-pages/icons/edit.png') }}" alt="edit" />
-                    </div>
-                    <h5 class="mb-2">Stater-Kit</h5>
-                    <p class="features-icon-description">
-                        Start your project quickly without having to remove unnecessary features.
-                    </p>
+                    <span class="features-new-icon badge rounded-pill bg-label-hover-primary mb-4 p-5 d-flex align-items-center justify-content-center">
+                        <i class="tf-icons ri-whatsapp-line ri-42px"></i>
+                    </span>
+                    <h5 class="mb-2">{{ trans('landing.features.whatsappNotifications.title') }}</h5>
+                    <p class="features-icon-description">{{ trans('landing.features.whatsappNotifications.description') }}</p>
                 </div>
                 <div class="col-lg-4 col-sm-6 text-center features-icon-box">
-                    <div class="features-icon mb-4">
-                        <img src="{{ asset('assets/img/front-pages/icons/3d-select-solid.png') }}" alt="3d select solid" />
-                    </div>
-                    <h5 class="mb-2">API Ready</h5>
-                    <p class="features-icon-description">
-                        Just change the endpoint and see your own data loaded within seconds.
-                    </p>
+                    <span class="features-new-icon badge rounded-pill bg-label-hover-primary mb-4 p-5 d-flex align-items-center justify-content-center">
+                        <i class="tf-icons ri-refresh-line ri-42px"></i>
+                    </span>
+                    <h5 class="mb-2">{{ trans('landing.features.updates.title') }}</h5>
+                    <p class="features-icon-description">{{ trans('landing.features.updates.description') }}</p>
                 </div>
                 <div class="col-lg-4 col-sm-6 text-center features-icon-box">
-                    <div class="features-icon mb-4">
-                        <img src="{{ asset('assets/img/front-pages/icons/lifebelt.png') }}" alt="lifebelt" />
-                    </div>
-                    <h5 class="mb-2">Excellent Support</h5>
-                    <p class="features-icon-description">An easy-to-follow doc with lots of references and code examples.
-                    </p>
+                    <span class="features-new-icon badge rounded-pill bg-label-hover-primary mb-4 p-5 d-flex align-items-center justify-content-center">
+                        <i class="tf-icons ri-brain-line ri-42px"></i>
+                    </span>
+                    <h5 class="mb-2">{{ trans('landing.features.studentActivities.title') }}</h5>
+                    <p class="features-icon-description">{{ trans('landing.features.studentActivities.description') }}</p>
                 </div>
                 <div class="col-lg-4 col-sm-6 text-center features-icon-box">
-                    <div class="features-icon mb-4">
-                        <img src="{{ asset('assets/img/front-pages/icons/google-docs.png') }}" alt="google docs" />
-                    </div>
-                    <h5 class="mb-2">Well Documented</h5>
-                    <p class="features-icon-description">An easy-to-follow doc with lots of references and code examples.
-                    </p>
+                    <span class="features-new-icon badge rounded-pill bg-label-hover-primary mb-4 p-5 d-flex align-items-center justify-content-center">
+                        <i class="tf-icons ri-customer-service-2-line ri-42px"></i>
+                    </span>
+                    <h5 class="mb-2">{{ trans('landing.features.support.title') }}</h5>
+                    <p class="features-icon-description">{{ trans('landing.features.support.description') }}</p>
                 </div>
             </div>
         </div>
     </section>
     <!-- Useful features: End -->
-
 
     <!-- Our great team: Start -->
     <section id="landingTeam" class="section-py bg-body landing-team">
@@ -125,102 +129,33 @@
             <h6 class="text-center d-flex justify-content-center align-items-center mb-6">
                 <img src="{{ asset('assets/img/front-pages/icons/section-tilte-icon.png') }}" alt="section title icon"
                     class="me-3" />
-                <span class="text-uppercase">our great team</span>
+                <span class="text-uppercase">{{ trans('landing.team.title') }}</span>
             </h6>
-            <h5 class="text-center mb-2"><span class="display-5 fs-4 fw-bold">Supported</span> by Real People</h5>
-            <p class="text-center fw-medium mb-4 mb-md-12 pb-7">Who is behind these great-looking interfaces?</p>
+            <h5 class="text-center mb-2"><span class="display-5 fs-4 fw-bold">{{ trans('landing.team.heading1') }}</span> {{ trans('landing.team.heading2') }}</h5>
+            <p class="text-center fw-medium mb-4 mb-md-12 pb-7">{{ trans('landing.team.subtitle') }}</p>
             <div class="row gy-lg-5 gy-12 mt-2">
-                <div class="col-lg-3 col-sm-6">
+                <div class="col-12">
                     <div class="card card-hover-border-primary mt-4 mt-lg-0 shadow-none">
                         <div class="bg-label-primary position-relative team-image-box">
-                            <img src="{{ asset('assets/img/front-pages/landing-page/team-member-1.png') }}"
+                            <img src="{{ asset('assets/img/front-pages/landing-page/team-member.png') }}"
                                 class="position-absolute card-img-position bottom-0 start-50 scaleX-n1-rtl"
-                                alt="human image" />
+                                alt="founder image" />
                         </div>
                         <div class="card-body text-center">
-                            <h5 class="card-title mb-1">Sophie Gilbert</h5>
-                            <p class="card-text mb-3">Project Manager</p>
+                            <h5 class="card-title mb-1">{{ trans('layouts/footer.founderName') }}</h5>
+                            <p class="card-text mb-3">{{ trans('landing.team.memberRole') }}</p>
                             <div class="text-center team-media-icons">
-                                <a href="javascript:void(0);" class="text-heading" target="_blank">
-                                    <i class="tf-icons ri-facebook-circle-line ri-22px me-1"></i>
+                                <a href="https://www.instagram.com/bwazik/" class="text-heading" target="_blank">
+                                    <i class="tf-icons ri-instagram-line ri-22px me-1"></i>
                                 </a>
-                                <a href="javascript:void(0);" class="text-heading" target="_blank">
-                                    <i class="tf-icons ri-twitter-line ri-22px me-1"></i>
+                                <a href="https://wa.me/+201098617164" class="text-heading" target="_blank">
+                                    <i class="tf-icons ri-whatsapp-line ri-22px me-1"></i>
                                 </a>
-                                <a href="javascript:void(0);" class="text-heading" target="_blank">
-                                    <i class="tf-icons ri-linkedin-box-line ri-22px"></i>
+                                <a href="https://github.com/bwazik" class="text-heading" target="_blank">
+                                    <i class="tf-icons ri-github-fill ri-22px me-1"></i>
                                 </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-sm-6">
-                    <div class="card card-hover-border-danger mt-4 mt-lg-0 shadow-none">
-                        <div class="bg-label-danger position-relative team-image-box">
-                            <img src="{{ asset('assets/img/front-pages/landing-page/team-member-2.png') }}"
-                                class="position-absolute card-img-position bottom-0 start-50 scaleX-n1-rtl"
-                                alt="human image" />
-                        </div>
-                        <div class="card-body text-center">
-                            <h5 class="card-title mb-1">Nannie Ford</h5>
-                            <p class="card-text mb-3">Development Lead</p>
-                            <div class="text-center team-media-icons">
-                                <a href="javascript:void(0);" class="text-heading" target="_blank">
-                                    <i class="tf-icons ri-facebook-circle-line ri-22px me-1"></i>
-                                </a>
-                                <a href="javascript:void(0);" class="text-heading" target="_blank">
-                                    <i class="tf-icons ri-twitter-line ri-22px me-1"></i>
-                                </a>
-                                <a href="javascript:void(0);" class="text-heading" target="_blank">
-                                    <i class="tf-icons ri-linkedin-box-line ri-22px"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-sm-6">
-                    <div class="card card-hover-border-success mt-4 mt-lg-0 shadow-none">
-                        <div class="bg-label-success position-relative team-image-box">
-                            <img src="{{ asset('assets/img/front-pages/landing-page/team-member-3.png') }}"
-                                class="position-absolute card-img-position bottom-0 start-50 scaleX-n1-rtl"
-                                alt="human image" />
-                        </div>
-                        <div class="card-body text-center">
-                            <h5 class="card-title mb-1">Chris Watkins</h5>
-                            <p class="card-text mb-3">Marketing Manager</p>
-                            <div class="text-center team-media-icons">
-                                <a href="javascript:void(0);" class="text-heading" target="_blank">
-                                    <i class="tf-icons ri-facebook-circle-line ri-22px me-1"></i>
-                                </a>
-                                <a href="javascript:void(0);" class="text-heading" target="_blank">
-                                    <i class="tf-icons ri-twitter-line ri-22px me-1"></i>
-                                </a>
-                                <a href="javascript:void(0);" class="text-heading" target="_blank">
-                                    <i class="tf-icons ri-linkedin-box-line ri-22px"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-sm-6">
-                    <div class="card card-hover-border-info mt-4 mt-lg-0 shadow-none">
-                        <div class="bg-label-info position-relative team-image-box">
-                            <img src="{{ asset('assets/img/front-pages/landing-page/team-member-4.png') }}"
-                                class="position-absolute card-img-position bottom-0 start-50 scaleX-n1-rtl"
-                                alt="human image" />
-                        </div>
-                        <div class="card-body text-center">
-                            <h5 class="card-title mb-1">Paul Miles</h5>
-                            <p class="card-text mb-3">UI Designer</p>
-                            <div class="text-center team-media-icons">
-                                <a href="javascript:void(0);" class="text-heading" target="_blank">
-                                    <i class="tf-icons ri-facebook-circle-line ri-22px me-1"></i>
-                                </a>
-                                <a href="javascript:void(0);" class="text-heading" target="_blank">
-                                    <i class="tf-icons ri-twitter-line ri-22px me-1"></i>
-                                </a>
-                                <a href="javascript:void(0);" class="text-heading" target="_blank">
-                                    <i class="tf-icons ri-linkedin-box-line ri-22px"></i>
+                                <a href="https://www.linkedin.com/in/bazoka/" class="text-heading" target="_blank">
+                                    <i class="tf-icons ri-linkedin-box-fill ri-22px"></i>
                                 </a>
                             </div>
                         </div>
@@ -237,27 +172,27 @@
             <div class="row gx-0 gy-6 gx-sm-6">
                 <div class="col-md-3 col-sm-6 text-center">
                     <span class="badge rounded-pill bg-label-hover-primary fun-facts-icon mb-6 p-5"><i
-                            class="tf-icons ri-layout-line ri-42px"></i></span>
-                    <h2 class="fw-bold mb-0 fun-facts-text">137+</h2>
-                    <h6 class="mb-0 text-body">Completed Sites</h6>
+                            class="tf-icons ri-presentation-line ri-42px"></i></span>
+                    <h2 class="fw-bold mb-0 fun-facts-text">{{ $metrics['teachers'] }}+</h2>
+                    <h6 class="mb-0 text-body">{{ trans('admin/teachers.teachers') }}</h6>
                 </div>
                 <div class="col-md-3 col-sm-6 text-center">
                     <span class="badge rounded-pill bg-label-hover-success fun-facts-icon mb-6 p-5"><i
-                            class="tf-icons ri-time-line ri-42px"></i></span>
-                    <h2 class="fw-bold mb-0 fun-facts-text">1,100+</h2>
-                    <h6 class="mb-0 text-body">Working Hours</h6>
+                            class="tf-icons ri-graduation-cap-line ri-42px"></i></span>
+                    <h2 class="fw-bold mb-0 fun-facts-text">{{ $metrics['students'] }}+</h2>
+                    <h6 class="mb-0 text-body">{{ trans('admin/students.students') }}</h6>
                 </div>
                 <div class="col-md-3 col-sm-6 text-center">
                     <span class="badge rounded-pill bg-label-hover-warning fun-facts-icon mb-6 p-5"><i
-                            class="tf-icons ri-user-smile-line ri-42px"></i></span>
-                    <h2 class="fw-bold mb-0 fun-facts-text">137+</h2>
-                    <h6 class="mb-0 text-body">Happy Customers</h6>
+                            class="tf-icons ri-pencil-ruler-line ri-42px"></i></span>
+                    <h2 class="fw-bold mb-0 fun-facts-text">{{ $metrics['lessons'] }}+</h2>
+                    <h6 class="mb-0 text-body">{{ trans('admin/lessons.lessons') }}</h6>
                 </div>
                 <div class="col-md-3 col-sm-6 text-center">
                     <span class="badge rounded-pill bg-label-hover-info fun-facts-icon mb-6 p-5"><i
-                            class="tf-icons ri-award-line ri-42px"></i></span>
-                    <h2 class="fw-bold mb-0 fun-facts-text">23+</h2>
-                    <h6 class="mb-0 text-body">Awards Winning</h6>
+                            class="tf-icons ri-group-2-line ri-42px"></i></span>
+                    <h2 class="fw-bold mb-0 fun-facts-text">{{ $metrics['groups'] }}+</h2>
+                    <h6 class="mb-0 text-body">{{ trans('admin/groups.groups') }}</h6>
                 </div>
             </div>
         </div>
@@ -401,9 +336,9 @@
         <div class="container">
             <div class="row align-items-center gy-5 gy-lg-0">
                 <div class="col-lg-6 text-center text-lg-start">
-                    <h3 class="display-5 text-primary fw-bold mb-1 h3">Ready to Get Started?</h3>
-                    <p class="fw-medium mb-6 mb-md-8">Start your project with a 14-day free trial</p>
-                    <a href="payment-page.html" class="btn btn-primary">Get Started<i
+                    <h3 class="display-5 text-primary fw-bold mb-1 h3">{{ trans('landing.cta.title') }}</h3>
+                    <p class="fw-medium mb-6 mb-md-8">{{ trans('landing.cta.subtitle') }}</p>
+                    <a href="{{ route('login.choose') }}" class="btn btn-primary">{{ trans('landing.cta.button') }}<i
                             class="ri-arrow-right-line ri-16px ms-2 scaleX-n1-rtl"></i></a>
                 </div>
                 <div class="col-lg-6 pt-lg-12">
@@ -425,56 +360,38 @@
             <h6 class="text-center d-flex justify-content-center align-items-center mb-6">
                 <img src="{{ asset('assets/img/front-pages/icons/section-tilte-icon.png') }}" alt="section title icon"
                     class="me-3" />
-                <span class="text-uppercase">contact us</span>
+                <span class="text-uppercase">{{ trans('landing.contact.title') }}</span>
             </h6>
-            <h5 class="text-center mb-2"><span class="display-5 fs-4 fw-bold">Lets work</span> together</h5>
-            <p class="text-center fw-medium mb-4 mb-md-12 pb-3">Any question or remark? just write us a message</p>
+            <p class="text-center fw-medium mb-4 mb-md-12 pb-3">{{ trans('landing.contact.subtitle') }}</p>
             <div class="row gy-6">
                 <div class="col-lg-5">
                     <div class="card h-100">
                         <div class="bg-primary rounded-4 text-white card-body p-8">
-                            <p class="fw-medium mb-1_5 tagline">Let’s contact with us</p>
-                            <h4 class="text-white mb-5 title">Share your ideas or requirement with our experts.</h4>
-                            <img src="{{ asset('assets/img/front-pages/landing-page/let’s-contact.png') }}"
+                            <p class="fw-medium mb-1_5 tagline">{{ trans('landing.contact.cardTagline') }}</p>
+                            <h4 class="text-white mb-5 title">{{ trans('landing.contact.cardTitle') }}</h4>
+                            <img src="{{ asset('assets/img/illustrations/auth-cover-login-mask-dark.png') }}"
                                 alt="let’s contact" class="w-100 mb-5" />
-                            <p class="mb-0 description">
-                                Looking for more customisation, more features, and more anything? Don’t worry, We’ve
-                                provide you
-                                with an entire team of experienced professionals.
-                            </p>
+                            <p class="mb-0 description">{{ trans('landing.contact.cardDescription') }}</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-7">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="mb-6">Share your ideas</h5>
-                            <form>
+                            <form id="contact-form" action="{{ route('landing.contact') }}" method="POST" autocomplete="off">
+                                @csrf
                                 <div class="row g-5">
-                                    <div class="col-md-6">
+                                    <x-basic-input context="modal" type="text" name="name" label="{{ trans('main.realName_ar') }}" placeholder="{{ trans('main.placeholders.realName') }}" required />
+                                    <x-basic-input context="modal" type="number" name="phone" label="{{ trans('main.phone') }}" placeholder="{{ trans('admin/teachers.placeholders.phone') }}" required />
+                                    <div class="col-sm-12">
                                         <div class="form-floating form-floating-outline">
-                                            <input type="text" class="form-control" id="basic-default-fullname"
-                                                placeholder="John Doe" />
-                                            <label for="basic-default-fullname">Full name</label>
+                                            <textarea id="message" class="form-control h-px-250" name="message" required placeholder="{{ trans('main.placeholders.message') }}" aria-label="{{ trans('main.placeholders.message') }}" maxlength="255"></textarea>
+                                            <label for="message">{{ trans('landing.contact.message') }}</label>
                                         </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <input type="email" class="form-control" id="basic-default-email"
-                                                placeholder="johndoe99@gmail.com" />
-                                            <label for="basic-default-email">Email address</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <div class="form-floating form-floating-outline">
-                                            <textarea class="form-control h-px-250" placeholder="Message" aria-label="Message" id="basic-default-message"></textarea>
-                                            <label for="basic-default-message">Message</label>
-                                        </div>
+                                        <span class="invalid-feedback" id="message_error" role="alert"></span>
                                     </div>
                                 </div>
-                                <button type="submit" class="btn btn-primary mt-5">Send inquiry</button>
+                                <button type="submit" class="btn btn-primary mt-5 waves-effect waves-light">{{ trans('landing.contact.button') }}</button>
                             </form>
                         </div>
                     </div>
@@ -487,4 +404,9 @@
 
 @section('page-js')
     <script src="{{ asset('assets/js/front-page-landing.js') }}"></script>
+
+    <script>
+        let fields = ['name', 'phone', 'message'];
+        handleFormSubmit('#contact-form', fields);
+    </script>
 @endsection

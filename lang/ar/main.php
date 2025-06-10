@@ -86,6 +86,7 @@ return [
         'description_ar' => 'اكتب وصف مختصر للعنصر دا.',
         'description_en' => 'Enter a brief description of the item.',
         'realName' => 'الإسم الثلاثي',
+        'message' => 'اكتب رسالتك هنا...',
     ],
 
     # Main inputs

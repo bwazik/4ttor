@@ -2,6 +2,8 @@
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\LandingController;
+
 use App\Http\Controllers\ProfileController;
 
 use App\Http\Controllers\Api\DataFetchController;
@@ -48,9 +50,12 @@ Route::group(
     ],
     function () {
 
-        Route::get('/', function () {
-            return view('landing.index');
-        })->name('landing');
+        Route::controller(LandingController::class)->group(function () {
+            Route::get('/', 'index')->name('landing');
+            Route::middleware('throttle:1,5')->group(function () {
+                Route::post('contact-us', 'contact')->name('landing.contact');
+            });
+        });
     }
 );
 

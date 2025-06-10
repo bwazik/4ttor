@@ -83,5 +83,6 @@ return [
     'feedbackSubmitted' => 'تم تحديث الدرجة والملاحظات بنجاح.',
     'assignmentResetSuccess' => 'تم إعادة تعيين الواجب بنجاح.',
     'zoomAccountUpdated' => 'تم تحديث حساب الزوم بنجاح.',
+    'messageSent' => 'تم إرسال الرسالة بنجاح.',
 ];
 

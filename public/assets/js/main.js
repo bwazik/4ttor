@@ -179,23 +179,27 @@ if (document.getElementById('layout-menu')) {
     // Update style switcher icon based on the stored style
 
     const styleSwitcherIcon = styleSwitcher.querySelector('i');
+    let title = '';
 
     if (storedStyle === 'light') {
       styleSwitcherIcon.classList.add('ri-sun-line');
+      title = document.querySelector('html[dir="rtl"]') ? 'الوضع النهاري' : 'Light Mode';
       new bootstrap.Tooltip(styleSwitcherIcon, {
-        title: 'Light Mode',
+        title: title,
         fallbackPlacements: ['bottom']
       });
     } else if (storedStyle === 'dark') {
       styleSwitcherIcon.classList.add('ri-moon-clear-line');
+      title = document.querySelector('html[dir="rtl"]') ? 'الوضع الليلي' : 'Dark Mode';
       new bootstrap.Tooltip(styleSwitcherIcon, {
-        title: 'Dark Mode',
+        title: title,
         fallbackPlacements: ['bottom']
       });
     } else {
       styleSwitcherIcon.classList.add('ri-computer-line');
+      title = document.querySelector('html[dir="rtl"]') ? 'وضع النظام' : 'System Mode';
       new bootstrap.Tooltip(styleSwitcherIcon, {
-        title: 'System Mode',
+        title: title,
         fallbackPlacements: ['bottom']
       });
     }
