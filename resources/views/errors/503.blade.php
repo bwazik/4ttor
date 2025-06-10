@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/page-misc.css') }}" />
 @endsection
 
-@section('title', pageTitle('errors.503.heading'))
+@section('title', trans('errors.503.heading'))
 
 @section('content')
     <!--Under Maintenance -->

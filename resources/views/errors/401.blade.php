@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/page-misc.css') }}" />
 @endsection
 
-@section('title', pageTitle('errors.401.heading'))
+@section('title', trans('errors.401.heading'))
 
 @section('content')
     <!-- Not Authorized -->
