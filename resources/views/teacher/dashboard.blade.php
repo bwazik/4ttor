@@ -1,13 +1,7 @@
 @extends('layouts.teacher.master')
 
-@section('vendors-css')
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/apex-charts/apex-charts.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/swiper/swiper.css') }}" />
-@endsection
-
 @section('page-css')
-    <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/cards-statistics.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/cards-analytics.css') }}" />
+
 @endsection
 
 @section('title', pageTitle('layouts/sidebar.dashboard'))
@@ -20,11 +14,5 @@
     </div>
 @endsection
 
-@section('vendors-js')
-    <script src="{{ asset('assets/vendor/libs/apex-charts/apexcharts.js') }}"></script>
-    <script src="{{ asset('assets/vendor/libs/swiper/swiper.js') }}"></script>
-@endsection
-
 @section('page-js')
-    <script src="{{ asset('assets/js/dashboards-analytics.js') }}"></script>
 @endsection

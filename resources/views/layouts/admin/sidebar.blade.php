@@ -291,7 +291,7 @@
         </li>
         <li class="menu-item {{ isActiveRoute(['admin.categories.index']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
-                <i class="menu-icon tf-icons ri-lifebuoy-line"></i>
+                <i class="menu-icon tf-icons ri-customer-service-2-line"></i>
                 <div>{{ trans('layouts/sidebar.support') }}</div>
             </a>
             <ul class="menu-sub">
