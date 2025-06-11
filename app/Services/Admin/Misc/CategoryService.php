@@ -65,7 +65,7 @@ class CategoryService
                 'name' => ['en' => $request['name_en'], 'ar' => $request['name_ar']],
                 'slug' => $request['slug'],
                 'icon' => $request['icon'] ?? NULL,
-                'description' => (isset($request['description_en']) || isset($request['description_ar'])) ? ['en' => $request['description_en'] ?? null, 'ar' => $request['description_ar'] ?? null] : NULL,
+                'description' => (isset($request['description_en']) || isset($request['description_ar'])) ? ['en' => $request['description_en'], 'ar' => $request['description_ar']] : NULL,
                 'order' => $request['order'],
             ]);
 
@@ -83,7 +83,7 @@ class CategoryService
                 'name' => ['en' => $request['name_en'], 'ar' => $request['name_ar']],
                 'slug' => $request['slug'],
                 'icon' => $request['icon'] ?? NULL,
-                'description' => (isset($request['description_en']) || isset($request['description_ar'])) ? ['en' => $request['description_en'] ?? null, 'ar' => $request['description_ar'] ?? null] : NULL,
+                'description' => (isset($request['description_en']) || isset($request['description_ar'])) ? ['en' => $request['description_en'], 'ar' => $request['description_ar']] : NULL,
                 'order' => $request['order'],
             ]);
 

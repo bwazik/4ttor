@@ -11,12 +11,24 @@
         class="faq-header d-flex flex-column justify-content-center align-items-center h-px-300 position-relative overflow-hidden rounded-4">
         <img src="{{ asset('assets/img/pages/header-light.png') }}" class="scaleX-n1-rtl faq-banner-img h-px-300 z-n1"
             alt="background image" data-app-light-img="pages/header-light.png" data-app-dark-img="pages/header-dark.png" />
-        <h4 class="text-center text-primary mb-2">Hello, how can we help?</h4>
-        <p class="text-body text-center mb-0 px-4">or choose a category to quickly find the help you need</p>
-        <div class="input-wrapper mb-6 mt-7 input-group input-group-merge px-sm-5">
-            <span class="input-group-text" id="basic-addon1"><i class="ri-search-line"></i></span>
-            <input type="text" class="form-control" placeholder="Ask a question...." aria-label="Search"
-                aria-describedby="basic-addon1" />
+        <h4 class="text-center text-primary mb-2">{{ trans('admin/faqs.header') }}</h4>
+        <p class="text-body text-center mb-0 px-4">{{ trans('admin/faqs.subheader') }}</p>
+        <div class="d-flex gap-3">
+            <button id="delete-selected-btn" class="btn btn-danger mb-6 mt-7 px-sm-5 waves-effect waves-light"
+                tabindex="0" data-bs-target="#delete-selected-modal" data-bs-toggle="modal" data-bs-dismiss="modal">
+                <span>
+                    <i class="ri-delete-bin-line ri-16px me-sm-2"></i>
+                    <span class="d-none d-sm-inline-block">{{ trans('main.deleteSelected') }}</span>
+                </span>
+            </button>
+            <button id="add-button" type="button" class="btn btn-primary mb-6 mt-7 px-sm-5 waves-effect waves-light"
+                tabindex="0" data-bs-toggle="modal" data-bs-target="#add-modal">
+                <span>
+                    <i class="ri-add-line ri-16px me-sm-2"></i>
+                    <span
+                        class="d-none d-sm-inline-block">{{ trans('main.addItem', ['item' => trans('admin/faqs.faq')]) }}</span>
+                </span>
+            </button>
         </div>
     </div>
 
@@ -24,37 +36,17 @@
         <!-- Navigation -->
         <div class="col-lg-3 col-md-4 col-12 mb-md-0 mb-4">
             <div class="d-flex justify-content-between flex-column nav-align-left mb-2 mb-md-0">
-                <ul class="nav nav-pills flex-column flex-nowrap">
-                    <li class="nav-item">
-                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#payment">
-                            <i class="ri-bank-card-line me-2"></i>
-                            <span class="align-middle">Payment</span>
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#delivery">
-                            <i class="ri-shopping-cart-line me-2"></i>
-                            <span class="align-middle">Delivery</span>
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#cancellation">
-                            <i class="ri-refresh-line me-2"></i>
-                            <span class="align-middle">Cancellation & Return</span>
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#orders">
-                            <i class="ri-inbox-archive-line me-2"></i>
-                            <span class="align-middle">My Orders</span>
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#product">
-                            <i class="ri-settings-4-line me-2"></i>
-                            <span class="align-middle">Product & Services</span>
-                        </button>
-                    </li>
+                <ul class="nav nav-pills flex-column flex-nowrap" role="tablist">
+                    @foreach ($categories as $index => $category)
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {{ $index === 0 ? 'active' : '' }}" data-bs-toggle="tab"
+                                data-bs-target="#{{ $category->slug }}"
+                                aria-selected="{{ $index === 0 ? 'true' : 'false' }}" role="tab">
+                                <i class="ri ri-{{ $category->icon }} me-2"></i>
+                                <span class="align-middle">{{ $category->name }}</span>
+                            </button>
+                        </li>
+                    @endforeach
                 </ul>
                 <div class="d-none d-md-block">
                     <div class="mt-4 text-center">
@@ -66,408 +58,96 @@
         </div>
         <!-- /Navigation -->
 
-        <!-- FAQ's -->
+        <!-- FAQs -->
         <div class="col-lg-9 col-md-8 col-12">
             <div class="tab-content p-0">
-                <div class="tab-pane fade show active" id="payment" role="tabpanel">
-                    <div class="d-flex mb-4 gap-4">
-                        <div class="avatar avatar-md">
-                            <div class="avatar-initial bg-label-primary rounded-4">
-                                <i class="ri-bank-card-line ri-30px"></i>
+                @foreach ($categories as $index => $category)
+                    <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}" id="{{ $category->slug }}"
+                        role="tabpanel">
+                        <div class="d-flex mb-4 gap-4 align-items-center">
+                            <div class="avatar avatar-md">
+                                <span class="avatar-initial bg-label-primary rounded-4">
+                                    <i class="ri ri-{{ $category->icon }} ri-30px"></i>
+                                </span>
+                            </div>
+                            <div>
+                                <h5 class="mb-0">
+                                    <span class="align-middle">{{ $category->name }}</span>
+                                </h5>
+                                <span>{{ $category->description }}</span>
                             </div>
                         </div>
-                        <div>
-                            <h5 class="mb-0">
-                                <span class="align-middle">Payment</span>
-                            </h5>
-                            <span>Get help with payment</span>
+                        <div id="accordion{{ $category->slug }}"
+                            class="accordion accordion-popout accordion-header-primary">
+                            @forelse ($category->faqs as $faqIndex => $faq)
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header d-flex align-items-center">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                            aria-expanded="false"
+                                            data-bs-target="#accordion{{ $category->slug }}-{{ $faq->id }}"
+                                            aria-controls="accordion{{ $category->slug }}-{{ $faq->id }}">
+                                            <div class="d-flex align-items-center">
+                                                <div class="dt-checkboxes-cell me-2">
+                                                    <input type="checkbox" value="{{ $faq->id }}"
+                                                        class="dt-checkboxes form-check-input">
+                                                </div>
+                                                <div class="me-1 text-nowrap">{{ $faqIndex + 1 }} -</div>
+                                            </div>
+                                            <span class="flex-grow-1 text-break">{{ $faq->question }}</span>
+                                        </button>
+
+                                        <div class="d-flex align-items-center ms-2">
+                                            <button
+                                                class="btn btn-sm btn-icon btn-text-secondary text-body rounded-pill waves-effect waves-light me-1"
+                                                tabindex="0" type="button" data-bs-toggle="modal"
+                                                data-bs-target="#edit-modal" id="edit-button" data-id="{{ $faq->id }}"
+                                                data-category_id="{{ $faq->category_id }}"
+                                                data-audience="{{ $faq->audience }}"
+                                                data-is_active="{{ $faq->is_active ? 1 : 0 }}"
+                                                data-is_at_landing="{{ $faq->is_at_landing ? 1 : 0 }}"
+                                                data-order="{{ $faq->order }}"
+                                                data-question_ar="{{ $faq->getTranslation('question', 'ar') }}"
+                                                data-question_en="{{ $faq->getTranslation('question', 'en') }}"
+                                                data-answer_ar="{{ $faq->getTranslation('answer', 'ar') }}"
+                                                data-answer_en="{{ $faq->getTranslation('answer', 'en') }}">
+                                                <i class="ri-edit-box-line ri-20px"></i>
+                                            </button>
+                                            <button
+                                                class="btn btn-sm btn-icon btn-text-danger rounded-pill text-body waves-effect waves-light me-1"
+                                                id="delete-button" data-id="{{ $faq->id }}"
+                                                data-question_ar="{{ $faq->getTranslation('question', 'ar') }}"
+                                                data-question_en="{{ $faq->getTranslation('question', 'en') }}"
+                                                data-bs-target="#delete-modal" data-bs-toggle="modal"
+                                                data-bs-dismiss="modal">
+                                                <i class="ri-delete-bin-7-line ri-20px text-danger"></i>
+                                            </button>
+                                        </div>
+                                    </h2>
+                                    <div id="accordion{{ $category->slug }}-{{ $faq->id }}"
+                                        class="accordion-collapse collapse"
+                                        data-bs-parent="#accordion{{ $category->slug }}">
+                                        <div class="accordion-body">
+                                            {!! $faq->answer !!}
+                                        </div>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-center mt-6">{{ trans('main.datatable.empty_table') }}</div>
+                            @endforelse
                         </div>
                     </div>
-                    <div id="accordionPayment" class="accordion">
-                        <div class="accordion-item active">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                    aria-expanded="true" data-bs-target="#accordionPayment-1"
-                                    aria-controls="accordionPayment-1">
-                                    When is payment taken for my order?
-                                </button>
-                            </h2>
-
-                            <div id="accordionPayment-1" class="accordion-collapse collapse show">
-                                <div class="accordion-body">
-                                    Payment is taken during the checkout process when you pay for your order. The order
-                                    number
-                                    that appears on the confirmation screen indicates payment has been successfully
-                                    processed.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#accordionPayment-2" aria-controls="accordionPayment-2">
-                                    How do I pay for my order?
-                                </button>
-                            </h2>
-                            <div id="accordionPayment-2" class="accordion-collapse collapse">
-                                <div class="accordion-body">
-                                    We accept Visa®, MasterCard®, American Express®, and PayPal®. Our servers encrypt all
-                                    information submitted to them, so you can be confident that your credit card information
-                                    will be kept safe and secure.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#accordionPayment-3" aria-controls="accordionPayment-3">
-                                    What should I do if I'm having trouble placing an order?
-                                </button>
-                            </h2>
-                            <div id="accordionPayment-3" class="accordion-collapse collapse">
-                                <div class="accordion-body">
-                                    For any technical difficulties you are experiencing with our website, please contact us
-                                    at
-                                    our
-                                    <a href="javascript:void(0);">support portal</a>, or you can call us toll-free at
-                                    <span class="fw-medium">1-000-000-000</span>, or email us at
-                                    <a href="javascript:void(0);">order@companymail.com</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#accordionPayment-4" aria-controls="accordionPayment-4">
-                                    Which license do I need for an end product that is only accessible to paying users?
-                                </button>
-                            </h2>
-                            <div id="accordionPayment-4" class="accordion-collapse collapse">
-                                <div class="accordion-body">
-                                    If you have paying users or you are developing any SaaS products then you need an
-                                    Extended
-                                    License. For each products, you need a license. You can get free lifetime updates as
-                                    well.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#accordionPayment-5" aria-controls="accordionPayment-5">
-                                    Does my subscription automatically renew?
-                                </button>
-                            </h2>
-                            <div id="accordionPayment-5" class="accordion-collapse collapse">
-                                <div class="accordion-body">
-                                    No, This is not subscription based item.Pastry pudding cookie toffee bonbon jujubes
-                                    jujubes powder topping. Jelly beans gummi bears sweet roll bonbon muffin liquorice.
-                                    Wafer
-                                    lollipop sesame snaps.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="delivery" role="tabpanel">
-                    <div class="d-flex mb-4 gap-4 align-items-center">
-                        <div class="avatar avatar-md">
-                            <span class="avatar-initial bg-label-primary rounded-4">
-                                <i class="ri-shopping-cart-line ri-30px"></i>
-                            </span>
-                        </div>
-                        <div>
-                            <h5 class="mb-0">
-                                <span class="align-middle">Delivery</span>
-                            </h5>
-                            <span>Lorem ipsum, dolor sit amet.</span>
-                        </div>
-                    </div>
-                    <div id="accordionDelivery" class="accordion">
-                        <div class="accordion-item active">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                    aria-expanded="true" data-bs-target="#accordionDelivery-1"
-                                    aria-controls="accordionDelivery-1">
-                                    How would you ship my order?
-                                </button>
-                            </h2>
-
-                            <div id="accordionDelivery-1" class="accordion-collapse collapse show">
-                                <div class="accordion-body">
-                                    For large products, we deliver your product via a third party logistics company offering
-                                    you the “room of choice” scheduled delivery service. For small products, we offer free
-                                    parcel delivery.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#accordionDelivery-2" aria-controls="accordionDelivery-2">
-                                    What is the delivery cost of my order?
-                                </button>
-                            </h2>
-                            <div id="accordionDelivery-2" class="accordion-collapse collapse">
-                                <div class="accordion-body">
-                                    The cost of scheduled delivery is $69 or $99 per order, depending on the destination
-                                    postal code. The parcel delivery is free.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#accordionDelivery-4" aria-controls="accordionDelivery-4">
-                                    What to do if my product arrives damaged?
-                                </button>
-                            </h2>
-                            <div id="accordionDelivery-4" class="accordion-collapse collapse">
-                                <div class="accordion-body">
-                                    We will promptly replace any product that is damaged in transit. Just contact our
-                                    <a href="javascript:void(0);">support team</a>, to notify us of the situation within 48
-                                    hours of product arrival.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="cancellation" role="tabpanel">
-                    <div class="d-flex mb-4 gap-4 align-items-center">
-                        <div class="avatar avatar-md">
-                            <span class="avatar-initial bg-label-primary rounded-4">
-                                <i class="ri-refresh-line ri-30px"></i>
-                            </span>
-                        </div>
-                        <div>
-                            <h5 class="mb-0"><span class="align-middle">Cancellation & Return</span></h5>
-                            <span>Lorem ipsum, dolor sit amet.</span>
-                        </div>
-                    </div>
-                    <div id="accordionCancellation" class="accordion">
-                        <div class="accordion-item active">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                    aria-expanded="true" data-bs-target="#accordionCancellation-1"
-                                    aria-controls="accordionCancellation-1">
-                                    Can I cancel my order?
-                                </button>
-                            </h2>
-
-                            <div id="accordionCancellation-1" class="accordion-collapse collapse show">
-                                <div class="accordion-body">
-                                    <p>
-                                        Scheduled delivery orders can be cancelled 72 hours prior to your selected delivery
-                                        date
-                                        for full refund.
-                                    </p>
-                                    <p class="mb-0">
-                                        Parcel delivery orders cannot be cancelled, however a free return label can be
-                                        provided
-                                        upon request.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#accordionCancellation-2" aria-controls="accordionCancellation-2">
-                                    Can I return my product?
-                                </button>
-                            </h2>
-                            <div id="accordionCancellation-2" class="accordion-collapse collapse">
-                                <div class="accordion-body">
-                                    You can return your product within 15 days of delivery, by contacting our
-                                    <a href="javascript:void(0);">support team</a>, All merchandise returned must be in the
-                                    original packaging with all original items.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    aria-controls="accordionCancellation-3" data-bs-target="#accordionCancellation-3">
-                                    Where can I view status of return?
-                                </button>
-                            </h2>
-                            <div id="accordionCancellation-3" class="accordion-collapse collapse">
-                                <div class="accordion-body">
-                                    <p>Locate the item from Your <a href="javascript:void(0);">Orders</a></p>
-                                    <p class="mb-0">Select <span class="fw-medium">Return/Refund</span> status</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="orders" role="tabpanel">
-                    <div class="d-flex mb-4 gap-4 align-items-center">
-                        <div class="avatar avatar-md">
-                            <span class="avatar-initial bg-label-primary rounded-4">
-                                <i class="ri-inbox-archive-line ri-30px"></i>
-                            </span>
-                        </div>
-                        <div>
-                            <h5 class="mb-0">
-                                <span class="align-middle">My Orders</span>
-                            </h5>
-                            <span>Lorem ipsum, dolor sit amet.</span>
-                        </div>
-                    </div>
-                    <div id="accordionOrders" class="accordion">
-                        <div class="accordion-item active">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                    aria-expanded="true" data-bs-target="#accordionOrders-1"
-                                    aria-controls="accordionOrders-1">
-                                    Has my order been successful?
-                                </button>
-                            </h2>
-
-                            <div id="accordionOrders-1" class="accordion-collapse collapse show">
-                                <div class="accordion-body">
-                                    <p>
-                                        All successful order transactions will receive an order confirmation email once the
-                                        order has been processed. If you have not received your order confirmation email
-                                        within
-                                        24 hours, check your junk email or spam folder.
-                                    </p>
-                                    <p class="mb-0">
-                                        Alternatively, log in to your account to check your order summary. If you do not
-                                        have a
-                                        account, you can contact our Customer Care Team on
-                                        <span class="fw-medium">1-000-000-000</span>.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#accordionOrders-2" aria-controls="accordionOrders-2">
-                                    My Promotion Code is not working, what can I do?
-                                </button>
-                            </h2>
-                            <div id="accordionOrders-2" class="accordion-collapse collapse">
-                                <div class="accordion-body">
-                                    If you are having issues with a promotion code, please contact us at
-                                    <span class="fw-medium">1 000 000 000</span> for assistance.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#accordionOrders-3" aria-controls="accordionOrders-3">
-                                    How do I track my Orders?
-                                </button>
-                            </h2>
-                            <div id="accordionOrders-3" class="accordion-collapse collapse">
-                                <div class="accordion-body">
-                                    <p>
-                                        If you have an account just sign into your account from
-                                        <a href="javascript:void(0);">here</a> and select
-                                        <span class="fw-medium">“My Orders”</span>.
-                                    </p>
-                                    <p class="mb-0">
-                                        If you have a a guest account track your order from
-                                        <a href="javascript:void(0);">here</a> using the order number and the email
-                                        address.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="product" role="tabpanel">
-                    <div class="d-flex mb-4 gap-4 align-items-center">
-                        <div class="avatar avatar-md">
-                            <span class="avatar-initial bg-label-primary rounded-4">
-                                <i class="ri-settings-4-line ri-30px"></i>
-                            </span>
-                        </div>
-                        <div>
-                            <h5 class="mb-0">
-                                <span class="align-middle">Product & Services</span>
-                            </h5>
-                            <span>Lorem ipsum, dolor sit amet.</span>
-                        </div>
-                    </div>
-                    <div id="accordionProduct" class="accordion">
-                        <div class="accordion-item active">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                    aria-expanded="true" data-bs-target="#accordionProduct-1"
-                                    aria-controls="accordionProduct-1">
-                                    Will I be notified once my order has shipped?
-                                </button>
-                            </h2>
-
-                            <div id="accordionProduct-1" class="accordion-collapse collapse show">
-                                <div class="accordion-body">
-                                    Yes, We will send you an email once your order has been shipped. This email will contain
-                                    tracking and order information.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#accordionProduct-2" aria-controls="accordionProduct-2">
-                                    Where can I find warranty information?
-                                </button>
-                            </h2>
-                            <div id="accordionProduct-2" class="accordion-collapse collapse">
-                                <div class="accordion-body">
-                                    We are committed to quality products. For information on warranty period and warranty
-                                    services, visit our Warranty section <a href="javascript:void(0);">here</a>.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#accordionProduct-3" aria-controls="accordionProduct-3">
-                                    How can I purchase additional warranty coverage?
-                                </button>
-                            </h2>
-                            <div id="accordionProduct-3" class="accordion-collapse collapse">
-                                <div class="accordion-body">
-                                    For the peace of your mind, we offer extended warranty plans that add additional year(s)
-                                    of protection to the standard manufacturer’s warranty provided by us. To purchase or
-                                    find
-                                    out more about the extended warranty program, visit Extended Warranty section
-                                    <a href="javascript:void(0);">here</a>.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
-        <!-- /FAQ's -->
+        <!-- /FAQs -->
     </div>
 
     <!-- Contact -->
     <div class="row my-6">
         <div class="col-12 text-center my-6">
-            <div class="badge bg-label-primary rounded-pill">Question?</div>
-            <h4 class="my-2">You still have a question?</h4>
-            <p class="mb-0">
-                If you can't find question in our FAQ, you can contact us. We'll answer you shortly!
-            </p>
+            <div class="badge bg-label-primary rounded-pill">{{ trans('admin/faqs.contact.question') }}</div>
+            <h4 class="my-2">{{ trans('admin/faqs.contact.title') }}</h4>
+            <p class="mb-0">{{ trans('admin/faqs.contact.subtitle') }}</p>
         </div>
     </div>
     <div class="row justify-content-center gap-sm-0 gap-6">
@@ -478,8 +158,8 @@
                         <i class="ri-phone-line ri-30px"></i>
                     </span>
                 </div>
-                <h5 class="mt-4 mb-1"><a class="text-heading" href="tel:+(810)25482568">+ (810) 2548 2568</a></h5>
-                <p class="mb-0">We are always happy to help</p>
+                <h5 class="mt-4 mb-1"><a class="text-heading" href="tel:+(810)25482568">+201098617164</a></h5>
+                <p class="mb-0">{{ trans('admin/faqs.contact.phone') }}</p>
             </div>
         </div>
         <div class="col-sm-6">
@@ -489,8 +169,8 @@
                         <i class="ri-mail-line ri-30px"></i>
                     </span>
                 </div>
-                <h5 class="mt-4 mb-1"><a class="text-heading" href="mailto:help@help.com">help@help.com</a></h5>
-                <p class="mb-0">Best way to get a quick answer</p>
+                <h5 class="mt-4 mb-1"><a class="text-heading" href="mailto:support@shattor.com">support@shattor.com</a></h5>
+                <p class="mb-0">{{ trans('admin/faqs.contact.email') }}</p>
             </div>
         </div>
     </div>
@@ -500,19 +180,33 @@
 
 @section('page-js')
     <script>
+        // Setup add modal
+        setupModal({
+            buttonId: '#add-button',
+            modalId: '#add-modal',
+            fields: {
+                category_id: () => '',
+                audience: () => '',
+                is_active: () => '',
+                is_at_landing: () => '',
+            }
+        });
+
         // Setup edit modal
         setupModal({
             buttonId: '#edit-button',
             modalId: '#edit-modal',
             fields: {
                 id: button => button.data('id'),
-                name_ar: button => button.data('name_ar'),
-                name_en: button => button.data('name_en'),
-                slug: button => button.data('slug'),
-                icon: button => button.data('icon'),
-                description_ar: button => button.data('description_ar'),
-                description_en: button => button.data('description_en'),
+                category_id: button => button.data('category_id'),
+                audience: button => button.data('audience'),
+                is_active: button => button.data('is_active'),
+                is_at_landing: button => button.data('is_at_landing'),
                 order: button => button.data('order'),
+                question_ar: button => button.data('question_ar'),
+                question_en: button => button.data('question_en'),
+                answer_ar: button => button.data('answer_ar'),
+                answer_en: button => button.data('answer_en'),
             }
         });
         // Setup delete modal
@@ -521,14 +215,40 @@
             modalId: '#delete-modal',
             fields: {
                 id: button => button.data('id'),
-                itemToDelete: button => `${button.data('name_ar')} - ${button.data('name_en')}`
+                itemToDelete: button => `${button.data('question_ar')} - ${button.data('question_en')}`
             }
         });
 
-        let fields = ['name_ar', 'name_en', 'slug', 'icon', 'description_ar', 'description_en', 'order'];
-        handleFormSubmit('#add-form', fields, '#add-modal', 'offcanvas', '#datatable');
-        handleFormSubmit('#edit-form', fields, '#edit-modal', 'offcanvas', '#datatable');
-        handleDeletionFormSubmit('#delete-form', '#delete-modal', '#datatable')
-        handleDeletionFormSubmit('#delete-selected-form', '#delete-selected-modal', '#datatable')
+        let fields = ['category_id', 'audience', 'is_active', 'is_at_landing', 'question_ar', 'question_en', 'answer_ar',
+            'answer_en'
+        ];
+        handleFormSubmit('#add-form', fields, '#add-modal', 'modal');
+        handleFormSubmit('#edit-form', fields, '#edit-modal', 'modal');
+        handleDeletionFormSubmit('#delete-form', '#delete-modal');
+        handleDeletionFormSubmit('#delete-selected-form', '#delete-selected-modal');
+        $(function() {
+            $('body').on('click', '#delete-selected-btn', function(e) {
+                e.preventDefault();
+
+                $('#delete-selected-form #ids-container').empty();
+                const selected = Array.from($(".dt-checkboxes-cell input[type=checkbox]:checked"))
+                    .map(
+                        checkbox => checkbox.value);
+
+                if (selected.length > 0) {
+                    $('#delete-selected-modal').modal('show');
+
+                    selected.forEach(id => {
+                        $('#delete-selected-form #ids-container').append(
+                            `<input type="hidden" name="ids[]" value="${id}">`
+                        );
+                    });
+
+                    $('input[id="itemToDelete"]').val(window.translations.items + ': ' + selected.length);
+                } else {
+                    $('#delete-selected-modal').modal('show');
+                }
+            });
+        });
     </script>
 @endsection

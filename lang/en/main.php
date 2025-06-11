@@ -122,6 +122,7 @@ return [
     'is_exempted' => 'Is Exempted',
     'exempted' => 'Exempted',
     'notexempted' => 'Not Exempted',
+    'is_at_landing' => 'Is At Landing',
     'used' => 'Used',
     'unused' => 'Available',
     'score' => 'Score',
@@ -167,6 +168,7 @@ return [
     'scheduled' => 'Scheduled',
     'completed' => 'Completed',
     'time' => 'Time',
+    'audience' => 'Audience',
 
     # Modals
     'items' => 'Items Count',
@@ -236,4 +238,5 @@ return [
     'clickHere' => 'Click Here',
     'yes' => 'Yes',
     'no' => 'No',
+    'all' => 'All',
 ];

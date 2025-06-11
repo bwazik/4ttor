@@ -6,8 +6,8 @@
     <x-basic-input context="offcanvas" type="text" name="slug" label="{{ trans('main.slug') }}" placeholder="{{ trans('admin/categories.placeholders.slug') }}" required/>
     <x-basic-input context="offcanvas" type="text" name="icon" label="{{ trans('main.icon') }}" placeholder="{{ trans('admin/categories.placeholders.icon') }}"/>
     <x-basic-input context="offcanvas" type="number" name="order" label="{{ trans('main.order') }}" placeholder="1" required/>
-    <x-text-area context="offcanvas" name="description_ar" label="{{ trans('main.description_ar') }}" placeholder="{{ trans('main.placeholders.description_ar') }}"/>
-    <x-text-area context="offcanvas" name="description_en" label="{{ trans('main.description_en') }}" placeholder="{{ trans('main.placeholders.description_en') }}"/>
+    <x-text-area context="offcanvas" name="description_ar" label="{{ trans('main.description_ar') }}" placeholder="{{ trans('main.placeholders.description_ar') }}" maxlength="500"/>
+    <x-text-area context="offcanvas" name="description_en" label="{{ trans('main.description_en') }}" placeholder="{{ trans('main.placeholders.description_en') }}" maxlength="500"/>
 </x-offcanvas>
 <!-- Edit Modal -->
 <x-offcanvas offcanvasType="edit" offcanvasTitle="{{ trans('main.editItem', ['item' => trans('admin/categories.category')]) }}"

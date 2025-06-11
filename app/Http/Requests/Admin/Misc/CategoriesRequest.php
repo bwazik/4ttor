@@ -19,7 +19,8 @@ class CategoriesRequest extends FormRequest
             'slug' => 'required|min:3|max:100|unique:categories,slug,'.$this->id,
             'icon' => 'required|min:3|max:100',
             'order' => 'required|numeric|between:0,999999.99',
-            'description' => 'nullable|string|max:500'
+            'description_ar' => 'nullable|string|max:500',
+            'description_en' => 'nullable|string|max:500',
         ];
     }
 

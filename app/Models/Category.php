@@ -25,4 +25,15 @@ class Category extends Model
         'created_at',
         'updated_at',
     ];
+
+    # Relationships
+    public function faqs()
+    {
+        return $this->hasMany(Faq::class, 'category_id');
+    }
+
+    public function articles()
+    {
+        return $this->hasMany(Article::class, 'category_id');
+    }
 }

@@ -35,6 +35,11 @@ class Article extends Model
         return $this->belongsTo(Category::class, 'category_id');
     }
 
+    public function articleContents()
+    {
+        return $this->hasMany(ArticleContent::class, 'article_id');
+    }
+
     # Scopes
     public function scopeActive($query)
     {

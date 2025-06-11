@@ -289,7 +289,7 @@
         <li class="menu-header mt-5">
             <span class="menu-header-text">{{ trans('layouts/sidebar.misc') }}</span>
         </li>
-        <li class="menu-item {{ isActiveRoute(['admin.categories.index']) ? 'active open' : '' }}">
+        <li class="menu-item {{ isActiveRoute(['admin.categories.index', 'admin.faqs.index']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle waves-effect">
                 <i class="menu-icon tf-icons ri-customer-service-2-line"></i>
                 <div>{{ trans('layouts/sidebar.support') }}</div>
