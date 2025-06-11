@@ -34,7 +34,7 @@
         @csrf
         <div class="form-floating form-floating-outline mb-5">
             <input type="text" class="form-control @error('username') is-invalid @enderror" id="username"
-                name="username" placeholder="{{ trans('layouts/login.placeholders.username') }}" value="bwazik" autofocus
+                name="username" placeholder="{{ trans('layouts/login.placeholders.username') }}" autofocus
                 required />
             <label for="username">{{ trans('layouts/login.username') }}</label>
             @error('username')
@@ -48,7 +48,7 @@
                         <input type="password" id="password" class="form-control @error('password') is-invalid @enderror"
                             name="password"
                             placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
-                            aria-describedby="password" value="123456789" required />
+                            aria-describedby="password" required />
                         <label for="password">{{ trans('layouts/login.password') }}</label>
                         @error('password')
                             <div class="invalid-feedback">{{ $message }}</div>

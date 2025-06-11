@@ -105,7 +105,7 @@
                 <div class="icon-wrapper bg-light">
                     <i class="tf-icons ri-user-star-line ri-2x text-success"></i>
                 </div>
-                <h5 class="mt-1 mb-0 text-center">{{ trans('admin/assistants.assistant') }}</h5>
+                <h5 class="mt-1 mb-0 text-center">{{ trans('admin/assistants.assistant') }} ({{ trans('main.soon') }})</h5>
             </a>
         </div>
 
@@ -127,7 +127,7 @@
                 <div class="icon-wrapper bg-light">
                     <i class="tf-icons ri-parent-line ri-2x text-warning"></i>
                 </div>
-                <h5 class="mt-1 mb-0 text-center">{{ trans('admin/parents.parent') }}</h5>
+                <h5 class="mt-1 mb-0 text-center">{{ trans('admin/parents.parent') }} ({{ trans('main.soon') }})</h5>
             </a>
         </div>
     </div>

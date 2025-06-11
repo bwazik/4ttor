@@ -16,10 +16,10 @@ class AdminSeeder extends Seeder
         $this->truncateTables(['users']);
 
         User::create([
-            'username' => 'bwazik',
+            'username' => 'bwazikdeveloper',
             'name' => ['en' => 'Abdullah Mohamed Fathy', 'ar' => 'عبدالله محمد فتحي'],
             'email' => 'bwazik@outlook.com',
-            'password' => Hash::make('123456789'),
+            'password' => Hash::make('125.5from140@aA'),
         ]);
     }
 }

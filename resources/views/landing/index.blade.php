@@ -39,7 +39,7 @@
                 <h2 class="h6 mb-8">{{ trans('landing.hero.subtitle') }}</h2>
                 <a href="https://wa.me/+201098617164" class="btn btn-lg btn-primary">{{ trans('landing.hero.button') }}</a>
             </div>
-            <div class="position-relative hero-animation-img">
+            {{-- <div class="position-relative hero-animation-img">
                 <a href="../vertical-menu-template/app-ecommerce-dashboard.html" target="_blank">
                     <div class="hero-dashboard-img text-center">
                         <img src="{{ asset('assets/img/front-pages/landing-page/hero-dashboard-light.png') }}"
@@ -54,7 +54,7 @@
                             data-app-dark-img="front-pages/landing-page/hero-elements-dark.png" />
                     </div>
                 </a>
-            </div>
+            </div> --}}
         </div>
     </section>
     <!-- Hero: End -->
@@ -68,47 +68,55 @@
                 <span class="text-uppercase">{{ trans('landing.features.title') }}</span>
             </h6>
             <h5 class="text-center mb-2">
-                <span class="display-5 fs-4 fw-bold">{{ trans('landing.features.heading1') }}</span> {{ trans('landing.features.heading2') }}
+                <span class="display-5 fs-4 fw-bold">{{ trans('landing.features.heading1') }}</span>
+                {{ trans('landing.features.heading2') }}
             </h5>
             <p class="text-center fw-medium mb-4 mb-md-12">{{ trans('landing.features.subtitle') }}</p>
             <div class="features-icon-wrapper row gx-0 gy-12 gx-sm-6 mt-n4 mt-sm-0">
                 <div class="col-lg-4 col-sm-6 text-center features-icon-box">
-                    <span class="features-new-icon badge rounded-pill bg-label-hover-primary mb-4 p-5 d-flex align-items-center justify-content-center">
+                    <span
+                        class="features-new-icon badge rounded-pill bg-label-hover-primary mb-4 p-5 d-flex align-items-center justify-content-center">
                         <i class="tf-icons ri-dashboard-3-line ri-42px"></i>
                     </span>
                     <h5 class="mb-2">{{ trans('landing.features.multiDashboards.title') }}</h5>
                     <p class="features-icon-description">{{ trans('landing.features.multiDashboards.description') }}</p>
                 </div>
                 <div class="col-lg-4 col-sm-6 text-center features-icon-box">
-                    <span class="features-new-icon badge rounded-pill bg-label-hover-primary mb-4 p-5 d-flex align-items-center justify-content-center">
+                    <span
+                        class="features-new-icon badge rounded-pill bg-label-hover-primary mb-4 p-5 d-flex align-items-center justify-content-center">
                         <i class="tf-icons ri-video-on-line ri-42px"></i>
                     </span>
                     <h5 class="mb-2">{{ trans('landing.features.zoom.title') }}</h5>
                     <p class="features-icon-description">{{ trans('landing.features.zoom.description') }}</p>
                 </div>
                 <div class="col-lg-4 col-sm-6 text-center features-icon-box">
-                    <span class="features-new-icon badge rounded-pill bg-label-hover-primary mb-4 p-5 d-flex align-items-center justify-content-center">
+                    <span
+                        class="features-new-icon badge rounded-pill bg-label-hover-primary mb-4 p-5 d-flex align-items-center justify-content-center">
                         <i class="tf-icons ri-whatsapp-line ri-42px"></i>
                     </span>
                     <h5 class="mb-2">{{ trans('landing.features.whatsappNotifications.title') }}</h5>
-                    <p class="features-icon-description">{{ trans('landing.features.whatsappNotifications.description') }}</p>
+                    <p class="features-icon-description">{{ trans('landing.features.whatsappNotifications.description') }}
+                    </p>
                 </div>
                 <div class="col-lg-4 col-sm-6 text-center features-icon-box">
-                    <span class="features-new-icon badge rounded-pill bg-label-hover-primary mb-4 p-5 d-flex align-items-center justify-content-center">
+                    <span
+                        class="features-new-icon badge rounded-pill bg-label-hover-primary mb-4 p-5 d-flex align-items-center justify-content-center">
                         <i class="tf-icons ri-refresh-line ri-42px"></i>
                     </span>
                     <h5 class="mb-2">{{ trans('landing.features.updates.title') }}</h5>
                     <p class="features-icon-description">{{ trans('landing.features.updates.description') }}</p>
                 </div>
                 <div class="col-lg-4 col-sm-6 text-center features-icon-box">
-                    <span class="features-new-icon badge rounded-pill bg-label-hover-primary mb-4 p-5 d-flex align-items-center justify-content-center">
+                    <span
+                        class="features-new-icon badge rounded-pill bg-label-hover-primary mb-4 p-5 d-flex align-items-center justify-content-center">
                         <i class="tf-icons ri-brain-line ri-42px"></i>
                     </span>
                     <h5 class="mb-2">{{ trans('landing.features.studentActivities.title') }}</h5>
                     <p class="features-icon-description">{{ trans('landing.features.studentActivities.description') }}</p>
                 </div>
                 <div class="col-lg-4 col-sm-6 text-center features-icon-box">
-                    <span class="features-new-icon badge rounded-pill bg-label-hover-primary mb-4 p-5 d-flex align-items-center justify-content-center">
+                    <span
+                        class="features-new-icon badge rounded-pill bg-label-hover-primary mb-4 p-5 d-flex align-items-center justify-content-center">
                         <i class="tf-icons ri-customer-service-2-line ri-42px"></i>
                     </span>
                     <h5 class="mb-2">{{ trans('landing.features.support.title') }}</h5>
@@ -131,7 +139,8 @@
                     class="me-3" />
                 <span class="text-uppercase">{{ trans('landing.team.title') }}</span>
             </h6>
-            <h5 class="text-center mb-2"><span class="display-5 fs-4 fw-bold">{{ trans('landing.team.heading1') }}</span> {{ trans('landing.team.heading2') }}</h5>
+            <h5 class="text-center mb-2"><span class="display-5 fs-4 fw-bold">{{ trans('landing.team.heading1') }}</span>
+                {{ trans('landing.team.heading2') }}</h5>
             <p class="text-center fw-medium mb-4 mb-md-12 pb-7">{{ trans('landing.team.subtitle') }}</p>
             <div class="row gy-lg-5 gy-12 mt-2">
                 <div class="col-12">
@@ -210,12 +219,11 @@
             <h6 class="text-center d-flex justify-content-center align-items-center mb-6">
                 <img src="{{ asset('assets/img/front-pages/icons/section-tilte-icon.png') }}" alt="section title icon"
                     class="me-3" />
-                <span class="text-uppercase">faq</span>
+                <span class="text-uppercase">{{ trans('landing.faqs.title') }}</span>
             </h6>
-            <h5 class="text-center mb-2">Frequently asked<span class="display-5 fs-4 fw-bold"> questions</span></h5>
-            <p class="text-center fw-medium mb-4 mb-md-12 pb-4">
-                Browse through these FAQs to find answers to commonly asked questions.
-            </p>
+            <h5 class="text-center mb-2">{{ trans('landing.faqs.heading1') }}<span
+                    class="display-5 fs-4 fw-bold"> {{ trans('landing.faqs.heading2') }}</span></h5>
+            <p class="text-center fw-medium mb-4 mb-md-12 pb-4">{{ trans('landing.faqs.subtitle') }}</p>
             <div class="row gy-5">
                 <div class="col-lg-5">
                     <div class="text-center">
@@ -225,103 +233,23 @@
                 </div>
                 <div class="col-lg-7">
                     <div class="accordion" id="accordionFront">
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="head-One">
-                                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
-                                    data-bs-target="#accordionOne" aria-expanded="true" aria-controls="accordionOne">
-                                    Do you charge for each upgrade?
-                                </button>
-                            </h2>
-
-                            <div id="accordionOne" class="accordion-collapse collapse" data-bs-parent="#accordionFront"
-                                aria-labelledby="accordionOne">
-                                <div class="accordion-body">
-                                    Lemon drops chocolate cake gummies carrot cake chupa chups muffin topping. Sesame
-                                    snaps icing
-                                    marzipan gummi bears macaroon dragée danish caramels powder. Bear claw dragée
-                                    pastry topping
-                                    soufflé. Wafer gummi bears marshmallow pastry pie.
+                        @foreach ($faqs as $faq)
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="head-{{ $faq->id }}">
+                                    <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
+                                        data-bs-target="#accordion{{ $faq->id }}" aria-expanded="false"
+                                        aria-controls="accordion{{ $faq->id }}">
+                                        {{ $faq->question }}
+                                    </button>
+                                </h2>
+                                <div id="accordion{{ $faq->id }}" class="accordion-collapse collapse"
+                                    aria-labelledby="head-{{ $faq->id }}" data-bs-parent="#accordionFront">
+                                    <div class="accordion-body">
+                                        {{ $faq->answer }}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="accordion-item previous-active">
-                            <h2 class="accordion-header" id="head-Two">
-                                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
-                                    data-bs-target="#accordionTwo" aria-expanded="false" aria-controls="accordionTwo">
-                                    Do I need to purchase a license for each website?
-                                </button>
-                            </h2>
-                            <div id="accordionTwo" class="accordion-collapse collapse" aria-labelledby="accordionTwo"
-                                data-bs-parent="#accordionFront">
-                                <div class="accordion-body">
-                                    Dessert ice cream donut oat cake jelly-o pie sugar plum cheesecake. Bear claw
-                                    dragée oat cake
-                                    dragée ice cream halvah tootsie roll. Danish cake oat cake pie macaroon tart donut
-                                    gummies. Jelly
-                                    beans candy canes carrot cake. Fruitcake chocolate chupa chups.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item active">
-                            <h2 class="accordion-header" id="head-Three">
-                                <button type="button" class="accordion-button" data-bs-toggle="collapse"
-                                    data-bs-target="#accordionThree" aria-expanded="true" aria-controls="accordionThree">
-                                    What is regular license?
-                                </button>
-                            </h2>
-                            <div id="accordionThree" class="accordion-collapse collapse show"
-                                aria-labelledby="accordionThree" data-bs-parent="#accordionFront">
-                                <div class="accordion-body">
-                                    Regular license can be used for end products that do not charge users for access
-                                    or service(access
-                                    is free and there will be no monthly subscription fee). Single regular license can
-                                    be used for
-                                    single end product and end product can be used by you or your client. If you want
-                                    to sell end
-                                    product to multiple clients then you will need to purchase separate license for
-                                    each client. The
-                                    same rule applies if you want to use the same end product on multiple
-                                    domains(unique setup). For
-                                    more info on regular license you can check official description.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="head-Four">
-                                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
-                                    data-bs-target="#accordionFour" aria-expanded="false" aria-controls="accordionFour">
-                                    What is extended license?
-                                </button>
-                            </h2>
-                            <div id="accordionFour" class="accordion-collapse collapse" aria-labelledby="accordionFour"
-                                data-bs-parent="#accordionFront">
-                                <div class="accordion-body">
-                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis et aliquid quaerat
-                                    possimus maxime!
-                                    Mollitia reprehenderit neque repellat deleniti delectus architecto dolorum maxime,
-                                    blanditiis
-                                    earum ea, incidunt quam possimus cumque.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="head-Five">
-                                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
-                                    data-bs-target="#accordionFive" aria-expanded="false" aria-controls="accordionFive">
-                                    Which license is applicable for SASS application?
-                                </button>
-                            </h2>
-                            <div id="accordionFive" class="accordion-collapse collapse" aria-labelledby="accordionFive"
-                                data-bs-parent="#accordionFront">
-                                <div class="accordion-body">
-                                    Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sequi molestias
-                                    exercitationem ab cum
-                                    nemo facere voluptates veritatis quia, eveniet veniam at et repudiandae mollitia
-                                    ipsam quasi
-                                    labore enim architecto non!
-                                </div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -335,16 +263,16 @@
             class="position-absolute bottom-0 end-0 scaleX-n1-rtl h-100 w-100 z-n1" alt="cta image" />
         <div class="container">
             <div class="row align-items-center gy-5 gy-lg-0">
-                <div class="col-lg-6 text-center text-lg-start">
+                <div class="col-lg-12 p-lg-12 text-center text-lg-start">
                     <h3 class="display-5 text-primary fw-bold mb-1 h3">{{ trans('landing.cta.title') }}</h3>
                     <p class="fw-medium mb-6 mb-md-8">{{ trans('landing.cta.subtitle') }}</p>
                     <a href="{{ route('login.choose') }}" class="btn btn-primary">{{ trans('landing.cta.button') }}<i
                             class="ri-arrow-right-line ri-16px ms-2 scaleX-n1-rtl"></i></a>
                 </div>
-                <div class="col-lg-6 pt-lg-12">
+                {{-- <div class="col-lg-6 pt-lg-12">
                     <img src="{{ asset('assets/img/front-pages/landing-page/cta-dashboard.png') }}" alt="cta dashboard"
                         class="img-fluid" />
-                </div>
+                </div> --}}
             </div>
         </div>
     </section>
@@ -378,20 +306,28 @@
                 <div class="col-lg-7">
                     <div class="card">
                         <div class="card-body">
-                            <form id="contact-form" action="{{ route('landing.contact') }}" method="POST" autocomplete="off">
+                            <form id="contact-form" action="{{ route('landing.contact') }}" method="POST"
+                                autocomplete="off">
                                 @csrf
                                 <div class="row g-5">
-                                    <x-basic-input context="modal" type="text" name="name" label="{{ trans('main.realName_ar') }}" placeholder="{{ trans('main.placeholders.realName') }}" required />
-                                    <x-basic-input context="modal" type="number" name="phone" label="{{ trans('main.phone') }}" placeholder="{{ trans('admin/teachers.placeholders.phone') }}" required />
+                                    <x-basic-input context="modal" type="text" name="name"
+                                        label="{{ trans('main.realName_ar') }}"
+                                        placeholder="{{ trans('main.placeholders.realName') }}" required />
+                                    <x-basic-input context="modal" type="number" name="phone"
+                                        label="{{ trans('main.phone') }}"
+                                        placeholder="{{ trans('admin/teachers.placeholders.phone') }}" required />
                                     <div class="col-sm-12">
                                         <div class="form-floating form-floating-outline">
-                                            <textarea id="message" class="form-control h-px-250" name="message" required placeholder="{{ trans('main.placeholders.message') }}" aria-label="{{ trans('main.placeholders.message') }}" maxlength="255"></textarea>
+                                            <textarea id="message" class="form-control h-px-250" name="message" required
+                                                placeholder="{{ trans('main.placeholders.message') }}" aria-label="{{ trans('main.placeholders.message') }}"
+                                                maxlength="255"></textarea>
                                             <label for="message">{{ trans('landing.contact.message') }}</label>
                                         </div>
                                         <span class="invalid-feedback" id="message_error" role="alert"></span>
                                     </div>
                                 </div>
-                                <button type="submit" class="btn btn-primary mt-5 waves-effect waves-light">{{ trans('landing.contact.button') }}</button>
+                                <button type="submit"
+                                    class="btn btn-primary mt-5 waves-effect waves-light">{{ trans('landing.contact.button') }}</button>
                             </form>
                         </div>
                     </div>

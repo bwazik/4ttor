@@ -76,7 +76,7 @@
                                         class="accordion-collapse collapse"
                                         data-bs-parent="#accordion{{ $category->slug }}">
                                         <div class="accordion-body">
-                                            {!! $faq->answer !!}
+                                            {{ $faq->answer }}
                                         </div>
                                     </div>
                                 </div>

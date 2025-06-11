@@ -575,3 +575,16 @@ if (!function_exists('getDashboardRoute')) {
         };
     }
 }
+
+if (!function_exists('getHelpCenterRoute')) {
+    function getHelpCenterRoute() {
+        return match (true) {
+            isAdmin() => route('admin.help-center.index'),
+            isTeacher() => route('teacher.help-center.index'),
+            isAssistant() => route('assistant.help-center.index'),
+            isStudent() => route('student.help-center.index'),
+            isParent() => route('parent.help-center.index'),
+            default => route('login.choose'),
+        };
+    }
+}

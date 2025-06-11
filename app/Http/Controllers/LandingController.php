@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Faq;
 use App\Models\Group;
 use App\Models\Lesson;
 use App\Models\Student;
@@ -27,7 +28,11 @@ class LandingController extends Controller
             ];
         });
 
-        return view('landing.index', compact('metrics'));
+        $faqs = Cache::remember('landing_faqs', 1440, function () {
+            return Faq::atLanding()->active()->orderBy('order')->get();
+        });
+
+        return view('landing.index', compact('metrics', 'faqs'));
     }
 
     public function contact(Request $request)

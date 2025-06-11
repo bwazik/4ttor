@@ -9,6 +9,7 @@ return [
         'features' => 'Features',
         'team' => 'Team',
         'faq' => 'FAQ',
+        'helpCenter' => 'Help Center',
         'contact' => 'Contact Us',
         'light' => 'Light Mode',
         'dark' => 'Dark Mode',
@@ -56,13 +57,21 @@ return [
         ],
     ],
 
-    // Team Section
+    // Team
     'team' => [
         'title' => 'Our Outstanding Team',
         'heading1' => 'Powered',
         'heading2' => 'By Innovation Passion',
         'subtitle' => 'Who\'s behind this advanced educational platform?',
         'memberRole' => 'Platform Founder',
+    ],
+
+    // FAQ
+    'faqs' => [
+        'title' => 'FAQs',
+        'heading1' => 'Frequently asked',
+        'heading2' => 'questions',
+        'subtitle' => 'Browse through these FAQs to find answers to commonly asked questions.',
     ],
 
     // CTA

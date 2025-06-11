@@ -50,6 +50,7 @@ class FaqsController extends Controller
             'admin_faqs_categories',
             'teacher_faqs_categories',
             'student_faqs_categories',
+            'landing_faqs',
             'admin_faqs_category_ids',
         ]);
     }
@@ -63,6 +64,7 @@ class FaqsController extends Controller
             'admin_faqs_categories',
             'teacher_faqs_categories',
             'student_faqs_categories',
+            'landing_faqs',
             'admin_faqs_category_ids',
         ]);
     }
@@ -78,6 +80,7 @@ class FaqsController extends Controller
             'admin_faqs_categories',
             'teacher_faqs_categories',
             'student_faqs_categories',
+            'landing_faqs',
             'admin_faqs_category_ids',
         ]);
     }
@@ -93,6 +96,7 @@ class FaqsController extends Controller
             'admin_faqs_categories',
             'teacher_faqs_categories',
             'student_faqs_categories',
+            'landing_faqs',
             'admin_faqs_category_ids',
         ]);
     }

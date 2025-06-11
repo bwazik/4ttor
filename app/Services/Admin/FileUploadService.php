@@ -9,7 +9,6 @@ use App\Models\AssignmentFile;
 use App\Models\Resource;
 use App\Models\SubmissionFile;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Traits\PublicValidatesTrait;
 use Illuminate\Support\Facades\Auth;

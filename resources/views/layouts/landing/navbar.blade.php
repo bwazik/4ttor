@@ -37,6 +37,11 @@
                 <li class="nav-item">
                     <a class="nav-link fw-medium" href="{{ route('landing') }}#landingFAQ">{{ trans('landing.navbar.faq') }}</a>
                 </li>
+                @if(isAdmin() || isTeacher() || isAssistant() || isStudent() || isParent())
+                    <li class="nav-item">
+                        <a class="nav-link fw-medium" href={{ getHelpCenterRoute() }}">{{ trans('landing.navbar.helpCenter') }}</a>
+                    </li>
+                @endif
                 <li class="nav-item">
                     <a class="nav-link fw-medium text-nowrap" href="{{ route('landing') }}#landingContact">{{ trans('landing.navbar.contact') }}</a>
                 </li>
