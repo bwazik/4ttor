@@ -60,17 +60,17 @@
                 <ul class="dropdown-menu dropdown-menu-end dropdown-styles">
                     <li>
                         <a class="dropdown-item" href="javascript:void(0);" data-theme="light">
-                            <span class="align-middle"><i class="ri-sun-line ri-22px me-3"></i>Light</span>
+                            <span class="align-middle"><i class="ri-sun-line ri-22px me-3"></i>{{ trans('landing.navbar.light') }}</span>
                         </a>
                     </li>
                     <li>
                         <a class="dropdown-item" href="javascript:void(0);" data-theme="dark">
-                            <span class="align-middle"><i class="ri-moon-clear-line ri-22px me-3"></i>Dark</span>
+                            <span class="align-middle"><i class="ri-moon-clear-line ri-22px me-3"></i>{{ trans('landing.navbar.dark') }}</span>
                         </a>
                     </li>
                     <li>
                         <a class="dropdown-item" href="javascript:void(0);" data-theme="system">
-                            <span class="align-middle"><i class="ri-computer-line ri-22px me-3"></i>System</span>
+                            <span class="align-middle"><i class="ri-computer-line ri-22px me-3"></i>{{ trans('landing.navbar.system') }}</span>
                         </a>
                     </li>
                 </ul>
@@ -174,7 +174,7 @@
                         <div class="dropdown-divider"></div>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="#">
+                        <a class="dropdown-item" href="{{ route('student.faqs.index') }}">
                             <i class="ri-question-line ri-22px me-3"></i><span class="align-middle">{{ trans('layouts/navbar.faq') }}</span>
                         </a>
                     </li>

@@ -158,7 +158,7 @@
                         <i class="ri-phone-line ri-30px"></i>
                     </span>
                 </div>
-                <h5 class="mt-4 mb-1"><a class="text-heading" href="tel:+(810)25482568">+201098617164</a></h5>
+                <h5 class="mt-4 mb-1"><a class="text-heading" href="https://wa.me/+201098617164">+201098617164</a></h5>
                 <p class="mb-0">{{ trans('admin/faqs.contact.phone') }}</p>
             </div>
         </div>

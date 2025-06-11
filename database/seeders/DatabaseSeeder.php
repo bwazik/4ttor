@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             $this->call(SubjectSeeder::class);
             $this->call(PlanSeeder::class);
             $this->call(CategorySeeder::class);
+            $this->call(FaqSeeder::class);
         }
         else
         {
@@ -28,6 +29,7 @@ class DatabaseSeeder extends Seeder
             $this->call(SubjectSeeder::class);
             $this->call(PlanSeeder::class);
             $this->call(CategorySeeder::class);
+            $this->call(FaqSeeder::class);
             $this->call(TeacherSeeder::class);
             $this->call(TeacherGradeSeeder::class);
             $this->call(AssistantSeeder::class);

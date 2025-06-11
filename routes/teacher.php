@@ -32,6 +32,8 @@ use App\Http\Controllers\Teacher\Account\BillingController;
 use App\Http\Controllers\Teacher\Account\SubscriptionsController;
 use App\Http\Controllers\AccountController;
 
+use App\Http\Controllers\Teacher\Misc\FaqsController;
+
 Route::group(
     [
         'prefix' => LaravelLocalization::setLocale() . '/teacher',
@@ -312,6 +314,12 @@ Route::group(
                     Route::get('/', 'index')->name('index');
                 });
             # End Finance Managment
+
+            # Start Misc
+                Route::prefix('faqs')->controller(FaqsController::class)->name('faqs.')->group(function () {
+                    Route::get('/', 'index')->name('index');
+                });
+            # End Misc
         });
     });
 });

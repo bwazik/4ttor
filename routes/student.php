@@ -7,6 +7,8 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Http\Controllers\Student\Activities\QuizzesController;
 use App\Http\Controllers\Student\Activities\AssignmentsController;
 
+use App\Http\Controllers\Student\Misc\FaqsController;
+
 Route::group(
     [
         'prefix' => LaravelLocalization::setLocale() . '/student',
@@ -57,6 +59,12 @@ Route::group(
                     });
                 });
             # End Activities
+
+            # Start Misc
+                Route::prefix('faqs')->controller(FaqsController::class)->name('faqs.')->group(function () {
+                    Route::get('/', 'index')->name('index');
+                });
+            # End Misc
         });
     }
 );

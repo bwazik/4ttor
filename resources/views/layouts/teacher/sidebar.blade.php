@@ -151,5 +151,16 @@
                 <div>{{ trans('layouts/sidebar.transactions') }}</div>
             </a>
         </li>
+
+        <!-- Misc -->
+        <li class="menu-header mt-5">
+            <span class="menu-header-text">{{ trans('layouts/sidebar.misc') }}</span>
+        </li>
+        <li class="menu-item {{ isActiveRoute('teacher.faqs.index') ? 'active' : '' }}">
+            <a href="{{ route('teacher.faqs.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons ri-question-line"></i>
+                <div>{{ trans('layouts/sidebar.faqs') }}</div>
+            </a>
+        </li>
     </ul>
 </aside>
