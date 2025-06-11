@@ -1,22 +1,22 @@
 <?php
 
 namespace App\Services\Admin\Misc;
-use App\Models\Category;
+use App\Models\Faq;
 use App\Traits\PublicValidatesTrait;
 use App\Traits\DatabaseTransactionTrait;
 use App\Traits\PreventDeletionIfRelated;
 
-class CategoryService
+class FaqService
 {
     use PreventDeletionIfRelated, PublicValidatesTrait, DatabaseTransactionTrait;
 
     protected $relationships = [];
 
-    protected $transModelKey = 'admin/categories.categories';
+    protected $transModelKey = 'admin/faqs.faqs';
 
-    public function getCategoriesForDatatable($categoriesQuery)
+    public function getFaqsForDatatable($faqsQuery)
     {
-        return datatables()->eloquent($categoriesQuery)
+        return datatables()->eloquent($faqsQuery)
             ->addIndexColumn()
             ->addColumn('selectbox', fn($row) => generateSelectbox($row->id))
             ->editColumn('name', fn($row) => $row->name)
@@ -57,81 +57,81 @@ class CategoryService
             '</div>';
     }
 
-    public function insertCategory(array $request)
+    public function insertFaq(array $request)
     {
         return $this->executeTransaction(function () use ($request)
         {
-            Category::create([
+            Faq::create([
                 'name' => ['en' => $request['name_en'], 'ar' => $request['name_ar']],
                 'slug' => $request['slug'],
                 'icon' => $request['icon'] ?? NULL,
-                'description' => (isset($request['description_en']) || isset($request['description_ar'])) ? ['en' => $request['description_en'] ?? null, 'ar' => $request['description_ar'] ?? null] : NULL,
+                'description' => $request['description'] ? ['en' => $request['description_en'], 'ar' => $request['description_ar']] : NULL,
                 'order' => $request['order'],
             ]);
 
-            return $this->successResponse(trans('main.added', ['item' => trans('admin/categories.category')]));
+            return $this->successResponse(trans('main.added', ['item' => trans('admin/faqs.faq')]));
         });
     }
 
-    public function updateCategory($id, array $request)
+    public function updateFaq($id, array $request)
     {
         return $this->executeTransaction(function () use ($id, $request)
         {
-            $category = Category::findOrFail($id);
+            $faq = Faq::findOrFail($id);
 
-            $category->update([
+            $faq->update([
                 'name' => ['en' => $request['name_en'], 'ar' => $request['name_ar']],
                 'slug' => $request['slug'],
                 'icon' => $request['icon'] ?? NULL,
-                'description' => (isset($request['description_en']) || isset($request['description_ar'])) ? ['en' => $request['description_en'] ?? null, 'ar' => $request['description_ar'] ?? null] : NULL,
+                'description' => $request['description'] ? ['en' => $request['description_en'], 'ar' => $request['description_ar']] : NULL,
                 'order' => $request['order'],
             ]);
 
-            return $this->successResponse(trans('main.edited', ['item' => trans('admin/categories.category')]));
+            return $this->successResponse(trans('main.edited', ['item' => trans('admin/faqs.faq')]));
         });
     }
 
-    public function deleteCategory($id): array
+    public function deleteFaq($id): array
     {
         return $this->executeTransaction(function () use ($id)
         {
-            $category = Category::select('id', 'name')->findOrFail($id);
+            $faq = Faq::select('id', 'name')->findOrFail($id);
 
-            if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($category))
+            if ($dependencyCheck = $this->checkDependenciesForSingleDeletion($faq))
                 return $dependencyCheck;
 
-            $category->delete();
+            $faq->delete();
 
-            return $this->successResponse(trans('main.deleted', ['item' => trans('admin/categories.category')]));
+            return $this->successResponse(trans('main.deleted', ['item' => trans('admin/faqs.faq')]));
         });
     }
 
-    public function deleteSelectedCategories($ids)
+    public function deleteSelectedFaqs($ids)
     {
         if ($validationResult = $this->validateSelectedItems((array) $ids))
             return $validationResult;
 
         return $this->executeTransaction(function () use ($ids)
         {
-            $categories = Category::whereIn('id', $ids)->select('id', 'name')->orderBy('id')->get();
+            $faqs = Faq::whereIn('id', $ids)->select('id', 'name')->orderBy('id')->get();
 
-            if ($dependencyCheck = $this->checkDependenciesForMultipleDeletion($categories)) {
+            if ($dependencyCheck = $this->checkDependenciesForMultipleDeletion($faqs)) {
                 return $dependencyCheck;
             }
 
-            Category::whereIn('id', $ids)->delete();
+            Faq::whereIn('id', $ids)->delete();
 
-            return $this->successResponse(trans('main.deletedSelected', ['item' => trans('admin/categories.category')]));
+            return $this->successResponse(trans('main.deletedSelected', ['item' => trans('admin/faqs.faq')]));
         });
     }
 
-    public function checkDependenciesForSingleDeletion($category)
+    public function checkDependenciesForSingleDeletion($faq)
     {
-        return $this->checkForSingleDependencies($category, $this->relationships, $this->transModelKey);
+        return $this->checkForSingleDependencies($faq, $this->relationships, $this->transModelKey);
     }
 
-    public function checkDependenciesForMultipleDeletion($categories)
+    public function checkDependenciesForMultipleDeletion($faqs)
     {
-        return $this->checkForMultipleDependencies($categories, $this->relationships, $this->transModelKey);
+        return $this->checkForMultipleDependencies($faqs, $this->relationships, $this->transModelKey);
     }
 }

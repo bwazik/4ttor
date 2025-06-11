@@ -11,7 +11,7 @@ class Article extends Model
 
     protected $table = 'articles';
 
-    public $translatable = ['name', 'description'];
+    public $translatable = ['title', 'description'];
 
     protected $fillable = [
         'title',
@@ -20,6 +20,7 @@ class Article extends Model
         'audience',
         'description',
         'is_active',
+        'is_pinned',
         'published_at',
     ];
 
@@ -43,5 +44,10 @@ class Article extends Model
     public function scopeInactive($query)
     {
         return $query->where('is_active', 0);
+    }
+
+    public function scopePinned($query)
+    {
+        return $query->where('is_pinned', 1);
     }
 }

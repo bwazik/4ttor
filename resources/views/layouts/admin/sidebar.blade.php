@@ -182,7 +182,7 @@
         </li>
         <li class="menu-item {{ isActiveRoute('admin.quizzes.index') ? 'active' : '' }}">
             <a href="{{ route('admin.quizzes.index') }}" class="menu-link">
-                <i class="menu-icon tf-icons ri-question-line"></i>
+                <i class="menu-icon tf-icons ri-brain-line"></i>
                 <div>{{ trans('layouts/sidebar.quizzes') }}</div>
             </a>
         </li>
@@ -298,6 +298,11 @@
                 <li class="menu-item {{ isActiveRoute('admin.categories.index') ? 'active' : '' }}">
                     <a href="{{ route('admin.categories.index') }}" class="menu-link">
                         <div>{{ trans('admin/categories.categories') }}</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ isActiveRoute('admin.faqs.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.faqs.index') }}" class="menu-link">
+                        <div>{{ trans('admin/faqs.faqs') }}</div>
                     </a>
                 </li>
             </ul>

@@ -42,6 +42,7 @@ use App\Http\Controllers\Admin\Finance\TeacherSubscriptionsController;
 use App\Http\Controllers\Admin\Finance\TeachersInvoicesController;
 
 use App\Http\Controllers\Admin\Misc\CategoriesController;
+use App\Http\Controllers\Admin\Misc\FaqsController;
 
 Route::group(
     [

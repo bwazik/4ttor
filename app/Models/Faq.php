@@ -11,7 +11,7 @@ class Faq extends Model
 
     protected $table = 'faqs';
 
-    public $translatable = ['name', 'description'];
+    public $translatable = ['question', 'answer'];
 
     protected $fillable = [
         'category_id',
@@ -19,6 +19,7 @@ class Faq extends Model
         'question',
         'answer',
         'is_active',
+        'is_at_landing',
         'order',
     ];
 
@@ -42,5 +43,10 @@ class Faq extends Model
     public function scopeInactive($query)
     {
         return $query->where('is_active', 0);
+    }
+
+    public function scopeAtLanding($query)
+    {
+        return $query->where('is_at_landing', 1);
     }
 }

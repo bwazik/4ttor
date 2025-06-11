@@ -68,36 +68,18 @@
                                     class="btn btn-primary waves-effect waves-light">{{ trans('admin/quizzes.startQuiz') }}</a>
                             @endif
                             <div class="collapse mt-3" id="instructions" style="">
-                                <ol class="mb-6">
-                                    <li class="mb-3">
-                                        <p>
-                                            {{ e(trans('admin/quizzes.instructions.screen_lock')) }}
-                                        </p>
-                                    </li>
-                                    <li class="mb-3 text-warning">
-                                        <p>{{ e(trans('admin/quizzes.instructions.cheating')) }}</p>
-                                    </li>
-                                    <li class="mb-3">
-                                        <p>{{ e(trans('admin/quizzes.instructions.navigation')) }}</p>
-                                    </li>
-                                    <li class="mb-3">
-                                        <p>{{ e(trans('admin/quizzes.instructions.saving')) }}</p>
-                                    </li>
-                                    <li class="mb-3">
-                                        <p>{{ e(trans('admin/quizzes.instructions.submission')) }}</p>
-                                    </li>
-                                    <li class="mb-3">
-                                        <p>
-                                            {{ e(trans('admin/quizzes.instructions.warnings')) }}
-                                        </p>
-                                    </li>
-                                    <li class="mb-3">
-                                        <p>{{ e(trans('admin/quizzes.instructions.review')) }}</p>
-                                    </li>
-                                    <li class="mb-3">
-                                        <p>{{ e(trans('admin/quizzes.instructions.closure')) }}</p>
-                                    </li>
-                                </ol>
+                                <div class="demo-inline-spacing mt-4">
+                                    <ol class="list-group list-group-numbered">
+                                        <li class="list-group-item list-group-item-action list-group-item-warning waves-effect waves-light">{{ e(trans('admin/quizzes.instructions.screen_lock')) }}</li>
+                                        <li class="list-group-item list-group-item-action list-group-item-warning waves-effect waves-light">{{ e(trans('admin/quizzes.instructions.cheating')) }}</li>
+                                        <li class="list-group-item list-group-item-action waves-effect waves-light">{{ e(trans('admin/quizzes.instructions.navigation')) }}</li>
+                                        <li class="list-group-item list-group-item-action waves-effect waves-light">{{ e(trans('admin/quizzes.instructions.saving')) }}</li>
+                                        <li class="list-group-item list-group-item-action waves-effect waves-light">{{ e(trans('admin/quizzes.instructions.submission')) }}</li>
+                                        <li class="list-group-item list-group-item-action waves-effect waves-light">{{ e(trans('admin/quizzes.instructions.warnings')) }}</li>
+                                        <li class="list-group-item list-group-item-action waves-effect waves-light">{{ e(trans('admin/quizzes.instructions.review')) }}</li>
+                                        <li class="list-group-item list-group-item-action waves-effect waves-light">{{ e(trans('admin/quizzes.instructions.closure')) }}</li>
+                                    </ol>
+                                </div>
                             </div>
                             <hr class="my-6" />
                             <h5>{{ app()->getLocale() === 'ar' ? 'ال' : '' }}{{ trans('admin/teachers.teacher') }}

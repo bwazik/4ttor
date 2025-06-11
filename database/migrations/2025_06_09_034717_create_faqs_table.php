@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('question');
             $table->text('answer');
             $table->boolean('is_active')->default(true);
+            $table->boolean('is_at_landing')->default(false)->index();
             $table->tinyInteger('order')->default(0);
             $table->timestamps();
         });

@@ -101,7 +101,7 @@ class CategorySeeder extends Seeder
             [
                 'name' => ['en' => 'Quizzes', 'ar' => 'الاختبارات'],
                 'slug' => 'quizzes',
-                'icon' => 'question-line',
+                'icon' => 'brain-line',
                 'description' => ['en' => 'Assessment creation, grading systems, and quiz result analysis', 'ar' => 'عمل الامتحانات وطريقة التصحيح وتحليل النتايج'],
                 'order' => 9,
                 'created_at' => now(),
