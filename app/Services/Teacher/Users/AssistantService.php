@@ -77,7 +77,7 @@ class AssistantService
         {
             Assistant::create([
                 'username' => $request['username'],
-                'password' => Hash::make($request['username']),
+                'password' => Hash::make($request['password']),
                 'name' => ['ar' => $request['name_ar'], 'en' => $request['name_en']],
                 'phone' => $request['phone'],
                 'email' => $request['email'],
