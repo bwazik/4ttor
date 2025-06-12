@@ -305,6 +305,11 @@
                         <div>{{ trans('admin/faqs.faqs') }}</div>
                     </a>
                 </li>
+                <li class="menu-item {{ isActiveRoute('admin.help-center.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.help-center.index') }}" class="menu-link">
+                        <div>{{ trans('layouts/sidebar.helpCenter') }}</div>
+                    </a>
+                </li>
             </ul>
         </li>
     </ul>
