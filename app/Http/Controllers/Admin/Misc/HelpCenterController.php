@@ -28,7 +28,7 @@ class HelpCenterController extends Controller
 
     public function index()
     {
-        $categories = Cache::remember('help_center_categories', 1440, function () {
+        $categories = Cache::remember('admin_help_center_categories', 1440, function () {
             return Category::with(['articles' => fn($q) => $q->orderBy('published_at', 'desc')])
                 ->orderBy('order')
                 ->get();
@@ -41,7 +41,7 @@ class HelpCenterController extends Controller
                 ->toArray();
         });
 
-        $pinnedArticles = Cache::remember('pinned_articles', 1440, function () {
+        $pinnedArticles = Cache::remember('admin_pinned_articles', 1440, function () {
             return Article::pinned()
                 ->orderBy('published_at', 'desc')
                 ->take(3)
@@ -58,9 +58,13 @@ class HelpCenterController extends Controller
         return $this->conrtollerJsonResponse(
             $result,
             [
-                'help_center_categories',
+                'admin_help_center_categories',
+                'teacher_help_center_categories',
+                'student_help_center_categories',
                 'admin_faqs_category_ids',
-                'pinned_articles',
+                'admin_pinned_articles',
+                'teacher_pinned_articles',
+                'student_pinned_articles',
             ]
         );
     }
@@ -72,9 +76,13 @@ class HelpCenterController extends Controller
         return $this->conrtollerJsonResponse(
             $result,
             [
-                'help_center_categories',
+                'admin_help_center_categories',
+                'teacher_help_center_categories',
+                'student_help_center_categories',
                 'admin_faqs_category_ids',
-                'pinned_articles',
+                'admin_pinned_articles',
+                'teacher_pinned_articles',
+                'student_pinned_articles',
             ]
         );
     }
@@ -88,9 +96,13 @@ class HelpCenterController extends Controller
         return $this->conrtollerJsonResponse(
             $result,
             [
-                'help_center_categories',
+                'admin_help_center_categories',
+                'teacher_help_center_categories',
+                'student_help_center_categories',
                 'admin_faqs_category_ids',
-                'pinned_articles',
+                'admin_pinned_articles',
+                'teacher_pinned_articles',
+                'student_pinned_articles',
             ]
         );
     }
@@ -104,9 +116,13 @@ class HelpCenterController extends Controller
         return $this->conrtollerJsonResponse(
             $result,
             [
-                'help_center_categories',
+                'admin_help_center_categories',
+                'teacher_help_center_categories',
+                'student_help_center_categories',
                 'admin_faqs_category_ids',
-                'pinned_articles',
+                'admin_pinned_articles',
+                'teacher_pinned_articles',
+                'student_pinned_articles',
             ]
         );
     }
@@ -114,7 +130,10 @@ class HelpCenterController extends Controller
     public function show($categorySlug, $articleSlug)
     {
         $article = Cache::remember("article_{$categorySlug}_{$articleSlug}", 1440, function () use ($categorySlug, $articleSlug) {
-            return Article::with('category', 'articleContents')
+            return Article::with([
+                'category',
+                'articleContents' => fn($q) => $q->orderBy('order', 'asc')
+            ])
                 ->where('slug', $articleSlug)
                 ->whereHas('category', fn($q) => $q->where('slug', $categorySlug))
                 ->firstOrFail();

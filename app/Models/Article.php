@@ -56,7 +56,7 @@ class Article extends Model
         return $query->where('is_pinned', 1);
     }
 
-        public function scopeForTeachers($query)
+    public function scopeForTeachers($query)
     {
         return $query->whereIn('audience', [1, 5, 7]); // Teachers, Teachers & Assistants, All
     }

@@ -33,6 +33,7 @@ use App\Http\Controllers\Teacher\Account\SubscriptionsController;
 use App\Http\Controllers\AccountController;
 
 use App\Http\Controllers\Teacher\Misc\FaqsController;
+use App\Http\Controllers\Teacher\Misc\HelpCenterController;
 
 Route::group(
     [
@@ -318,6 +319,10 @@ Route::group(
             # Start Misc
                 Route::prefix('faqs')->controller(FaqsController::class)->name('faqs.')->group(function () {
                     Route::get('/', 'index')->name('index');
+                });
+                Route::prefix('help-center')->controller(HelpCenterController::class)->name('help-center.')->group(function () {
+                    Route::get('/', 'index')->name('index');
+                    Route::get('/{categorySlug}/{articleSlug}', 'show')->name('show');
                 });
             # End Misc
         });
