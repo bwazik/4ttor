@@ -162,5 +162,11 @@
                 <div>{{ trans('layouts/sidebar.faqs') }}</div>
             </a>
         </li>
+        <li class="menu-item {{ isActiveRoute('teacher.help-center.index') ? 'active' : '' }}">
+            <a href="{{ route('teacher.help-center.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons ri-customer-service-2-line"></i>
+                <div>{{ trans('layouts/sidebar.helpCenter') }}</div>
+            </a>
+        </li>
     </ul>
 </aside>
