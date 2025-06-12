@@ -44,6 +44,11 @@ class EnsureTeacherIsSubscribed
             'teacher.account.password.update',
             'teacher.account.coupons.index',
             'teacher.account.coupons.redeem',
+
+            // Misc
+            'teacher.faqs.index',
+            'teacher.help-center.index',
+            'teacher.help-center.show',
         ];
 
         if (in_array($request->route()->getName(), $allowedRoutes)) {

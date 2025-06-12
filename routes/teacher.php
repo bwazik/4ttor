@@ -86,6 +86,17 @@ Route::group(
             });
 
             Route::get('plans/{plan}/{period?}', [DataFetchController::class, 'getPlanData'])->name('fetch.plans.data');
+
+
+            # Start Misc
+                Route::prefix('faqs')->controller(FaqsController::class)->name('faqs.')->group(function () {
+                    Route::get('/', 'index')->name('index');
+                });
+                Route::prefix('help-center')->controller(HelpCenterController::class)->name('help-center.')->group(function () {
+                    Route::get('/', 'index')->name('index');
+                    Route::get('/{categorySlug}/{articleSlug}', 'show')->name('show');
+                });
+            # End Misc
         # End Unsubscriped Routes
 
         Route::middleware('subscribed')->group(function () {
@@ -315,16 +326,6 @@ Route::group(
                     Route::get('/', 'index')->name('index');
                 });
             # End Finance Managment
-
-            # Start Misc
-                Route::prefix('faqs')->controller(FaqsController::class)->name('faqs.')->group(function () {
-                    Route::get('/', 'index')->name('index');
-                });
-                Route::prefix('help-center')->controller(HelpCenterController::class)->name('help-center.')->group(function () {
-                    Route::get('/', 'index')->name('index');
-                    Route::get('/{categorySlug}/{articleSlug}', 'show')->name('show');
-                });
-            # End Misc
         });
     });
 });
