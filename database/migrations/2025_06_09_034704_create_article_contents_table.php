@@ -16,7 +16,6 @@ return new class extends Migration
             $table->integer('article_id')->unsigned();
             $table->tinyInteger('type')->default(1)->comment('1 => text, 2 => image');
             $table->text('content');
-            $table->text('caption')->nullable();
             $table->tinyInteger('order')->default(0);
             $table->timestamps();
         });

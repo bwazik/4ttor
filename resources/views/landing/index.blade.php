@@ -339,6 +339,7 @@
 @endsection
 
 @section('page-js')
+    <script src="{{ asset('assets/js/front-custom.js') }}"></script>
     <script src="{{ asset('assets/js/front-page-landing.js') }}"></script>
 
     <script>

@@ -8,9 +8,11 @@
 
 <script>
     window.translations = {
+        items: @json(trans('main.items')),
         errorMessage: @json(trans('main.errorMessage')),
         tooManyRequestsMessage: @json(trans('main.tooManyRequestsMessage')),
         processing: @json(trans('main.processing')),
+        select_option: @json(trans('main.select_option')),
     };
 </script>
 
@@ -21,7 +23,6 @@
 
 <!-- Main JS -->
 <script src="{{ asset('assets/js/front-main.js') }}"></script>
-<script src="{{ asset('assets/js/front-custom.js') }}"></script>
 
 <!-- Page JS -->
 @yield('page-js')

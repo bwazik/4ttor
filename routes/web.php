@@ -4,8 +4,6 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\LandingController;
 
-use App\Http\Controllers\ProfileController;
-
 use App\Http\Controllers\Api\DataFetchController;
 
 use App\Http\Controllers\Admin\Platform\StagesController;
@@ -460,25 +458,21 @@ Route::group(
             });
             Route::prefix('help-center')->controller(HelpCenterController::class)->name('help-center.')->group(function () {
                 Route::get('/', 'index')->name('index');
+                Route::get('/{categorySlug}/{articleSlug}', 'show')->name('show');
                 Route::middleware('throttle:10,1')->group(function () {
-                    Route::post('insert', 'insert')->name('insert');
-                    Route::post('update', 'update')->name('update');
-                    Route::post('delete', 'delete')->name('delete');
-                    Route::post('delete-selected', 'deleteSelected')->name('deleteSelected');
+                    Route::post('insert-article', 'insertArticle')->name('insertArticle');
+                    Route::post('update-article', 'updateArticle')->name('updateArticle');
+                    Route::post('delete-article', 'deleteArticle')->name('deleteArticle');
+                    Route::post('delete-selected-articles', 'deleteSelectedArticles')->name('deleteSelectedArticles');
+                    Route::post('insert-content/{id}', 'insertContent')->name('insertContent');
+                    Route::post('update-content', 'updateContent')->name('updateContent');
+                    Route::post('delete-content', 'deleteContent')->name('deleteContent');
                 });
             });
         # End Misc
         });
     }
 );
-
-
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
 
 require __DIR__ . '/auth.php';
 require __DIR__ . '/teacher.php';

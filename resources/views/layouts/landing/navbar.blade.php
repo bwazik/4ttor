@@ -39,7 +39,7 @@
                 </li>
                 @if(isAdmin() || isTeacher() || isAssistant() || isStudent() || isParent())
                     <li class="nav-item">
-                        <a class="nav-link fw-medium" href={{ getHelpCenterRoute() }}">{{ trans('landing.navbar.helpCenter') }}</a>
+                        <a class="nav-link fw-medium" href={{ getHelpCenterRoute() }}>{{ trans('landing.navbar.helpCenter') }}</a>
                     </li>
                 @endif
                 <li class="nav-item">

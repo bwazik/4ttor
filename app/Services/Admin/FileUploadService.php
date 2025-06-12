@@ -21,8 +21,7 @@ class FileUploadService
 
     public function updateProfilePic($request, $model, $id, $directory = 'students')
     {
-        return $this->executeTransaction(function () use ($request, $model, $id, $directory)
-        {
+        return $this->executeTransaction(function () use ($request, $model, $id, $directory) {
             $entity = $model::select('id', 'profile_pic')->findOrFail($id);
 
             if ($request->hasFile('profile')) {
@@ -71,11 +70,11 @@ class FileUploadService
                 $groupIds = $assignment->groups->pluck('id')->toArray();
 
                 if ($guard === 'teacher') {
-                    if ($OwnershipValidationResult = $this->checkOwnership($user, $assignment)){
+                    if ($OwnershipValidationResult = $this->checkOwnership($user, $assignment)) {
                         return $OwnershipValidationResult;
                     }
 
-                    if ($validationResult = $this->validateTeacherGradeAndGroups($user->id, $groupIds, $assignment->grade_id, true)){
+                    if ($validationResult = $this->validateTeacherGradeAndGroups($user->id, $groupIds, $assignment->grade_id, true)) {
                         return $validationResult;
                     }
 
@@ -164,11 +163,11 @@ class FileUploadService
                 $resource = Resource::findOrFail($entityId);
 
                 if ($guard === 'teacher') {
-                    if ($OwnershipValidationResult = $this->checkOwnership($user, $resource)){
+                    if ($OwnershipValidationResult = $this->checkOwnership($user, $resource)) {
                         return $OwnershipValidationResult;
                     }
 
-                    if ($validationResult = $this->validateTeacherGrade($resource->grade_id, $user->id)){
+                    if ($validationResult = $this->validateTeacherGrade($resource->grade_id, $user->id)) {
                         return $validationResult;
                     }
                 }
@@ -247,10 +246,10 @@ class FileUploadService
 
             if ($guard === 'teacher') {
                 if ($entityType === 'assignment') {
-                    if ($OwnershipValidationResult = $this->checkOwnership($user, $file->assignment)){
+                    if ($OwnershipValidationResult = $this->checkOwnership($user, $file->assignment)) {
                         return $OwnershipValidationResult;
                     }
-                    if ($validationResult = $this->validateTeacherGradeAndGroups($user->id, $groupIds, $assignment->grade_id, true)){
+                    if ($validationResult = $this->validateTeacherGradeAndGroups($user->id, $groupIds, $assignment->grade_id, true)) {
                         return $validationResult;
                     }
                 } elseif ($entityType === 'submission') {
@@ -264,12 +263,12 @@ class FileUploadService
                         return $this->errorResponse(trans('toasts.ownershipError'));
                     }
                 } elseif ($entityType === 'resource') {
-                    if ($OwnershipValidationResult = $this->checkOwnership($user, $file)){
+                    if ($OwnershipValidationResult = $this->checkOwnership($user, $file)) {
                         return $OwnershipValidationResult;
                     }
                 }
             } elseif ($guard === 'student') {
-                if($entityType === 'submission') {
+                if ($entityType === 'submission') {
                     $submission = SubmissionFile::where('id', $fileId)
                         ->whereHas('submission', function ($query) use ($user) {
                             $query->where('student_id', $user->id);
@@ -280,11 +279,11 @@ class FileUploadService
                     }
                 } elseif ($entityType === 'assignment') {
                     $hasAccess = Assignment::where('id', $file->assignment_id)
-                    ->where('grade_id', $user->grade_id)
-                    ->whereIn('teacher_id', $user->teachers()->pluck('teachers.id')->toArray())
-                    ->whereHas('groups', function ($query) use ($user) {
-                        $query->whereIn('groups.id', $user->groups()->pluck('groups.id')->toArray());
-                    })->exists();
+                        ->where('grade_id', $user->grade_id)
+                        ->whereIn('teacher_id', $user->teachers()->pluck('teachers.id')->toArray())
+                        ->whereHas('groups', function ($query) use ($user) {
+                            $query->whereIn('groups.id', $user->groups()->pluck('groups.id')->toArray());
+                        })->exists();
 
                     if (!$hasAccess) {
                         return $this->errorResponse(trans('toasts.ownershipError'));
@@ -303,12 +302,11 @@ class FileUploadService
                 $this->errorResponse(trans('toasts.fileNotFound'));
             }
 
-            if($viewAction)
-            {
+            if ($viewAction) {
                 $temporaryUrl = Storage::disk('s3')->temporaryUrl(
-                $filePath,
-                now()->addMinutes(10),
-                ['ResponseContentDisposition' => 'inline']
+                    $filePath,
+                    now()->addMinutes(10),
+                    ['ResponseContentDisposition' => 'inline']
                 );
 
                 return redirect($temporaryUrl);
@@ -323,8 +321,7 @@ class FileUploadService
 
     public function deleteFile(string $entityType, int $fileId)
     {
-        return $this->executeTransaction(function () use ($entityType, $fileId)
-        {
+        return $this->executeTransaction(function () use ($entityType, $fileId) {
             $fileModelClass = match ($entityType) {
                 'assignment' => AssignmentFile::class,
                 'submission' => SubmissionFile::class,
@@ -348,15 +345,15 @@ class FileUploadService
 
             if ($guard === 'teacher') {
                 if ($entityType === 'assignment') {
-                    if ($OwnershipValidationResult = $this->checkOwnership($user, $file->assignment)){
+                    if ($OwnershipValidationResult = $this->checkOwnership($user, $file->assignment)) {
                         return $OwnershipValidationResult;
                     }
 
-                    if ($validationResult = $this->validateTeacherGradeAndGroups($user->id, $groupIds, $assignment->grade_id, true)){
+                    if ($validationResult = $this->validateTeacherGradeAndGroups($user->id, $groupIds, $assignment->grade_id, true)) {
                         return $validationResult;
                     }
                 } elseif ($entityType === 'resource') {
-                    if ($OwnershipValidationResult = $this->checkOwnership($user, $file)){
+                    if ($OwnershipValidationResult = $this->checkOwnership($user, $file)) {
                         return $OwnershipValidationResult;
                     }
                 }
@@ -378,7 +375,7 @@ class FileUploadService
 
             if ($entityType === 'submission' || $entityType === 'assignment') {
                 $file->delete();
-            }elseif ($entityType === 'resource') {
+            } elseif ($entityType === 'resource') {
                 $file->update([
                     'file_path' => null,
                     'file_name' => null,
@@ -433,5 +430,21 @@ class FileUploadService
                 });
             }
         });
+    }
+
+    public function uploadImage($request, $articleSlug, $disk = 'articles')
+    {
+        if ($request->hasFile('fileContent')) {
+            $file = $request->file('fileContent');
+            $fileName = uniqid('content_', true) . '.' . $file->getClientOriginalExtension();
+            $file->storeAs($articleSlug, $fileName, $disk);
+            return [
+                'status' => 'success',
+                'message' => trans('toasts.imageUploaded'),
+                'data' => ['file_name' => $fileName]
+            ];
+        }
+
+        return $this->errorResponse(trans('toasts.noFileUploaded'));
     }
 }

@@ -12,7 +12,6 @@ class ArticleContent extends Model
         'article_id',
         'type', // 1 => text, 2 => image
         'content',
-        'caption',
         'order',
     ];
 

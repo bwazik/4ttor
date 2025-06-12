@@ -84,5 +84,6 @@ return [
     'assignmentResetSuccess' => 'تم إعادة تعيين الواجب بنجاح.',
     'zoomAccountUpdated' => 'تم تحديث حساب الزوم بنجاح.',
     'messageSent' => 'تم إرسال الرسالة بنجاح.',
+    'imageUploaded' => 'تم رفع الصورة بنجاح.',
 ];
 

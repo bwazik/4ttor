@@ -169,6 +169,11 @@ return [
     'completed' => 'Completed',
     'time' => 'Time',
     'audience' => 'Audience',
+    'is_pinned' => 'Is Pinned',
+    'type' => 'Type',
+    'text' => 'Text',
+    'image' => 'Image',
+    'content' => 'Content',
 
     # Modals
     'items' => 'Items Count',

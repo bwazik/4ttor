@@ -83,4 +83,5 @@ return [
     'assignmentResetSuccess' => 'Assignment has been reset successfully.',
     'zoomAccountUpdated' => 'Zoom account has been updated successfully.',
     'messageSent' => 'Message has been sent successfully.',
+    'imageUploaded' => 'Image has been uploaded successfully.',
 ];

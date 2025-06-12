@@ -170,6 +170,11 @@ return [
     'completed' => 'مُكتملة',
     'time' => 'الوقت',
     'audience' => 'الجمهور',
+    'is_pinned' => 'مثَبَّت',
+    'type' => 'النوع',
+    'text' => 'نص',
+    'image' => 'صورة',
+    'content' => 'المحتوى',
 
     # Modals
     'items' => 'عدد العناصر',
